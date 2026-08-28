@@ -1,0 +1,142 @@
+/* src/components/layout/Header/Header.module.css */
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 240px;
+  right: 0;
+  height: 64px;
+  background: #ffffff;
+  border-bottom: 1px solid #E8EBF0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  z-index: 90;
+  transition: left 0.25s ease;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.searchWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #F7F8FA;
+  border: 1px solid #E8EBF0;
+  border-radius: 8px;
+  padding: 7px 12px;
+  width: 280px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  cursor: text;
+}
+
+.searchWrapper:focus-within {
+  border-color: #2563A6;
+  box-shadow: 0 0 0 3px rgba(37, 99, 166, 0.10);
+}
+
+.searchIcon {
+  color: #9BA3AE;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 13.5px;
+  color: #1A2332;
+  width: 100%;
+  font-family: 'Inter', sans-serif;
+}
+
+.searchInput::placeholder {
+  color: #9BA3AE;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.notifButton {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #6B7480;
+  transition: background 0.15s ease, color 0.15s ease;
+  border: none;
+  background: transparent;
+}
+
+.notifButton:hover {
+  background: #F7F8FA;
+  color: #1A2332;
+}
+
+.notifBadge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  background: #C83E4D;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+}
+
+.divider {
+  width: 1px;
+  height: 28px;
+  background: #E8EBF0;
+}
+
+.userArea {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  background: #2563A6;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.userName {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1A2332;
+  line-height: 1.3;
+}
+
+.userRole {
+  font-size: 11.5px;
+  color: #9BA3AE;
+  line-height: 1.3;
+}

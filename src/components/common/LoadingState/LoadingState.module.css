@@ -1,0 +1,82 @@
+/* src/components/common/LoadingState/LoadingState.module.css */
+
+.fullPage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100%;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #E8EBF0;
+  border-top-color: #2563A6;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.metricSkeleton {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid #F0F2F5;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.chartSkeleton {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid #F0F2F5;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.tableSkeleton {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid #F0F2F5;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.tableHeader {
+  display: flex;
+  gap: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #F0F2F5;
+  margin-bottom: 12px;
+}
+
+.tableRow {
+  display: flex;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid #F9FAFB;
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #F0F2F5 25%, #F8F9FA 50%, #F0F2F5 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

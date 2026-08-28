@@ -1,0 +1,26 @@
+/* src/components/layout/AppShell/AppShell.module.css */
+
+.shell {
+  display: flex;
+  min-height: 100vh;
+  background: #F7F8FA;
+}
+
+.main {
+  margin-left: 240px;
+  padding-top: 64px;
+  flex: 1;
+  min-width: 0;
+  transition: margin-left 0.25s ease;
+}
+
+.content {
+  padding: 24px;
+  min-height: calc(100vh - 64px);
+}
+
+@media (max-width: 900px) {
+  .main {
+    margin-left: 0;
+  }
+}

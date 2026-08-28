@@ -1,0 +1,53 @@
+/* src/components/common/ErrorState/ErrorState.module.css */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #F0F2F5;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.iconBox {
+  width: 52px;
+  height: 52px;
+  background: #FDEEF0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #C83E4D;
+}
+
+.message {
+  font-size: 14px;
+  color: #6B7480;
+  max-width: 280px;
+  line-height: 1.5;
+}
+
+.retryBtn {
+  background: #2563A6;
+  color: #ffffff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: background 0.15s ease;
+}
+
+.retryBtn:hover {
+  background: #1E519A;
+}

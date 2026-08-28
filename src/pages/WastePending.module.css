@@ -1,0 +1,52 @@
+/* src/pages/WastePending.module.css */
+
+.container {
+  background: #ffffff;
+  border: 1px solid #E8EBF0;
+  border-radius: 10px;
+  padding: 64px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.iconBox {
+  width: 64px;
+  height: 64px;
+  background: #EAF4EF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4F8A72;
+  margin-bottom: 4px;
+}
+
+.pill {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  background: #EBE6DE;
+  color: #142430;
+  padding: 4px 12px;
+  border-radius: 6px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1A2332;
+  margin: 4px 0 0 0;
+}
+
+.message {
+  font-size: 14px;
+  color: #6B7480;
+  max-width: 480px;
+  line-height: 1.6;
+  margin: 0;
+}

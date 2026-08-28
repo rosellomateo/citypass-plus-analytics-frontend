@@ -1,0 +1,64 @@
+/* src/pages/NotFound.module.css */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 12px;
+  text-align: center;
+  padding: 48px;
+}
+
+.iconBox {
+  width: 72px;
+  height: 72px;
+  background: #EBF3FC;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2563A6;
+  margin-bottom: 8px;
+}
+
+.code {
+  font-size: 72px;
+  font-weight: 800;
+  color: #E8EBF0;
+  line-height: 1;
+  letter-spacing: -2px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1A2332;
+  margin: 0;
+}
+
+.description {
+  font-size: 14px;
+  color: #9BA3AE;
+  max-width: 320px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.btn {
+  margin-top: 8px;
+  background: #2563A6;
+  color: #ffffff;
+  padding: 10px 24px;
+  border-radius: 7px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s ease;
+  display: inline-block;
+}
+
+.btn:hover {
+  background: #1E519A;
+}
