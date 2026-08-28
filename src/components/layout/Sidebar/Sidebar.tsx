@@ -61,17 +61,22 @@ export function Sidebar() {
       {/* Logo */}
       <div className={styles.logoArea}>
         <div className={styles.logoIcon}>
-          <svg width="24" height="28" viewBox="0 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-            {/* Pin bottom tip */}
-            <path d="M12 28C12 28 21 19 21 12H3C3 19 12 28 12 28Z" fill="#1B365D" />
-            {/* Pin top circle */}
-            <circle cx="12" cy="12" r="9" fill="#4d96c8" />
-            {/* Buildings */}
-            <rect x="8.5" y="11" width="1.8" height="6" fill="white" />
-            <rect x="11" y="8" width="2" height="9" fill="white" />
-            <rect x="13.7" y="13" width="1.8" height="4" fill="white" />
-            {/* Bottom connector line */}
-            <rect x="8" y="16.5" width="8" height="1" fill="white" />
+          <svg width="24" height="28" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <clipPath id="sidebar-pin-shape">
+                <path d="M 50 115 C 50 115 90 75 90 45 C 90 22.9 72.1 5 50 5 C 27.9 5 10 22.9 10 45 C 10 75 50 115 50 115 Z" />
+              </clipPath>
+            </defs>
+            <g clipPath="url(#sidebar-pin-shape)">
+              <rect x="0" y="0" width="100" height="53" fill="#2e9ee6" />
+              <rect x="0" y="53" width="100" height="67" fill="#16427b" />
+              <rect x="0" y="51" width="100" height="4" fill="white" />
+              <rect x="22" y="41" width="8" height="10" fill="white" />
+              <rect x="33" y="33" width="8" height="18" fill="white" />
+              <path d="M 44 51 V 25 L 56 14 V 51 Z" fill="white" />
+              <rect x="59" y="33" width="8" height="18" fill="white" />
+              <rect x="70" y="41" width="8" height="10" fill="white" />
+            </g>
           </svg>
         </div>
         <span className={styles.logoText}>
