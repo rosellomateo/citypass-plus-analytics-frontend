@@ -1,4 +1,6 @@
 // src/pages/CultureDashboard.tsx
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { DashboardHeader } from '../components/common/DashboardHeader/DashboardHeader';
 import { MetricCard } from '../components/common/MetricCard/MetricCard';
 import { ChartCard } from '../components/common/ChartCard/ChartCard';
@@ -15,6 +17,19 @@ export function CultureDashboard() {
   const { filters, updateFilter } = useFilters();
   const cultureAsync = useCultureData(filters);
   const resolved = useResolvedUiState(cultureAsync);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.search.includes('tab=events')) {
+      const timer = setTimeout(() => {
+        const el = document.getElementById('cultura-eventos-section');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [location]);
 
   return (
     <div>
@@ -75,7 +90,7 @@ export function CultureDashboard() {
           </div>
 
           {/* CU-C1: Ocupación de Espacios Públicos */}
-          <div className="section">
+          <div id="espacios-publicos-section" className="section">
             <h2 className="section-title">CU-C1 — Ocupación de Espacios Públicos</h2>
             <ChartCard
               title="Reservas Confirmadas vs Canceladas por Espacio"
@@ -95,7 +110,7 @@ export function CultureDashboard() {
           </div>
 
           {/* CU-C2: Convocatoria a Eventos Comunitarios */}
-          <div className="section">
+          <div id="cultura-eventos-section" className="section">
             <h2 className="section-title">CU-C2 — Convocatoria a Eventos Comunitarios</h2>
             <div className="charts-grid-2">
               <ChartCard

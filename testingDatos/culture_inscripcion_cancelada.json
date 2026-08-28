@@ -1,0 +1,16 @@
+[
+  {
+    "metadata": {
+      "eventId": "evt-ins-x1",
+      "eventType": "espacios.inscripcion.cancelada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-1",
+      "inscripcionId": "INS-1",
+      "eventoId": "EVT-701"
+    }
+  }
+]

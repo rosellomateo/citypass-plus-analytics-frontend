@@ -1,0 +1,77 @@
+[
+  {
+    "metadata": {
+      "eventId": "evt-em-st1",
+      "eventType": "EmergenciaEstadoActualizado",
+      "occurredAt": "2026-08-28T18:53:36.722Z",
+      "source": "emergency-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-em-01",
+      "emergenciaId": "EMG-901",
+      "estadoAnterior": "PENDIENTE",
+      "estadoNuevo": "VALIDADA"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-em-st2",
+      "eventType": "EmergenciaEstadoActualizado",
+      "occurredAt": "2026-08-28T18:58:36.722Z",
+      "source": "emergency-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-em-01",
+      "emergenciaId": "EMG-901",
+      "estadoAnterior": "VALIDADA",
+      "estadoNuevo": "DESPACHADA"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-em-st3",
+      "eventType": "EmergenciaEstadoActualizado",
+      "occurredAt": "2026-08-28T19:11:36.722Z",
+      "source": "emergency-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-em-02",
+      "emergenciaId": "EMG-902",
+      "estadoAnterior": "PENDIENTE",
+      "estadoNuevo": "DESPACHADA"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-em-st4",
+      "eventType": "EmergenciaEstadoActualizado",
+      "occurredAt": "2026-08-28T17:33:36.722Z",
+      "source": "emergency-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-em-04",
+      "emergenciaId": "EMG-904",
+      "estadoAnterior": "PENDIENTE",
+      "estadoNuevo": "DESPACHADA"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-em-st5",
+      "eventType": "EmergenciaEstadoActualizado",
+      "occurredAt": "2026-08-28T17:33:36.722Z",
+      "source": "emergency-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-em-04",
+      "emergenciaId": "EMG-904",
+      "estadoAnterior": "DESPACHADA",
+      "estadoNuevo": "CERRADA"
+    }
+  }
+]

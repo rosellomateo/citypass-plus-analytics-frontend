@@ -1,0 +1,98 @@
+[
+  {
+    "metadata": {
+      "eventId": "evt-m-i1",
+      "eventType": "movilidad.viaje.iniciado",
+      "occurredAt": "2026-08-28T11:33:36.727Z",
+      "source": "mobility-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-m-01",
+      "viajeId": "VJ-301",
+      "bicicletaId": "BK-102",
+      "estacionOrigenId": "Estación Universidad",
+      "usuarioId": "usr-anon-9988"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-m-i2",
+      "eventType": "movilidad.viaje.iniciado",
+      "occurredAt": "2026-08-28T11:33:36.727Z",
+      "source": "mobility-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-m-02",
+      "viajeId": "VJ-302",
+      "bicicletaId": "BK-145",
+      "estacionOrigenId": "Estación Palermo",
+      "usuarioId": "usr-anon-3344"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-m-i3",
+      "eventType": "movilidad.viaje.iniciado",
+      "occurredAt": "2026-08-28T07:33:36.727Z",
+      "source": "mobility-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-m-03",
+      "viajeId": "VJ-303",
+      "bicicletaId": "BK-201",
+      "estacionOrigenId": "Estación Universidad",
+      "usuarioId": "usr-anon-5566"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-m-i4",
+      "eventType": "movilidad.viaje.iniciado",
+      "occurredAt": "2026-08-28T02:33:36.727Z",
+      "source": "mobility-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-m-04",
+      "viajeId": "VJ-304",
+      "bicicletaId": "BK-089",
+      "estacionOrigenId": "Estación Retiro",
+      "usuarioId": "usr-anon-1122"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-m-i5",
+      "eventType": "movilidad.viaje.iniciado",
+      "occurredAt": "2026-08-28T01:33:36.727Z",
+      "source": "mobility-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-m-05",
+      "viajeId": "VJ-305",
+      "bicicletaId": "BK-304",
+      "estacionOrigenId": "Estación San Telmo",
+      "usuarioId": "usr-anon-7788"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-m-i6",
+      "eventType": "movilidad.viaje.iniciado",
+      "occurredAt": "2026-08-28T18:53:36.727Z",
+      "source": "mobility-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-m-06",
+      "viajeId": "VJ-306",
+      "bicicletaId": "BK-412",
+      "estacionOrigenId": "Estación Palermo",
+      "usuarioId": "usr-anon-9900"
+    }
+  }
+]

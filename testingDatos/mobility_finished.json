@@ -1,0 +1,82 @@
+[
+  {
+    "metadata": {
+      "eventId": "evt-m-f1",
+      "eventType": "movilidad.viaje.finalizado",
+      "occurredAt": "2026-08-28T12:33:36.727Z",
+      "source": "mobility-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-m-01",
+      "viajeId": "VJ-301",
+      "bicicletaId": "BK-102",
+      "estacionDestinoId": "Estación Microcentro",
+      "duracionSegundos": 900
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-m-f2",
+      "eventType": "movilidad.viaje.finalizado",
+      "occurredAt": "2026-08-28T12:33:36.727Z",
+      "source": "mobility-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-m-02",
+      "viajeId": "VJ-302",
+      "bicicletaId": "BK-145",
+      "estacionDestinoId": "Estación Retiro",
+      "duracionSegundos": 1440
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-m-f3",
+      "eventType": "movilidad.viaje.finalizado",
+      "occurredAt": "2026-08-28T08:33:36.727Z",
+      "source": "mobility-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-m-03",
+      "viajeId": "VJ-303",
+      "bicicletaId": "BK-201",
+      "estacionDestinoId": "Estación San Telmo",
+      "duracionSegundos": 720
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-m-f4",
+      "eventType": "movilidad.viaje.finalizado",
+      "occurredAt": "2026-08-28T03:33:36.727Z",
+      "source": "mobility-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-m-04",
+      "viajeId": "VJ-304",
+      "bicicletaId": "BK-089",
+      "estacionDestinoId": "Estación Palermo",
+      "duracionSegundos": 1080
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-m-f5",
+      "eventType": "movilidad.viaje.finalizado",
+      "occurredAt": "2026-08-28T02:33:36.727Z",
+      "source": "mobility-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-m-05",
+      "viajeId": "VJ-305",
+      "bicicletaId": "BK-304",
+      "estacionDestinoId": "Estación Constitución",
+      "duracionSegundos": 1800
+    }
+  }
+]

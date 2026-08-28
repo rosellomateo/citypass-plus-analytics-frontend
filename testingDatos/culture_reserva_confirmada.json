@@ -1,0 +1,78 @@
+[
+  {
+    "metadata": {
+      "eventId": "evt-res-c1",
+      "eventType": "espacios.reserva.confirmada",
+      "occurredAt": "2026-08-25T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-res-01",
+      "reservaId": "RES-101",
+      "espacioId": "Parque Central",
+      "tipoEspacio": "parque",
+      "zona": "Centro",
+      "franjaHoraria": "10:00 - 12:00",
+      "cantidadAsistentesEstim": 45,
+      "ciudadanoId": "usr-anon-1001"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-res-c2",
+      "eventType": "espacios.reserva.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-res-02",
+      "reservaId": "RES-102",
+      "espacioId": "Centro Cultural Sur",
+      "tipoEspacio": "centro_cultural",
+      "zona": "Sur",
+      "franjaHoraria": "14:00 - 18:00",
+      "cantidadAsistentesEstim": 120,
+      "ciudadanoId": "usr-anon-1002"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-res-c3",
+      "eventType": "espacios.reserva.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-res-03",
+      "reservaId": "RES-103",
+      "espacioId": "Plaza San Martín",
+      "tipoEspacio": "plaza",
+      "zona": "Centro",
+      "franjaHoraria": "16:00 - 20:00",
+      "cantidadAsistentesEstim": 300,
+      "ciudadanoId": "usr-anon-1003"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-res-c4",
+      "eventType": "espacios.reserva.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-res-04",
+      "reservaId": "RES-104",
+      "espacioId": "Cancha Municipal Norte",
+      "tipoEspacio": "cancha_deportiva",
+      "zona": "Norte",
+      "franjaHoraria": "18:00 - 21:00",
+      "cantidadAsistentesEstim": 80,
+      "ciudadanoId": "usr-anon-1004"
+    }
+  }
+]

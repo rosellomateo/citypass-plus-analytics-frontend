@@ -1,0 +1,94 @@
+[
+  {
+    "metadata": {
+      "eventId": "evt-u-001",
+      "eventType": "reclamos.actualizado",
+      "occurredAt": "2026-08-27T23:33:36.711Z",
+      "source": "claims-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-c-001",
+      "reclamoId": "CL-101",
+      "estadoAnterior": "creado",
+      "estadoNuevo": "en curso"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-u-002",
+      "eventType": "reclamos.actualizado",
+      "occurredAt": "2026-08-28T09:33:36.711Z",
+      "source": "claims-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-c-001",
+      "reclamoId": "CL-101",
+      "estadoAnterior": "en curso",
+      "estadoNuevo": "cerrado",
+      "motivo": "Luminaria reemplazada con éxito"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-u-003",
+      "eventType": "reclamos.actualizado",
+      "occurredAt": "2026-08-28T05:33:36.711Z",
+      "source": "claims-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-c-002",
+      "reclamoId": "CL-102",
+      "estadoAnterior": "creado",
+      "estadoNuevo": "en curso"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-u-004",
+      "eventType": "reclamos.actualizado",
+      "occurredAt": "2026-08-28T13:33:36.711Z",
+      "source": "claims-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-c-002",
+      "reclamoId": "CL-102",
+      "estadoAnterior": "en curso",
+      "estadoNuevo": "cerrado"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-u-005",
+      "eventType": "reclamos.actualizado",
+      "occurredAt": "2026-08-28T14:33:36.711Z",
+      "source": "claims-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-c-004",
+      "reclamoId": "CL-104",
+      "estadoAnterior": "creado",
+      "estadoNuevo": "cancelado",
+      "motivo": "Reporte duplicado"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-u-006",
+      "eventType": "reclamos.actualizado",
+      "occurredAt": "2026-08-28T17:33:36.711Z",
+      "source": "claims-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-c-005",
+      "reclamoId": "CL-105",
+      "estadoAnterior": "creado",
+      "estadoNuevo": "en curso"
+    }
+  }
+]

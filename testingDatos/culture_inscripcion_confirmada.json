@@ -1,0 +1,4277 @@
+[
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-1",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-1",
+      "inscripcionId": "INS-1",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2000"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-2",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-2",
+      "inscripcionId": "INS-2",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2001"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-3",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-3",
+      "inscripcionId": "INS-3",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2002"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-4",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-4",
+      "inscripcionId": "INS-4",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2003"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-5",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-5",
+      "inscripcionId": "INS-5",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2004"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-6",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-6",
+      "inscripcionId": "INS-6",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2005"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-7",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-7",
+      "inscripcionId": "INS-7",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2006"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-8",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-8",
+      "inscripcionId": "INS-8",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2007"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-9",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-9",
+      "inscripcionId": "INS-9",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2008"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-10",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-10",
+      "inscripcionId": "INS-10",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2009"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-11",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-11",
+      "inscripcionId": "INS-11",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2010"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-12",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-12",
+      "inscripcionId": "INS-12",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2011"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-13",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-13",
+      "inscripcionId": "INS-13",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2012"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-14",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-14",
+      "inscripcionId": "INS-14",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2013"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-15",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-15",
+      "inscripcionId": "INS-15",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2014"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-16",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-16",
+      "inscripcionId": "INS-16",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2015"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-17",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-17",
+      "inscripcionId": "INS-17",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2016"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-18",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-18",
+      "inscripcionId": "INS-18",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2017"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-19",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-19",
+      "inscripcionId": "INS-19",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2018"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-20",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-20",
+      "inscripcionId": "INS-20",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2019"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-21",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-21",
+      "inscripcionId": "INS-21",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2020"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-22",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-22",
+      "inscripcionId": "INS-22",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2021"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-23",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-23",
+      "inscripcionId": "INS-23",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2022"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-24",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-24",
+      "inscripcionId": "INS-24",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2023"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-25",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-25",
+      "inscripcionId": "INS-25",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2024"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-26",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-26",
+      "inscripcionId": "INS-26",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2025"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-27",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-27",
+      "inscripcionId": "INS-27",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2026"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-28",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-28",
+      "inscripcionId": "INS-28",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2027"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-29",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-29",
+      "inscripcionId": "INS-29",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2028"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-30",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-30",
+      "inscripcionId": "INS-30",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2029"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-31",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-31",
+      "inscripcionId": "INS-31",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2030"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-32",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-32",
+      "inscripcionId": "INS-32",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2031"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-33",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-33",
+      "inscripcionId": "INS-33",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2032"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-34",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-34",
+      "inscripcionId": "INS-34",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2033"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-35",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-35",
+      "inscripcionId": "INS-35",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2034"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-36",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-36",
+      "inscripcionId": "INS-36",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2035"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-37",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-37",
+      "inscripcionId": "INS-37",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2036"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-38",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-38",
+      "inscripcionId": "INS-38",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2037"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-39",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-39",
+      "inscripcionId": "INS-39",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2038"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-40",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-40",
+      "inscripcionId": "INS-40",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2039"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-41",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-41",
+      "inscripcionId": "INS-41",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2040"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-42",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-42",
+      "inscripcionId": "INS-42",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2041"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-43",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-43",
+      "inscripcionId": "INS-43",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2042"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-44",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-44",
+      "inscripcionId": "INS-44",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2043"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-45",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-45",
+      "inscripcionId": "INS-45",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2044"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-46",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-46",
+      "inscripcionId": "INS-46",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2045"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-47",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-47",
+      "inscripcionId": "INS-47",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2046"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-48",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-48",
+      "inscripcionId": "INS-48",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2047"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-49",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-49",
+      "inscripcionId": "INS-49",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2048"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-50",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-50",
+      "inscripcionId": "INS-50",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2049"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-51",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-51",
+      "inscripcionId": "INS-51",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2050"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-52",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-52",
+      "inscripcionId": "INS-52",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2051"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-53",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-53",
+      "inscripcionId": "INS-53",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2052"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-54",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-54",
+      "inscripcionId": "INS-54",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2053"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-55",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-55",
+      "inscripcionId": "INS-55",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2054"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-56",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-56",
+      "inscripcionId": "INS-56",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2055"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-57",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-57",
+      "inscripcionId": "INS-57",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2056"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-58",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-58",
+      "inscripcionId": "INS-58",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2057"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-59",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-59",
+      "inscripcionId": "INS-59",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2058"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-60",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-60",
+      "inscripcionId": "INS-60",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2059"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-61",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-61",
+      "inscripcionId": "INS-61",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2060"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-62",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-62",
+      "inscripcionId": "INS-62",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2061"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-63",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-63",
+      "inscripcionId": "INS-63",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2062"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-64",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-64",
+      "inscripcionId": "INS-64",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2063"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-65",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-65",
+      "inscripcionId": "INS-65",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2064"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-66",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-66",
+      "inscripcionId": "INS-66",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2065"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-67",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-67",
+      "inscripcionId": "INS-67",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2066"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-68",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-68",
+      "inscripcionId": "INS-68",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2067"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-69",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-69",
+      "inscripcionId": "INS-69",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2068"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-70",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-70",
+      "inscripcionId": "INS-70",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2069"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-71",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-71",
+      "inscripcionId": "INS-71",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2070"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-72",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-72",
+      "inscripcionId": "INS-72",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2071"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-73",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-73",
+      "inscripcionId": "INS-73",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2072"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-74",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-74",
+      "inscripcionId": "INS-74",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2073"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-75",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-75",
+      "inscripcionId": "INS-75",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2074"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-76",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-76",
+      "inscripcionId": "INS-76",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2075"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-77",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-77",
+      "inscripcionId": "INS-77",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2076"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-78",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-78",
+      "inscripcionId": "INS-78",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2077"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-79",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-79",
+      "inscripcionId": "INS-79",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2078"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-80",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-80",
+      "inscripcionId": "INS-80",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2079"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-81",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-81",
+      "inscripcionId": "INS-81",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2080"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-82",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-82",
+      "inscripcionId": "INS-82",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2081"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-83",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-83",
+      "inscripcionId": "INS-83",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2082"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-84",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-84",
+      "inscripcionId": "INS-84",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2083"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-85",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-85",
+      "inscripcionId": "INS-85",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2084"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-86",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-86",
+      "inscripcionId": "INS-86",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2085"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-87",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-87",
+      "inscripcionId": "INS-87",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2086"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-88",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-88",
+      "inscripcionId": "INS-88",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2087"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-89",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-89",
+      "inscripcionId": "INS-89",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2088"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-90",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-90",
+      "inscripcionId": "INS-90",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2089"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-91",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-91",
+      "inscripcionId": "INS-91",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2090"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-92",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-92",
+      "inscripcionId": "INS-92",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2091"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-93",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-93",
+      "inscripcionId": "INS-93",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2092"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-94",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-94",
+      "inscripcionId": "INS-94",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2093"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-95",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-95",
+      "inscripcionId": "INS-95",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2094"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-96",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-96",
+      "inscripcionId": "INS-96",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2095"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-97",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-97",
+      "inscripcionId": "INS-97",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2096"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-98",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-98",
+      "inscripcionId": "INS-98",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2097"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-99",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-99",
+      "inscripcionId": "INS-99",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2098"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-100",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-100",
+      "inscripcionId": "INS-100",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2099"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-101",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-101",
+      "inscripcionId": "INS-101",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2100"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-102",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-102",
+      "inscripcionId": "INS-102",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2101"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-103",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-103",
+      "inscripcionId": "INS-103",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2102"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-104",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-104",
+      "inscripcionId": "INS-104",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2103"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-105",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-105",
+      "inscripcionId": "INS-105",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2104"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-106",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-106",
+      "inscripcionId": "INS-106",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2105"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-107",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-107",
+      "inscripcionId": "INS-107",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2106"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-108",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-108",
+      "inscripcionId": "INS-108",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2107"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-109",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-109",
+      "inscripcionId": "INS-109",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2108"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-110",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-110",
+      "inscripcionId": "INS-110",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2109"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-111",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-111",
+      "inscripcionId": "INS-111",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2110"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-112",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-112",
+      "inscripcionId": "INS-112",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2111"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-113",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-113",
+      "inscripcionId": "INS-113",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2112"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-114",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-114",
+      "inscripcionId": "INS-114",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2113"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-115",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-115",
+      "inscripcionId": "INS-115",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2114"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-116",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-116",
+      "inscripcionId": "INS-116",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2115"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-117",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-117",
+      "inscripcionId": "INS-117",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2116"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-118",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-118",
+      "inscripcionId": "INS-118",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2117"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-119",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-119",
+      "inscripcionId": "INS-119",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2118"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-120",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-120",
+      "inscripcionId": "INS-120",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2119"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-121",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-121",
+      "inscripcionId": "INS-121",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2120"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-122",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-122",
+      "inscripcionId": "INS-122",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2121"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-123",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-123",
+      "inscripcionId": "INS-123",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2122"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-124",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-124",
+      "inscripcionId": "INS-124",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2123"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-125",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-125",
+      "inscripcionId": "INS-125",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2124"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-126",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-126",
+      "inscripcionId": "INS-126",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2125"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-127",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-127",
+      "inscripcionId": "INS-127",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2126"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-128",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-128",
+      "inscripcionId": "INS-128",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2127"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-129",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-129",
+      "inscripcionId": "INS-129",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2128"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-130",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-130",
+      "inscripcionId": "INS-130",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2129"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-131",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-131",
+      "inscripcionId": "INS-131",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2130"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-132",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-132",
+      "inscripcionId": "INS-132",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2131"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-133",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-133",
+      "inscripcionId": "INS-133",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2132"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-134",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-134",
+      "inscripcionId": "INS-134",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2133"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-135",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-135",
+      "inscripcionId": "INS-135",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2134"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-136",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-136",
+      "inscripcionId": "INS-136",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2135"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-137",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-137",
+      "inscripcionId": "INS-137",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2136"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-138",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-138",
+      "inscripcionId": "INS-138",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2137"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-139",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-139",
+      "inscripcionId": "INS-139",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2138"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-140",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-140",
+      "inscripcionId": "INS-140",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2139"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-141",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-141",
+      "inscripcionId": "INS-141",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2140"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-142",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-142",
+      "inscripcionId": "INS-142",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2141"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-143",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-143",
+      "inscripcionId": "INS-143",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2142"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-144",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-144",
+      "inscripcionId": "INS-144",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2143"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-145",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-145",
+      "inscripcionId": "INS-145",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2144"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-146",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-146",
+      "inscripcionId": "INS-146",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2145"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-147",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-147",
+      "inscripcionId": "INS-147",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2146"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-148",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-148",
+      "inscripcionId": "INS-148",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2147"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-149",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-149",
+      "inscripcionId": "INS-149",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2148"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-150",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-150",
+      "inscripcionId": "INS-150",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2149"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-151",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-151",
+      "inscripcionId": "INS-151",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2150"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-152",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-152",
+      "inscripcionId": "INS-152",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2151"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-153",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-153",
+      "inscripcionId": "INS-153",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2152"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-154",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-154",
+      "inscripcionId": "INS-154",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2153"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-155",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-155",
+      "inscripcionId": "INS-155",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2154"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-156",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-156",
+      "inscripcionId": "INS-156",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2155"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-157",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-157",
+      "inscripcionId": "INS-157",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2156"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-158",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-158",
+      "inscripcionId": "INS-158",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2157"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-159",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-159",
+      "inscripcionId": "INS-159",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2158"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-160",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-160",
+      "inscripcionId": "INS-160",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2159"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-161",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-161",
+      "inscripcionId": "INS-161",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2160"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-162",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-162",
+      "inscripcionId": "INS-162",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2161"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-163",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-163",
+      "inscripcionId": "INS-163",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2162"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-164",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-164",
+      "inscripcionId": "INS-164",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2163"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-165",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-165",
+      "inscripcionId": "INS-165",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2164"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-166",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-166",
+      "inscripcionId": "INS-166",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2165"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-167",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-167",
+      "inscripcionId": "INS-167",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2166"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-168",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-168",
+      "inscripcionId": "INS-168",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2167"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-169",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-169",
+      "inscripcionId": "INS-169",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2168"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c-170",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-26T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins-170",
+      "inscripcionId": "INS-170",
+      "eventoId": "EVT-701",
+      "ciudadanoId": "usr-anon-2169"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-1",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-1",
+      "inscripcionId": "INS2-1",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3000"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-2",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-2",
+      "inscripcionId": "INS2-2",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3001"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-3",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-3",
+      "inscripcionId": "INS2-3",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3002"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-4",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-4",
+      "inscripcionId": "INS2-4",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3003"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-5",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-5",
+      "inscripcionId": "INS2-5",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3004"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-6",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-6",
+      "inscripcionId": "INS2-6",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3005"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-7",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-7",
+      "inscripcionId": "INS2-7",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3006"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-8",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-8",
+      "inscripcionId": "INS2-8",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3007"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-9",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-9",
+      "inscripcionId": "INS2-9",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3008"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-10",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-10",
+      "inscripcionId": "INS2-10",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3009"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-11",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-11",
+      "inscripcionId": "INS2-11",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3010"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-12",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-12",
+      "inscripcionId": "INS2-12",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3011"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-13",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-13",
+      "inscripcionId": "INS2-13",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3012"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-14",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-14",
+      "inscripcionId": "INS2-14",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3013"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-15",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-15",
+      "inscripcionId": "INS2-15",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3014"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-16",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-16",
+      "inscripcionId": "INS2-16",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3015"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-17",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-17",
+      "inscripcionId": "INS2-17",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3016"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-18",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-18",
+      "inscripcionId": "INS2-18",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3017"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-19",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-19",
+      "inscripcionId": "INS2-19",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3018"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-20",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-20",
+      "inscripcionId": "INS2-20",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3019"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-21",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-21",
+      "inscripcionId": "INS2-21",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3020"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-22",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-22",
+      "inscripcionId": "INS2-22",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3021"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-23",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-23",
+      "inscripcionId": "INS2-23",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3022"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-24",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-24",
+      "inscripcionId": "INS2-24",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3023"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-25",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-25",
+      "inscripcionId": "INS2-25",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3024"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-26",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-26",
+      "inscripcionId": "INS2-26",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3025"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-27",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-27",
+      "inscripcionId": "INS2-27",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3026"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-28",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-28",
+      "inscripcionId": "INS2-28",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3027"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-29",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-29",
+      "inscripcionId": "INS2-29",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3028"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-30",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-30",
+      "inscripcionId": "INS2-30",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3029"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-31",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-31",
+      "inscripcionId": "INS2-31",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3030"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-32",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-32",
+      "inscripcionId": "INS2-32",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3031"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-33",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-33",
+      "inscripcionId": "INS2-33",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3032"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-34",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-34",
+      "inscripcionId": "INS2-34",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3033"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-35",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-35",
+      "inscripcionId": "INS2-35",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3034"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-36",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-36",
+      "inscripcionId": "INS2-36",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3035"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-37",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-37",
+      "inscripcionId": "INS2-37",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3036"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-38",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-38",
+      "inscripcionId": "INS2-38",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3037"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-39",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-39",
+      "inscripcionId": "INS2-39",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3038"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-40",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-40",
+      "inscripcionId": "INS2-40",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3039"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-41",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-41",
+      "inscripcionId": "INS2-41",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3040"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-42",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-42",
+      "inscripcionId": "INS2-42",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3041"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-43",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-43",
+      "inscripcionId": "INS2-43",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3042"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-44",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-44",
+      "inscripcionId": "INS2-44",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3043"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-45",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-45",
+      "inscripcionId": "INS2-45",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3044"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-46",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-46",
+      "inscripcionId": "INS2-46",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3045"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-47",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-47",
+      "inscripcionId": "INS2-47",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3046"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-48",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-48",
+      "inscripcionId": "INS2-48",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3047"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-49",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-49",
+      "inscripcionId": "INS2-49",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3048"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-50",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-50",
+      "inscripcionId": "INS2-50",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3049"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-51",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-51",
+      "inscripcionId": "INS2-51",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3050"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-52",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-52",
+      "inscripcionId": "INS2-52",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3051"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-53",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-53",
+      "inscripcionId": "INS2-53",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3052"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-54",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-54",
+      "inscripcionId": "INS2-54",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3053"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-55",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-55",
+      "inscripcionId": "INS2-55",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3054"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-56",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-56",
+      "inscripcionId": "INS2-56",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3055"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-57",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-57",
+      "inscripcionId": "INS2-57",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3056"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-58",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-58",
+      "inscripcionId": "INS2-58",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3057"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-59",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-59",
+      "inscripcionId": "INS2-59",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3058"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-60",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-60",
+      "inscripcionId": "INS2-60",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3059"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-61",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-61",
+      "inscripcionId": "INS2-61",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3060"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-62",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-62",
+      "inscripcionId": "INS2-62",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3061"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-63",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-63",
+      "inscripcionId": "INS2-63",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3062"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-64",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-64",
+      "inscripcionId": "INS2-64",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3063"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-65",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-65",
+      "inscripcionId": "INS2-65",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3064"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-66",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-66",
+      "inscripcionId": "INS2-66",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3065"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-67",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-67",
+      "inscripcionId": "INS2-67",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3066"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-68",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-68",
+      "inscripcionId": "INS2-68",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3067"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-69",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-69",
+      "inscripcionId": "INS2-69",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3068"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-70",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-70",
+      "inscripcionId": "INS2-70",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3069"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-71",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-71",
+      "inscripcionId": "INS2-71",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3070"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-72",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-72",
+      "inscripcionId": "INS2-72",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3071"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-73",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-73",
+      "inscripcionId": "INS2-73",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3072"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-74",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-74",
+      "inscripcionId": "INS2-74",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3073"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-75",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-75",
+      "inscripcionId": "INS2-75",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3074"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-76",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-76",
+      "inscripcionId": "INS2-76",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3075"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-77",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-77",
+      "inscripcionId": "INS2-77",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3076"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-78",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-78",
+      "inscripcionId": "INS2-78",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3077"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-79",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-79",
+      "inscripcionId": "INS2-79",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3078"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-80",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-80",
+      "inscripcionId": "INS2-80",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3079"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-81",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-81",
+      "inscripcionId": "INS2-81",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3080"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-82",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-82",
+      "inscripcionId": "INS2-82",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3081"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-83",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-83",
+      "inscripcionId": "INS2-83",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3082"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-84",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-84",
+      "inscripcionId": "INS2-84",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3083"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c2-85",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins2-85",
+      "inscripcionId": "INS2-85",
+      "eventoId": "EVT-702",
+      "ciudadanoId": "usr-anon-3084"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-1",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-1",
+      "inscripcionId": "INS3-1",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4000"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-2",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-2",
+      "inscripcionId": "INS3-2",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4001"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-3",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-3",
+      "inscripcionId": "INS3-3",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4002"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-4",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-4",
+      "inscripcionId": "INS3-4",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4003"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-5",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-5",
+      "inscripcionId": "INS3-5",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4004"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-6",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-6",
+      "inscripcionId": "INS3-6",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4005"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-7",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-7",
+      "inscripcionId": "INS3-7",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4006"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-8",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-8",
+      "inscripcionId": "INS3-8",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4007"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-9",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-9",
+      "inscripcionId": "INS3-9",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4008"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-10",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-10",
+      "inscripcionId": "INS3-10",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4009"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-11",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-11",
+      "inscripcionId": "INS3-11",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4010"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-12",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-12",
+      "inscripcionId": "INS3-12",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4011"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-13",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-13",
+      "inscripcionId": "INS3-13",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4012"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-14",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-14",
+      "inscripcionId": "INS3-14",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4013"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-15",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-15",
+      "inscripcionId": "INS3-15",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4014"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-16",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-16",
+      "inscripcionId": "INS3-16",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4015"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-17",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-17",
+      "inscripcionId": "INS3-17",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4016"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-18",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-18",
+      "inscripcionId": "INS3-18",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4017"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-19",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-19",
+      "inscripcionId": "INS3-19",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4018"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-20",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-20",
+      "inscripcionId": "INS3-20",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4019"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-21",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-21",
+      "inscripcionId": "INS3-21",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4020"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-22",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-22",
+      "inscripcionId": "INS3-22",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4021"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-23",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-23",
+      "inscripcionId": "INS3-23",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4022"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-24",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-24",
+      "inscripcionId": "INS3-24",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4023"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-25",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-25",
+      "inscripcionId": "INS3-25",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4024"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-26",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-26",
+      "inscripcionId": "INS3-26",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4025"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-27",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-27",
+      "inscripcionId": "INS3-27",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4026"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-28",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-28",
+      "inscripcionId": "INS3-28",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4027"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-29",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-29",
+      "inscripcionId": "INS3-29",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4028"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ins-c3-30",
+      "eventType": "espacios.inscripcion.confirmada",
+      "occurredAt": "2026-08-27T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ins3-30",
+      "inscripcionId": "INS3-30",
+      "eventoId": "EVT-703",
+      "ciudadanoId": "usr-anon-4029"
+    }
+  }
+]

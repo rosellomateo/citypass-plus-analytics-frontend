@@ -1,0 +1,58 @@
+[
+  {
+    "metadata": {
+      "eventId": "evt-em-d1",
+      "eventType": "EmergenciaDespachada",
+      "occurredAt": "2026-08-28T18:58:36.722Z",
+      "source": "emergency-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-em-01",
+      "emergenciaId": "EMG-901",
+      "recursoId": "AMB-402"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-em-d2",
+      "eventType": "EmergenciaDespachada",
+      "occurredAt": "2026-08-28T19:11:36.722Z",
+      "source": "emergency-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-em-02",
+      "emergenciaId": "EMG-902",
+      "recursoId": "BOMB-108"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-em-d3",
+      "eventType": "EmergenciaDespachada",
+      "occurredAt": "2026-08-28T17:33:36.722Z",
+      "source": "emergency-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-em-04",
+      "emergenciaId": "EMG-904",
+      "recursoId": "PAT-201"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-em-d4",
+      "eventType": "EmergenciaDespachada",
+      "occurredAt": "2026-08-28T15:33:36.722Z",
+      "source": "emergency-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-em-05",
+      "emergenciaId": "EMG-905",
+      "recursoId": "DEF-012"
+    }
+  }
+]

@@ -1,0 +1,121 @@
+[
+  {
+    "metadata": {
+      "eventId": "evt-c-001",
+      "eventType": "reclamos.creado",
+      "occurredAt": "2026-08-27T19:33:36.711Z",
+      "source": "claims-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-c-001",
+      "reclamoId": "CL-101",
+      "categoria": "alumbrado",
+      "estado": "creado",
+      "zona": "Centro",
+      "ciudadanoId": "usr-anon-8812"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-c-002",
+      "eventType": "reclamos.creado",
+      "occurredAt": "2026-08-28T01:33:36.711Z",
+      "source": "claims-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-c-002",
+      "reclamoId": "CL-102",
+      "categoria": "residuos",
+      "estado": "creado",
+      "zona": "Sur",
+      "ciudadanoId": "usr-anon-4412"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-c-003",
+      "eventType": "reclamos.creado",
+      "occurredAt": "2026-08-28T07:33:36.711Z",
+      "source": "claims-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-c-003",
+      "reclamoId": "CL-103",
+      "categoria": "calles",
+      "estado": "creado",
+      "zona": "Norte",
+      "ciudadanoId": "usr-anon-9901"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-c-004",
+      "eventType": "reclamos.creado",
+      "occurredAt": "2026-08-28T11:33:36.711Z",
+      "source": "claims-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-c-004",
+      "reclamoId": "CL-104",
+      "categoria": "transito",
+      "estado": "creado",
+      "zona": "Centro",
+      "ciudadanoId": "usr-anon-1102"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-c-005",
+      "eventType": "reclamos.creado",
+      "occurredAt": "2026-08-28T13:33:36.711Z",
+      "source": "claims-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-c-005",
+      "reclamoId": "CL-105",
+      "categoria": "espacios_publicos",
+      "estado": "creado",
+      "zona": "Oeste",
+      "ciudadanoId": "usr-anon-3320"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-c-006",
+      "eventType": "reclamos.creado",
+      "occurredAt": "2026-08-28T15:33:36.711Z",
+      "source": "claims-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-c-006",
+      "reclamoId": "CL-106",
+      "categoria": "ruido",
+      "estado": "creado",
+      "zona": "Centro",
+      "ciudadanoId": "usr-anon-7714"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-c-007",
+      "eventType": "reclamos.creado",
+      "occurredAt": "2026-08-28T18:03:36.711Z",
+      "source": "claims-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-c-007",
+      "reclamoId": "CL-107",
+      "categoria": "alumbrado",
+      "estado": "creado",
+      "zona": "Norte",
+      "ciudadanoId": "usr-anon-5511"
+    }
+  }
+]

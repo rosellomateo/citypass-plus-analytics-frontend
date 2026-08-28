@@ -1,0 +1,65 @@
+[
+  {
+    "metadata": {
+      "eventId": "evt-ev-p1",
+      "eventType": "espacios.evento.publicado",
+      "occurredAt": "2026-08-23T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ev-01",
+      "eventoId": "EVT-701",
+      "titulo": "Festival de Música Urbana",
+      "categoria": "cultural",
+      "espacioId": "Parque Central",
+      "zona": "Centro",
+      "fechaHoraEvento": "2026-08-30T19:33:36.717Z",
+      "cupoMaximo": 200,
+      "requiereInscripcion": true,
+      "organizadorId": "org-01"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ev-p2",
+      "eventType": "espacios.evento.publicado",
+      "occurredAt": "2026-08-24T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ev-02",
+      "eventoId": "EVT-702",
+      "titulo": "Torneo Barrio Activo",
+      "categoria": "deportivo",
+      "espacioId": "Cancha Municipal Norte",
+      "zona": "Norte",
+      "fechaHoraEvento": "2026-09-01T19:33:36.717Z",
+      "cupoMaximo": 100,
+      "requiereInscripcion": true,
+      "organizadorId": "org-02"
+    }
+  },
+  {
+    "metadata": {
+      "eventId": "evt-ev-p3",
+      "eventType": "espacios.evento.publicado",
+      "occurredAt": "2026-08-25T19:33:36.717Z",
+      "source": "culture-service",
+      "version": "1"
+    },
+    "data": {
+      "correlationId": "corr-ev-03",
+      "eventoId": "EVT-703",
+      "titulo": "Jornada de Reciclaje Recreativo",
+      "categoria": "recreativo",
+      "espacioId": "Plaza San Martín",
+      "zona": "Centro",
+      "fechaHoraEvento": "2026-09-02T19:33:36.717Z",
+      "cupoMaximo": 50,
+      "requiereInscripcion": true,
+      "organizadorId": "org-03"
+    }
+  }
+]

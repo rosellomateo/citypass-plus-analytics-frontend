@@ -29,10 +29,8 @@
 }
 
 .logoIcon {
-  width: 32px;
-  height: 32px;
-  background: #2563A6;
-  border-radius: 8px;
+  width: 24px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -40,19 +38,22 @@
 }
 
 .logoText {
-  font-size: 17px;
+  font-size: 19px;
   font-weight: 700;
   color: #ffffff;
   white-space: nowrap;
   letter-spacing: -0.3px;
+  display: flex;
+  align-items: center;
 }
 
 .logoPlus {
-  color: #8FB8D8;
+  color: #D99838;
+  margin-left: 2px;
 }
 
 .navSection {
-  padding: 16px 0 0;
+  padding: 16px 8px 0; /* Left/Right padding to create margin for rounded elements */
   flex: 1;
 }
 
@@ -62,7 +63,7 @@
   text-transform: uppercase;
   letter-spacing: 0.8px;
   color: rgba(255, 255, 255, 0.4);
-  padding: 8px 16px 8px;
+  padding: 8px 8px 8px; /* Adjusted padding to align with items */
   white-space: nowrap;
 }
 
@@ -70,12 +71,14 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 16px;
+  padding: 10px 12px;
+  margin: 4px 0;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease;
   text-decoration: none;
   position: relative;
   white-space: nowrap;
+  border-radius: 8px; /* Rounded corners like the screenshot */
 }
 
 .navItem:hover {
@@ -83,18 +86,7 @@
 }
 
 .navItem.active {
-  background: #2563A6;
-}
-
-.navItem.active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: #8FB8D8;
-  border-radius: 0 2px 2px 0;
+  background: rgba(37, 99, 166, 0.2); /* Soft translucent blue background for active */
 }
 
 .navIcon {
@@ -128,4 +120,38 @@
 .pendingItem .navLabel {
   color: rgba(255, 255, 255, 0.4);
   font-style: italic;
+}
+
+.activeBadge {
+  font-size: 9px;
+  font-weight: 700;
+  color: #D99838;
+  background-color: rgba(217, 152, 56, 0.12);
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.divider {
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 12px 8px;
+}
+
+.skylineWrapper {
+  margin-top: auto;
+  padding: 16px 0 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  pointer-events: none;
+  width: 100%;
+}
+
+.skylineSvg {
+  width: 100%;
+  height: auto;
 }
