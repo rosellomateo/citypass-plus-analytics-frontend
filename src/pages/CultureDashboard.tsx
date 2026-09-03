@@ -14,7 +14,7 @@ import { useCultureData } from '../hooks/useCultureData';
 import { useResolvedUiState } from '../hooks/useUiState';
 
 export function CultureDashboard() {
-  const { filters, updateFilter } = useFilters();
+  const { filters, updateFilter, updateDateRange } = useFilters();
   const cultureAsync = useCultureData(filters);
   const resolved = useResolvedUiState(cultureAsync);
   const location = useLocation();
@@ -38,6 +38,7 @@ export function CultureDashboard() {
         subtitle="CU-C1: Ocupación de espacios públicos | CU-C2: Convocatoria de eventos comunitarios"
         filters={filters}
         onDateRangeChange={(range) => updateFilter('dateRange', range)}
+        onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)}
       />
 
       {resolved.loading ? (

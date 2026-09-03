@@ -14,11 +14,14 @@ export interface EventEnvelope<T = Record<string, unknown>> {
   };
 }
 
+export type Severity = 'info' | 'low' | 'medium' | 'high' | 'critical';
+
 export interface Metric {
   label: string;
   value: number | string;
   unit?: string;
   sublabel?: string;
+  variation?: number;
   status?: 'normal' | 'warning' | 'critical' | 'info';
 }
 
@@ -33,6 +36,11 @@ export interface DashboardFilters {
   to?: string;
   domain?: Domain;
   search?: string;
+  zone?: string;
+  wasteType?: string;
+  category?: string;
+  status?: string;
+  severity?: string;
 }
 
 export type UiState = 'success' | 'loading' | 'error' | 'empty';

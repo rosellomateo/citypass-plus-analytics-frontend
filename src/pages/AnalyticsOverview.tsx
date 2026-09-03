@@ -1,7 +1,9 @@
 // src/pages/AnalyticsOverview.tsx
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Info } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { DashboardHeader } from '../components/common/DashboardHeader/DashboardHeader';
+import { FilterBar } from '../components/common/FilterBar/FilterBar';
 import { DOMAIN_NAV_ITEMS } from '../config/domains';
 import { DataTable } from '../components/common/DataTable/DataTable';
 import { useFilters } from '../hooks/useFilters';
@@ -23,10 +25,65 @@ const MVP_EVENTS = [
   { domain: 'Cultura', eventType: 'espacios.inscripcion.confirmada', source: 'culture-service', status: 'Pendiente confirmación' },
   { domain: 'Cultura', eventType: 'espacios.inscripcion.cancelada', source: 'culture-service', status: 'Pendiente confirmación' },
   { domain: 'Cultura', eventType: 'espacios.evento.cancelado', source: 'culture-service', status: 'Complementario' },
+  { domain: 'Residuos', eventType: 'Contrato JSON de entrada', source: 'waste-service (simulado)', status: 'Dashboard disponible (contrato a definir)' },
+];
+
+const DOMAIN_OPTIONS = [
+  { value: 'Reclamos', label: 'Reclamos' },
+  { value: 'Emergencias', label: 'Emergencias' },
+  { value: 'Movilidad', label: 'Movilidad' },
+  { value: 'Cultura', label: 'Cultura' },
+  { value: 'Residuos', label: 'Residuos' },
 ];
 
 export function AnalyticsOverview() {
   const { filters, updateFilter } = useFilters();
+
+  const eventTypeOptions = useMemo(() => {
+    return MVP_EVENTS.map((e) => ({ value: e.eventType, label: `${e.domain}: ${e.eventType}` }));
+  }, []);
+
+  const filteredEvents = useMemo(() => {
+    return MVP_EVENTS.filter((evt) => {
+      if (filters.domain && (filters.domain as string) !== 'all') {
+        const domLower = String(filters.domain).toLowerCase();
+        if (evt.domain.toLowerCase() !== domLower) return false;
+      }
+      if (filters.category && filters.category !== 'all') {
+        if (evt.eventType.toLowerCase() !== filters.category.toLowerCase()) return false;
+      }
+      if (filters.search) {
+        const q = filters.search.toLowerCase();
+        const match =
+          evt.domain.toLowerCase().includes(q) ||
+          evt.eventType.toLowerCase().includes(q) ||
+          evt.source.toLowerCase().includes(q) ||
+          evt.status.toLowerCase().includes(q);
+        if (!match) return false;
+      }
+      return true;
+    });
+  }, [filters]);
+
+  const filteredDomainItems = useMemo(() => {
+    return DOMAIN_NAV_ITEMS.filter((item) => {
+      if (filters.domain && (filters.domain as string) !== 'all') {
+        const domLower = String(filters.domain).toLowerCase();
+        const itemDomainLower = item.domain.toLowerCase();
+        const itemLabelLower = item.label.toLowerCase();
+        if (itemDomainLower !== domLower && !itemLabelLower.includes(domLower)) return false;
+      }
+      if (filters.search) {
+        const q = filters.search.toLowerCase();
+        const match =
+          item.label.toLowerCase().includes(q) ||
+          item.shortDescription.toLowerCase().includes(q) ||
+          item.domain.toLowerCase().includes(q);
+        if (!match) return false;
+      }
+      return true;
+    });
+  }, [filters]);
 
   return (
     <div>
@@ -35,26 +92,40 @@ export function AnalyticsOverview() {
         subtitle="Módulo analítico basado en arquitectura orientada a eventos (EDA)."
         filters={filters}
         onDateRangeChange={(range) => updateFilter('dateRange', range)}
+        onCustomDateSelect={(from, to) => {
+          updateFilter('from', from);
+          updateFilter('to', to);
+          updateFilter('dateRange', 'custom');
+        }}
+        filters_extra={
+          <FilterBar
+            filters={[
+              {
+                key: 'domain',
+                label: 'Tipo de Dominio',
+                options: DOMAIN_OPTIONS,
+                value: String(filters.domain ?? 'all'),
+                onChange: (val) => updateFilter('domain', val as any),
+              },
+              {
+                key: 'category',
+                label: 'Tipo de Evento',
+                options: eventTypeOptions,
+                value: filters.category ?? 'all',
+                onChange: (val) => updateFilter('category', val),
+              },
+            ]}
+            searchValue={filters.search}
+            onSearchChange={(val) => updateFilter('search', val)}
+            searchPlaceholder="Buscar por dominio, tipo de evento o fuente..."
+          />
+        }
       />
-
-      <div className="section">
-        <div className={styles.introBanner}>
-          <div className={styles.introIcon}>
-            <Info size={20} />
-          </div>
-          <div>
-            <h3 className={styles.bannerTitle}>Consumidor de Eventos MVP</h3>
-            <p className={styles.bannerText}>
-              Este módulo escucha eventos publicados por los servicios de la ciudad, deduplica por metadata.eventId y proyecta tableros analíticos de lectura.
-            </p>
-          </div>
-        </div>
-      </div>
 
       <div className="section">
         <h2 className="section-title">Dominios de Analítica</h2>
         <div className={styles.domainGrid}>
-          {DOMAIN_NAV_ITEMS.map((item) => (
+          {filteredDomainItems.map((item) => (
             <div
               key={item.domain}
               className={`${styles.card} ${item.isPending ? styles.pendingCard : ''}`}
@@ -81,7 +152,7 @@ export function AnalyticsOverview() {
       <div className="section">
         <div className={styles.tableWrapper}>
           <div className={styles.tableTitle}>
-            Eventos consumidos por el MVP
+            Eventos consumidos por el MVP ({filteredEvents.length} resultados)
           </div>
           <DataTable
             columns={[
@@ -90,7 +161,7 @@ export function AnalyticsOverview() {
               { key: 'source', label: 'Productor (Source)', width: '180px' },
               { key: 'status', label: 'Estado Especificación', width: '180px' },
             ]}
-            data={MVP_EVENTS}
+            data={filteredEvents}
             keyField="eventType"
           />
         </div>

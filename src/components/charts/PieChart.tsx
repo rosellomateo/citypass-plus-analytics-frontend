@@ -31,7 +31,7 @@ export function PieChart({ data, height = 280, showLegend = true, donut = true, 
           outerRadius="75%"
           dataKey="value"
           paddingAngle={2}
-          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+          label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
           labelLine={false}
         >
           {data.map((entry, i) => (
@@ -43,8 +43,8 @@ export function PieChart({ data, height = 280, showLegend = true, donut = true, 
         </Pie>
         <Tooltip
           contentStyle={CHART_TOOLTIP_STYLE}
-          formatter={(value: number, name: string) => [
-            unit ? `${value.toLocaleString()}${unit}` : value.toLocaleString(),
+          formatter={(value: any, name: any) => [
+            unit ? `${value?.toLocaleString() ?? value}${unit}` : value?.toLocaleString() ?? value,
             name,
           ]}
         />

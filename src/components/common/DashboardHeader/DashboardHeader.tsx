@@ -10,6 +10,7 @@ interface DashboardHeaderProps {
   subtitle?: string;
   filters: DashboardFilters;
   onDateRangeChange: (range: DashboardFilters['dateRange']) => void;
+  onCustomDateSelect?: (from: string, to: string) => void;
   actions?: ReactNode;
   filters_extra?: ReactNode;
 }
@@ -19,6 +20,7 @@ export function DashboardHeader({
   subtitle,
   filters,
   onDateRangeChange,
+  onCustomDateSelect,
   actions,
   filters_extra,
 }: DashboardHeaderProps) {
@@ -33,7 +35,13 @@ export function DashboardHeader({
           {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
         </div>
         <div className={styles.controlsGroup}>
-          <DateRangeSelector value={filters.dateRange} onChange={onDateRangeChange} />
+          <DateRangeSelector
+            value={filters.dateRange}
+            from={filters.from}
+            to={filters.to}
+            onChange={onDateRangeChange}
+            onCustomSelect={onCustomDateSelect}
+          />
           {actions}
         </div>
       </div>
@@ -43,3 +51,4 @@ export function DashboardHeader({
     </div>
   );
 }
+

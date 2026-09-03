@@ -71,7 +71,7 @@ export function filterByDomain<T extends { domain?: string }>(
   items: T[],
   filters: DashboardFilters
 ): T[] {
-  if (!filters.domain || filters.domain === 'all') return items;
+  if (!filters.domain || (filters.domain as string) === 'all') return items;
   return items.filter((item) => item.domain === filters.domain);
 }
 

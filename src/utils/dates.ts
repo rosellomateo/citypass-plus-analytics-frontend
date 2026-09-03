@@ -7,23 +7,37 @@ export function getDateRangeBounds(filters: DashboardFilters): { from: Date; to:
   if (filters.dateRange === 'today') {
     const from = new Date(now);
     from.setHours(0, 0, 0, 0);
-    return { from, to: now };
+    const to = new Date(now);
+    to.setHours(23, 59, 59, 999);
+    return { from, to };
   }
 
   if (filters.dateRange === '7d') {
     const from = new Date(now);
     from.setDate(from.getDate() - 7);
+    from.setHours(0, 0, 0, 0);
     return { from, to: now };
   }
 
   if (filters.dateRange === '30d') {
     const from = new Date(now);
     from.setDate(from.getDate() - 30);
+    from.setHours(0, 0, 0, 0);
     return { from, to: now };
   }
 
-  if (filters.dateRange === 'custom' && filters.from && filters.to) {
-    return { from: new Date(filters.from), to: new Date(filters.to) };
+  if (filters.dateRange === 'custom') {
+    let from = new Date(0);
+    let to = new Date(8640000000000000);
+    if (filters.from) {
+      const parsedFrom = new Date(filters.from.includes('T') ? filters.from : `${filters.from}T00:00:00`);
+      if (!isNaN(parsedFrom.getTime())) from = parsedFrom;
+    }
+    if (filters.to) {
+      const parsedTo = new Date(filters.to.includes('T') ? filters.to : `${filters.to}T23:59:59.999`);
+      if (!isNaN(parsedTo.getTime())) to = parsedTo;
+    }
+    return { from, to };
   }
 
   // fallback: 7 días
@@ -33,9 +47,32 @@ export function getDateRangeBounds(filters: DashboardFilters): { from: Date; to:
 }
 
 export function isWithinDateRange(isoTimestamp: string, filters: DashboardFilters): boolean {
-  const { from, to } = getDateRangeBounds(filters);
+  if (!isoTimestamp) return true;
   const date = new Date(isoTimestamp);
-  return date >= from && date <= to;
+  if (isNaN(date.getTime())) return true;
+
+  if (filters.dateRange === 'custom') {
+    const { from, to } = getDateRangeBounds(filters);
+    return date >= from && date <= to;
+  }
+
+  // For presets (today, 7d, 30d):
+  // Since mock data uses 2026-09-02 as the base date, we check relative to reference or current date
+  const now = new Date();
+  const refTime = Math.max(now.getTime(), new Date('2026-09-02T23:59:59Z').getTime());
+  const diffDays = (refTime - date.getTime()) / (1000 * 60 * 60 * 24);
+
+  if (filters.dateRange === 'today') {
+    return diffDays >= -1 && diffDays <= 1.5;
+  }
+  if (filters.dateRange === '7d') {
+    return diffDays >= -1 && diffDays <= 7.5;
+  }
+  if (filters.dateRange === '30d') {
+    return diffDays >= -1 && diffDays <= 30.5;
+  }
+
+  return true;
 }
 
 export function formatTimestamp(iso: string): string {

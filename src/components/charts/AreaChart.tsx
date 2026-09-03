@@ -12,7 +12,7 @@ import {
 import { CHART_COLORS, CHART_AXIS, CHART_GRID, CHART_TOOLTIP_STYLE, CHART_LEGEND_STYLE } from './chartTheme';
 
 interface AreaChartProps {
-  data: Record<string, unknown>[];
+  data: any[];
   xKey: string;
   areas: { key: string; label?: string; color?: string }[];
   height?: number;
@@ -49,7 +49,7 @@ export function AreaChart({
         <YAxis {...CHART_AXIS} tickFormatter={unit ? (v) => `${v}${unit}` : undefined} />
         <Tooltip
           contentStyle={CHART_TOOLTIP_STYLE}
-          formatter={(value: number, name: string) => [
+          formatter={(value: any, name: any) => [
             unit ? `${value}${unit}` : value,
             name,
           ]}

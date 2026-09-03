@@ -5,14 +5,14 @@ import {
   mockEmergenciaPriorizadaEvents,
   mockEmergenciaEstadoActualizadoEvents,
   mockEmergenciaDespachadaEvents,
-  mockEmergenciaCerradaEvents,
 } from '../data/mocks/emergencies.mock';
 import { delay } from '../utils';
+import { isWithinDateRange } from '../utils/dates';
 
-export async function getEmergencyAnalyticsData(_filters: DashboardFilters): Promise<EmergencyAnalyticsData> {
+export async function getEmergencyAnalyticsData(filters: DashboardFilters): Promise<EmergencyAnalyticsData> {
   await delay();
 
-  const created = mockEmergenciaCreadaEvents;
+  const created = mockEmergenciaCreadaEvents.filter((e) => isWithinDateRange(e.metadata.occurredAt, filters));
   const createdMap = new Map(created.map((e) => [e.data.emergenciaId, e]));
 
   // Priorities map

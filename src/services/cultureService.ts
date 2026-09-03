@@ -8,26 +8,43 @@ import {
   mockInscripcionCanceladaEvents,
 } from '../data/mocks/culture.mock';
 import { delay } from '../utils';
+import { isWithinDateRange } from '../utils/dates';
 
-export async function getCultureAnalyticsData(_filters: DashboardFilters): Promise<CultureAnalyticsData> {
+export async function getCultureAnalyticsData(filters: DashboardFilters): Promise<CultureAnalyticsData> {
   await delay();
 
+  const confirmedEvents = mockReservaConfirmadaEvents.filter((e) =>
+    isWithinDateRange(e.metadata.occurredAt, filters)
+  );
+  const cancelledEvents = mockReservaCanceladaEvents.filter((e) =>
+    isWithinDateRange(e.metadata.occurredAt, filters)
+  );
+  const publicadoEvents = mockEventoPublicadoEvents.filter((e) =>
+    isWithinDateRange(e.metadata.occurredAt, filters)
+  );
+  const inscripcionConfirmadaEvents = mockInscripcionConfirmadaEvents.filter((e) =>
+    isWithinDateRange(e.metadata.occurredAt, filters)
+  );
+  const inscripcionCanceladaEvents = mockInscripcionCanceladaEvents.filter((e) =>
+    isWithinDateRange(e.metadata.occurredAt, filters)
+  );
+
   // CU-C1: Public Space Occupation
-  const confirmedReservations = mockReservaConfirmadaEvents.length;
-  const cancelledReservations = mockReservaCanceladaEvents.length;
+  const confirmedReservations = confirmedEvents.length;
+  const cancelledReservations = cancelledEvents.length;
   const totalReservations = confirmedReservations + cancelledReservations;
   const cancellationRatePct =
     totalReservations > 0 ? Number(((cancelledReservations / totalReservations) * 100).toFixed(1)) : 0;
 
   const spaceMap: Record<string, { confirmed: number; cancelled: number }> = {};
 
-  mockReservaConfirmadaEvents.forEach((r) => {
+  confirmedEvents.forEach((r) => {
     const sp = r.data.espacioId;
     if (!spaceMap[sp]) spaceMap[sp] = { confirmed: 0, cancelled: 0 };
     spaceMap[sp].confirmed += 1;
   });
 
-  mockReservaCanceladaEvents.forEach((r) => {
+  cancelledEvents.forEach((r) => {
     const sp = r.data.espacioId;
     if (!spaceMap[sp]) spaceMap[sp] = { confirmed: 0, cancelled: 0 };
     spaceMap[sp].cancelled += 1;
@@ -40,24 +57,23 @@ export async function getCultureAnalyticsData(_filters: DashboardFilters): Promi
   }));
 
   // CU-C2: Community Event Turnout
-  const activeInscriptions = mockInscripcionConfirmadaEvents.length - mockInscripcionCanceladaEvents.length;
+  const activeInscriptions = inscripcionConfirmadaEvents.length - inscripcionCanceladaEvents.length;
 
-  const eventMap = new Map(mockEventoPublicadoEvents.map((e) => [e.data.eventoId, e.data]));
   const inscriptionsPerEvent: Record<string, number> = {};
 
-  mockInscripcionConfirmadaEvents.forEach((i) => {
+  inscripcionConfirmadaEvents.forEach((i) => {
     const evtId = i.data.eventoId;
     inscriptionsPerEvent[evtId] = (inscriptionsPerEvent[evtId] || 0) + 1;
   });
 
-  mockInscripcionCanceladaEvents.forEach((i) => {
+  inscripcionCanceladaEvents.forEach((i) => {
     const evtId = i.data.eventoId;
     if (inscriptionsPerEvent[evtId]) {
       inscriptionsPerEvent[evtId] -= 1;
     }
   });
 
-  const inscriptionsByEvent = mockEventoPublicadoEvents.map((e) => {
+  const inscriptionsByEvent = publicadoEvents.map((e) => {
     const reg = inscriptionsPerEvent[e.data.eventoId] || 0;
     const cap = e.data.cupoMaximo;
     const occupancyPct = cap > 0 ? Number(((reg / cap) * 100).toFixed(1)) : 0;
@@ -71,7 +87,7 @@ export async function getCultureAnalyticsData(_filters: DashboardFilters): Promi
   });
 
   const categoryCounts: Record<string, number> = {};
-  mockEventoPublicadoEvents.forEach((e) => {
+  publicadoEvents.forEach((e) => {
     const cat = e.data.categoria;
     const count = inscriptionsPerEvent[e.data.eventoId] || 0;
     categoryCounts[cat] = (categoryCounts[cat] || 0) + count;

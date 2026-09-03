@@ -10,7 +10,7 @@ import { useMobilityData } from '../hooks/useMobilityData';
 import { useResolvedUiState } from '../hooks/useUiState';
 
 export function MobilityDashboard() {
-  const { filters, updateFilter } = useFilters();
+  const { filters, updateFilter, updateDateRange } = useFilters();
   const mobilityAsync = useMobilityData(filters);
   const resolved = useResolvedUiState(mobilityAsync);
 
@@ -21,6 +21,7 @@ export function MobilityDashboard() {
         subtitle="CU-M1: Viajes por estación y franja horaria | CU-M2: Duración promedio de viaje"
         filters={filters}
         onDateRangeChange={(range) => updateFilter('dateRange', range)}
+        onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)}
       />
 
       {resolved.loading ? (

@@ -2,11 +2,12 @@
 import type { DashboardFilters, MobilityAnalyticsData } from '../types';
 import { mockViajeIniciadoEvents, mockViajeFinalizadoEvents } from '../data/mocks/mobility.mock';
 import { delay } from '../utils';
+import { isWithinDateRange } from '../utils/dates';
 
-export async function getMobilityAnalyticsData(_filters: DashboardFilters): Promise<MobilityAnalyticsData> {
+export async function getMobilityAnalyticsData(filters: DashboardFilters): Promise<MobilityAnalyticsData> {
   await delay();
 
-  const started = mockViajeIniciadoEvents;
+  const started = mockViajeIniciadoEvents.filter((e) => isWithinDateRange(e.metadata.occurredAt, filters));
   const startedMap = new Map(started.map((e) => [e.data.viajeId, e]));
 
   // CU-M1: Trips by origin station & time slot

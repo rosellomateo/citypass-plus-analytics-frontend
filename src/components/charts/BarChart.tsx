@@ -13,7 +13,7 @@ import {
 import { CHART_COLORS, CHART_AXIS, CHART_GRID, CHART_TOOLTIP_STYLE, CHART_LEGEND_STYLE } from './chartTheme';
 
 interface BarChartProps {
-  data: Record<string, unknown>[];
+  data: any[];
   xKey: string;
   bars: { key: string; label?: string; color?: string }[];
   height?: number;
@@ -40,7 +40,7 @@ export function BarChart({
           <CartesianGrid {...CHART_GRID} horizontal={false} />
           <XAxis type="number" {...CHART_AXIS} tickFormatter={unit ? (v) => `${v}${unit}` : undefined} />
           <YAxis type="category" dataKey={xKey} {...CHART_AXIS} width={100} />
-          <Tooltip contentStyle={CHART_TOOLTIP_STYLE} formatter={(v: number) => [unit ? `${v}${unit}` : v]} />
+          <Tooltip contentStyle={CHART_TOOLTIP_STYLE} formatter={(v: any) => [unit ? `${v}${unit}` : v]} />
           {bars.map((bar, i) => (
             <Bar
               key={bar.key}
@@ -69,7 +69,7 @@ export function BarChart({
         <YAxis {...CHART_AXIS} tickFormatter={unit ? (v) => `${v}${unit}` : undefined} />
         <Tooltip
           contentStyle={CHART_TOOLTIP_STYLE}
-          formatter={(value: number, name: string) => [
+          formatter={(value: any, name: any) => [
             unit ? `${value}${unit}` : value,
             name,
           ]}

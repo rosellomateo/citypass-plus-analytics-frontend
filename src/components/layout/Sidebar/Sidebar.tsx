@@ -16,10 +16,17 @@ import {
 } from 'lucide-react';
 import styles from './Sidebar.module.css';
 
-const NAV_ITEMS = [
+interface NavItem {
+  label: string;
+  path: string;
+  icon: React.ReactNode;
+  isPending?: boolean;
+}
+
+const NAV_ITEMS: NavItem[] = [
   { label: 'Inicio', path: '/', icon: <Home size={17} /> },
   { label: 'Movilidad', path: '/analytics/mobility', icon: <Network size={17} /> },
-  { label: 'Residuos', path: '/analytics/waste', icon: <Trash2 size={17} />, isPending: true },
+  { label: 'Residuos', path: '/analytics/waste', icon: <Trash2 size={17} /> },
   { label: 'Reclamos', path: '/analytics/claims', icon: <MessageSquare size={17} /> },
   { label: 'Emergencias', path: '/analytics/emergencies', icon: <Shield size={17} /> },
   { label: 'Espacios Publicos', path: '/analytics/culture', icon: <Building2 size={17} /> },

@@ -5,8 +5,8 @@ const now = new Date();
 function minsAgo(m: number) {
   return new Date(now.getTime() - m * 60000).toISOString();
 }
-function hoursAgo(h: number) {
-  return new Date(now.getTime() - h * 3600000).toISOString();
+function hoursAgo(h: number, m = 0) {
+  return new Date(now.getTime() - (h * 3600000 + m * 60000)).toISOString();
 }
 
 export const mockViajeIniciadoEvents: ViajeIniciadoEvent[] = [

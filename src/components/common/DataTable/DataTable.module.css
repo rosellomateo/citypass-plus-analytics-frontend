@@ -1,4 +1,8 @@
-/* src/components/common/DataTable/DataTable.module.css */
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
 
 .wrapper {
   overflow-x: auto;
@@ -57,3 +61,61 @@
   vertical-align: middle;
   white-space: nowrap;
 }
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-top: 1px solid #E8EBF0;
+  background-color: #FFFFFF;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.paginationInfo {
+  font-size: 13px;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.paginationControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pageBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #2563A6;
+  background-color: #F0F5FA;
+  border: 1px solid #D0E1F0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pageBtn:hover:not(:disabled) {
+  background-color: #E2ECF7;
+  border-color: #2563A6;
+}
+
+.pageBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background-color: #F8FAFC;
+  border-color: #E2E8F0;
+  color: #94A3B8;
+}
+
+.pageNumber {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+

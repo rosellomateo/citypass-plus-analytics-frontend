@@ -10,7 +10,7 @@ const ClaimsDashboard = lazy(() => import('../pages/ClaimsDashboard').then((m) =
 const EmergenciesDashboard = lazy(() => import('../pages/EmergenciesDashboard').then((m) => ({ default: m.EmergenciesDashboard })));
 const MobilityDashboard = lazy(() => import('../pages/MobilityDashboard').then((m) => ({ default: m.MobilityDashboard })));
 const CultureDashboard = lazy(() => import('../pages/CultureDashboard').then((m) => ({ default: m.CultureDashboard })));
-const WastePending = lazy(() => import('../pages/WastePending').then((m) => ({ default: m.WastePending })));
+const WasteDashboard = lazy(() => import('../pages/WasteDashboard').then((m) => ({ default: m.WasteDashboard })));
 
 function SuspenseWrapper({ children }: { children: React.ReactNode }) {
   return <Suspense fallback={<LoadingFullPage />}>{children}</Suspense>;
@@ -47,7 +47,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'analytics/waste',
-        element: <SuspenseWrapper><WastePending /></SuspenseWrapper>,
+        element: <SuspenseWrapper><WasteDashboard /></SuspenseWrapper>,
       },
     ],
   },

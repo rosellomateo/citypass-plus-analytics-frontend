@@ -47,10 +47,15 @@ export const DOMAIN_NAV_ITEMS: DomainNavMeta[] = [
   {
     domain: 'waste',
     label: 'Residuos',
-    shortDescription: 'Pendiente de definición funcional con el equipo productor.',
+    shortDescription: 'Seguimiento analítico de vaciado, volumen recolectado y contenedores críticos.',
     path: '/analytics/waste',
     color: '#4F8A72',
     bgColor: '#EAF4EF',
-    isPending: true,
   },
 ];
+
+export const DOMAIN_CONFIG: Record<string, DomainNavMeta> = DOMAIN_NAV_ITEMS.reduce((acc, item) => {
+  acc[item.domain] = item;
+  return acc;
+}, {} as Record<string, DomainNavMeta>);
+

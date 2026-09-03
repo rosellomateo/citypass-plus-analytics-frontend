@@ -11,7 +11,7 @@ import { useClaimsData } from '../hooks/useClaimsData';
 import { useResolvedUiState } from '../hooks/useUiState';
 
 export function ClaimsDashboard() {
-  const { filters, updateFilter } = useFilters();
+  const { filters, updateFilter, updateDateRange } = useFilters();
   const claimsAsync = useClaimsData(filters);
   const resolved = useResolvedUiState(claimsAsync);
 
@@ -22,6 +22,7 @@ export function ClaimsDashboard() {
         subtitle="CU-R1: Volumen por categoría y estado | CU-R2: Tiempo de resolución"
         filters={filters}
         onDateRangeChange={(range) => updateFilter('dateRange', range)}
+        onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)}
       />
 
       {resolved.loading ? (

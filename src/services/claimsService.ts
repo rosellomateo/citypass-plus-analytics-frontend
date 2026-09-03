@@ -2,12 +2,13 @@
 import type { DashboardFilters, ClaimsAnalyticsData, ClaimStatus } from '../types';
 import { mockClaimCreatedEvents, mockClaimUpdatedEvents } from '../data/mocks/claims.mock';
 import { delay } from '../utils';
+import { isWithinDateRange } from '../utils/dates';
 
 export async function getClaimsAnalyticsData(filters: DashboardFilters): Promise<ClaimsAnalyticsData> {
   await delay();
 
   // Filter created events
-  let created = mockClaimCreatedEvents;
+  let created = mockClaimCreatedEvents.filter((e) => isWithinDateRange(e.metadata.occurredAt, filters));
   if (filters.search) {
     const q = filters.search.toLowerCase();
     created = created.filter(

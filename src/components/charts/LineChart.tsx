@@ -12,7 +12,7 @@ import {
 import { CHART_COLORS, CHART_AXIS, CHART_GRID, CHART_TOOLTIP_STYLE, CHART_LEGEND_STYLE } from './chartTheme';
 
 interface LineChartProps {
-  data: Record<string, unknown>[];
+  data: any[];
   xKey: string;
   lines: { key: string; label?: string; color?: string }[];
   height?: number;
@@ -29,7 +29,7 @@ export function LineChart({ data, xKey, lines, height = 280, unit, showLegend = 
         <YAxis {...CHART_AXIS} tickFormatter={unit ? (v) => `${v}${unit}` : undefined} />
         <Tooltip
           contentStyle={CHART_TOOLTIP_STYLE}
-          formatter={(value: number, name: string) => [
+          formatter={(value: any, name: any) => [
             unit ? `${value}${unit}` : value,
             name,
           ]}

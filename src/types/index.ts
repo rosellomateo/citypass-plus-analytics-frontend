@@ -7,6 +7,7 @@ export type {
   TimeSeriesPoint,
   DashboardFilters,
   UiState,
+  Severity,
 } from './common';
 
 export type {
@@ -44,3 +45,16 @@ export type {
   EventoCanceladoEvent,
   CultureAnalyticsData,
 } from './culture';
+
+export type {
+  RawWasteContainerRecord,
+  WasteInputJson,
+  ContainerStatus,
+  ContainerStatusData,
+  WasteVolumeByType,
+  CollectionTimeByZone,
+  CriticalContainerDetail,
+  WasteMetrics,
+  WasteAnalyticsData,
+} from './waste';
+
