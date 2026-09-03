@@ -1,6 +1,6 @@
 // src/services/wasteService.ts
-import type { DashboardFilters, WasteMetrics, ContainerStatus } from '../types';
-import { mockWasteInputJson } from '../data/mocks/waste.mock';
+import type { DashboardFilters, WasteMetrics, ContainerStatus, WasteInputJson } from '../types';
+import rawWasteJson from '../../testingDatos/waste_records.json';
 import { adaptWasteInput } from '../adapters/wasteAdapter';
 import { delay } from '../utils';
 import { isWithinDateRange } from '../utils/dates';
@@ -8,7 +8,7 @@ import { isWithinDateRange } from '../utils/dates';
 /**
  * Servicio Analítico del Dominio de Residuos
  * Responsabilidades:
- * - Obtener datos JSON de entrada (actualmente mockWasteInputJson).
+ * - Obtener datos JSON de entrada desde testingDatos/waste_records.json.
  * - Invocar el adaptador para obtener modelos internos normalizados.
  * - Aplicar DashboardFilters (zona, tipo de residuo, búsqueda, rango temporal).
  * - Calcular los 4 KPIs principales.
@@ -20,7 +20,7 @@ export async function getWasteAnalyticsData(filters: DashboardFilters): Promise<
   await delay();
 
   // 1. Adaptar el JSON crudo entrante
-  const normalizedRecords = adaptWasteInput(mockWasteInputJson);
+  const normalizedRecords = adaptWasteInput(rawWasteJson as WasteInputJson);
 
   // 2. Aplicar filtros
   let filtered = [...normalizedRecords];

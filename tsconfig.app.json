@@ -16,11 +16,13 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
+    "resolveJsonModule": true,
+
     /* Linting */
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["src", "testingDatos"]
 }
