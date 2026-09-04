@@ -1,5 +1,22 @@
 # React + TypeScript + Vite
 
+## CI/CD
+
+Pull requests and pushes to `develop` or `main` run lint, tests with coverage,
+the production build, and a Docker image build through
+`.github/workflows/ci.yml`.
+
+Version tags publish the production image to GitHub Container Registry through
+`.github/workflows/cd.yml`:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+The published image is available at
+`ghcr.io/rosellomateo/citypass-plus-analytics-frontend:<version>`.
+
 This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
 Currently, two official plugins are available:
