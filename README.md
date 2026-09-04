@@ -1,5 +1,10 @@
 # React + TypeScript + Vite
 
+## Docker
+
+Consulta [DOCKER.md](./DOCKER.md) para construir la imagen, ejecutar el
+contenedor y verificar su estado de salud.
+
 ## CI/CD
 
 Pull requests and pushes to `develop` or `main` run lint, tests with coverage,
