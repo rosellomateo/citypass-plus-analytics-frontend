@@ -52,9 +52,7 @@ export async function getWasteAnalyticsData(filters: DashboardFilters): Promise<
   const totalTonsRaw = filtered.reduce((acc, r) => acc + r.collectedTons, 0);
   const totalCollectedTons = Number(totalTonsRaw.toFixed(1));
 
-  // 4. KPI 2: Contenedores Críticos (criticalContainersCount) -> >80% (CRÍTICO + DESBORDADO)
   const criticalRecords = filtered.filter((r) => r.status === 'CRÍTICO' || r.status === 'DESBORDADO');
-  const criticalContainersCount = criticalRecords.length;
 
   // 5. KPI 3: Tasa de Recolección a Tiempo (onTimeCollectionRatePct)
   const totalCount = filtered.length;
@@ -144,7 +142,6 @@ export async function getWasteAnalyticsData(filters: DashboardFilters): Promise<
 
   return {
     totalCollectedTons,
-    criticalContainersCount,
     onTimeCollectionRatePct,
     avgCollectionTimeHours,
     containersByStatus,

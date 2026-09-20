@@ -52,28 +52,10 @@ export async function getMobilityAnalyticsData(filters: DashboardFilters): Promi
       ? Number((durationsMinutes.reduce((a, b) => a + b, 0) / durationsMinutes.length).toFixed(1))
       : 0;
 
-  // Simple duration distribution
-  let shortTrips = 0; // < 15 min
-  let mediumTrips = 0; // 15-30 min
-  let longTrips = 0; // > 30 min
-
-  durationsMinutes.forEach((d) => {
-    if (d < 15) shortTrips += 1;
-    else if (d <= 30) mediumTrips += 1;
-    else longTrips += 1;
-  });
-
-  const tripDurationDistribution = [
-    { range: '< 15 min', count: shortTrips },
-    { range: '15 - 30 min', count: mediumTrips },
-    { range: '> 30 min', count: longTrips },
-  ];
-
   return {
     totalTripsStarted: started.length,
     tripsByOriginStation,
     tripsByTimeSlot,
     avgTripDurationMinutes,
-    tripDurationDistribution,
   };
 }

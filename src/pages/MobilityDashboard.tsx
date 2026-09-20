@@ -85,22 +85,6 @@ export function MobilityDashboard() {
               </ChartCard>
             </div>
           </div>
-
-          {/* CU-M2: Duración Promedio de Viaje */}
-          <div className="section">
-            <h2 className="section-title">CU-M2 — Duración Promedio de Viaje</h2>
-            <ChartCard
-              title="Distribución de Duración de Viajes"
-              subtitle="Rango de tiempo de viajes finalizados"
-            >
-              <BarChart
-                data={resolved.data.tripDurationDistribution}
-                xKey="range"
-                bars={[{ key: 'count', label: 'Viajes', color: '#4F8A72' }]}
-                height={260}
-              />
-            </ChartCard>
-          </div>
         </>
       ) : null}
     </div>

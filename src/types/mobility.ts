@@ -23,5 +23,4 @@ export interface MobilityAnalyticsData {
   tripsByOriginStation: { station: string; count: number }[];
   tripsByTimeSlot: { slot: string; count: number }[];
   avgTripDurationMinutes: number;
-  tripDurationDistribution: { range: string; count: number }[];
 }

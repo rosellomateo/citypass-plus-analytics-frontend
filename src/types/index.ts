@@ -16,6 +16,7 @@ export type {
   ClaimCreatedEvent,
   ClaimUpdatedEvent,
   ClaimsAnalyticsData,
+  BackendAnalyticsRecord,
 } from './claims';
 
 export type {
@@ -26,6 +27,7 @@ export type {
   EmergenciaEstadoActualizadoEvent,
   EmergenciaDespachadaEvent,
   EmergenciaCerradaEvent,
+  CategoryPriorityStackedData,
   EmergencyAnalyticsData,
 } from './emergencies';
 
