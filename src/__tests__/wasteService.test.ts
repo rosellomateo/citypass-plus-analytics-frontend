@@ -11,12 +11,12 @@ describe('Waste Service Analytics (wasteService.ts)', () => {
     expect(data.totalCollectedTons).toBeGreaterThan(0);
   });
 
-  it('2. Calculates criticalContainersCount including CRÍTICO and DESBORDADO (>80%)', async () => {
+  it('2. Includes critical containers in criticalContainersDetail (>80%)', async () => {
     const data = await getWasteAnalyticsData(defaultFilters);
     const criticalPlusOverflow = data.containersByStatus.find((s) => s.status === 'CRÍTICO')!.count +
       data.containersByStatus.find((s) => s.status === 'DESBORDADO')!.count;
 
-    expect(data.criticalContainersCount).toBe(criticalPlusOverflow);
+    expect(data.criticalContainersDetail.length).toBe(criticalPlusOverflow);
   });
 
   it('3. Calculates onTimeCollectionRatePct within 0-100%', async () => {

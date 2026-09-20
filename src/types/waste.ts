@@ -52,7 +52,6 @@ export interface CriticalContainerDetail {
 
 export interface WasteMetrics {
   totalCollectedTons: number;
-  criticalContainersCount: number;
   onTimeCollectionRatePct: number;
   avgCollectionTimeHours: number;
   containersByStatus: ContainerStatusData[];

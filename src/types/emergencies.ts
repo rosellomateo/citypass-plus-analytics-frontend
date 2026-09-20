@@ -1,7 +1,7 @@
 // src/types/emergencies.ts
 import type { EventEnvelope } from './common';
 
-export type EmergencyPriority = 'ALTA' | 'MEDIA' | 'BAJA';
+export type EmergencyPriority = 'CRITICA' | 'ALTA' | 'MEDIA' | 'BAJA';
 export type EmergencyState =
   | 'PENDIENTE'
   | 'VALIDADA'
@@ -10,14 +10,20 @@ export type EmergencyState =
   | 'EN_LUGAR'
   | 'RESUELTA'
   | 'CERRADA'
-  | 'DESCARTADA';
+  | 'DESCARTADA'
+  | 'RECIBIDO'
+  | 'EN_REVISION'
+  | 'ASIGNADO'
+  | 'EN_PROCESO'
+  | 'RECHAZADO';
 
 export interface EmergenciaCreadaData {
   emergenciaId: string;
   tipo: string;
+  categoria?: string;
   origen: string;
   ubicacion: string;
-  estado: 'PENDIENTE';
+  estado: EmergencyState;
 }
 
 export interface EmergenciaPriorizadaData {
@@ -48,6 +54,15 @@ export type EmergenciaEstadoActualizadoEvent = EventEnvelope<EmergenciaEstadoAct
 export type EmergenciaDespachadaEvent = EventEnvelope<EmergenciaDespachadaData>;
 export type EmergenciaCerradaEvent = EventEnvelope<EmergenciaCerradaData>;
 
+export interface CategoryPriorityStackedData {
+  category: string;
+  BAJA: number;
+  MEDIA: number;
+  ALTA: number;
+  CRITICA: number;
+  total: number;
+}
+
 export interface EmergencyAnalyticsData {
   totalEmergencies: number;
   activeCount: number;
@@ -56,4 +71,7 @@ export interface EmergencyAnalyticsData {
   emergenciesByPriority: { priority: string; count: number }[];
   avgDispatchTimeMinutes: number;
   avgDispatchTimeByPriority: { priority: string; minutes: number }[];
+  emergenciesByCategoryStacked: CategoryPriorityStackedData[];
+  availableCategories: string[];
 }
+

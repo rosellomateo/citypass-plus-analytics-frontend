@@ -59,7 +59,8 @@ export function isWithinDateRange(isoTimestamp: string, filters: DashboardFilter
   // For presets (today, 7d, 30d):
   // Since mock data uses 2026-09-02 as the base date, we check relative to reference or current date
   const now = new Date();
-  const refTime = Math.max(now.getTime(), new Date('2026-09-02T23:59:59Z').getTime());
+  const mockBaseTime = new Date('2026-09-02T23:59:59Z').getTime();
+  const refTime = date.getTime() <= mockBaseTime ? mockBaseTime : now.getTime();
   const diffDays = (refTime - date.getTime()) / (1000 * 60 * 60 * 24);
 
   if (filters.dateRange === 'today') {
