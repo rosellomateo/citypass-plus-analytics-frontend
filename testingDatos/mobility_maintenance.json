@@ -1,0 +1,14 @@
+[
+  { "id": "mnt-01", "bikeId": "bk-112", "startedAt": "2026-09-19T18:00:00.000Z", "endedAt": "2026-09-20T00:00:00.000Z", "description": "Ajuste de frenos", "cost": 4500, "performedBy": "Taller Central" },
+  { "id": "mnt-02", "bikeId": "bk-112", "startedAt": "2026-09-17T06:00:00.000Z", "endedAt": "2026-09-17T12:00:00.000Z", "description": "Cambio de neumático", "cost": 6000, "performedBy": "Taller Central" },
+  { "id": "mnt-03", "bikeId": "bk-113", "startedAt": "2026-09-20T13:00:00.000Z", "endedAt": "2026-09-20T19:00:00.000Z", "description": "Reparación de candado", "cost": 3200, "performedBy": "Móvil 2" },
+  { "id": "mnt-04", "bikeId": "bk-214", "startedAt": "2026-09-20T05:00:00.000Z", "endedAt": "2026-09-20T13:00:00.000Z", "description": "Reemplazo de pastilla de freno", "cost": 5000, "performedBy": "Taller Palermo" },
+  { "id": "mnt-05", "bikeId": "bk-215", "startedAt": "2026-09-20T19:00:00.000Z", "endedAt": "2026-09-21T05:00:00.000Z", "description": "Centrado de rueda", "cost": 4000, "performedBy": "Taller Palermo" },
+  { "id": "mnt-06", "bikeId": "bk-310", "startedAt": "2026-09-19T20:00:00.000Z", "endedAt": "2026-09-20T12:00:00.000Z", "description": "Mantenimiento integral", "cost": 12000, "performedBy": "Taller Central" },
+  { "id": "mnt-07", "bikeId": "bk-310", "startedAt": "2026-09-15T04:00:00.000Z", "endedAt": "2026-09-15T18:00:00.000Z", "description": "Cambio de cadena y piñón", "cost": 8500, "performedBy": "Taller Central" },
+  { "id": "mnt-08", "bikeId": "bk-311", "startedAt": "2026-09-20T23:00:00.000Z", "endedAt": "2026-09-21T07:00:00.000Z", "description": "Reparación eléctrica E-Bike", "cost": 15000, "performedBy": "Taller Especializado" },
+  { "id": "mnt-09", "bikeId": "bk-409", "startedAt": "2026-09-18T01:00:00.000Z", "endedAt": "2026-09-18T05:00:00.000Z", "description": "Parche de cámara", "cost": 1500, "performedBy": "Móvil 1" },
+  { "id": "mnt-10", "bikeId": "bk-410", "startedAt": "2026-09-21T03:00:00.000Z", "endedAt": "2026-09-21T07:00:00.000Z", "description": "Calibrado general", "cost": 2500, "performedBy": "Móvil 1" },
+  { "id": "mnt-11", "bikeId": "bk-509", "startedAt": "2026-09-20T17:00:00.000Z", "endedAt": "2026-09-21T03:00:00.000Z", "description": "Cambio de manillar", "cost": 7000, "performedBy": "Taller Central" },
+  { "id": "mnt-12", "bikeId": "bk-607", "startedAt": "2026-09-20T03:00:00.000Z", "endedAt": "2026-09-20T16:00:00.000Z", "description": "Enderezado de horquilla", "cost": 9500, "performedBy": "Taller Sur" }
+]
