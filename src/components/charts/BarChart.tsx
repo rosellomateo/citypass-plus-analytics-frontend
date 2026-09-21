@@ -52,7 +52,7 @@ export function BarChart({
         <RechartsBarChart data={data} layout="vertical" margin={{ top: 4, right: 24, bottom: 0, left: 8 }}>
           <CartesianGrid {...CHART_GRID} horizontal={false} />
           <XAxis type="number" {...CHART_AXIS} tickFormatter={unit ? (v) => `${v}${unit}` : undefined} />
-          <YAxis type="category" dataKey={xKey} {...CHART_AXIS} width={100} />
+          <YAxis type="category" dataKey={xKey} {...CHART_AXIS} width={145} />
           <Tooltip contentStyle={CHART_TOOLTIP_STYLE} formatter={(v: any) => [unit ? `${v}${unit}` : v]} />
           {showLegend && <Legend wrapperStyle={CHART_LEGEND_STYLE} />}
           {bars.map((bar, i) => (

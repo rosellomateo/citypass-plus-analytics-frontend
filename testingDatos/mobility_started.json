@@ -1,98 +1,50 @@
 [
   {
-    "metadata": {
-      "eventId": "evt-m-i1",
-      "eventType": "movilidad.viaje.iniciado",
-      "occurredAt": "2026-08-28T11:33:36.727Z",
-      "source": "mobility-service",
-      "version": "1"
-    },
-    "data": {
-      "correlationId": "corr-m-01",
-      "viajeId": "VJ-301",
-      "bicicletaId": "BK-102",
-      "estacionOrigenId": "Estación Universidad",
-      "usuarioId": "usr-anon-9988"
-    }
+    "metadata": { "eventId": "evt-i-07a", "eventType": "movilidad.viaje.iniciado", "occurredAt": "2026-09-20T07:15:00.000Z", "source": "mobility-service", "version": "1" },
+    "data": { "correlationId": "corr-07a", "viajeId": "VJ-701", "bicicletaId": "bk-101", "estacionOrigenId": "Estación Universidad", "usuarioId": "usr-001" }
   },
   {
-    "metadata": {
-      "eventId": "evt-m-i2",
-      "eventType": "movilidad.viaje.iniciado",
-      "occurredAt": "2026-08-28T11:33:36.727Z",
-      "source": "mobility-service",
-      "version": "1"
-    },
-    "data": {
-      "correlationId": "corr-m-02",
-      "viajeId": "VJ-302",
-      "bicicletaId": "BK-145",
-      "estacionOrigenId": "Estación Palermo",
-      "usuarioId": "usr-anon-3344"
-    }
+    "metadata": { "eventId": "evt-i-07b", "eventType": "movilidad.viaje.iniciado", "occurredAt": "2026-09-20T07:30:00.000Z", "source": "mobility-service", "version": "1" },
+    "data": { "correlationId": "corr-07b", "viajeId": "VJ-702", "bicicletaId": "bk-201", "estacionOrigenId": "Estación Palermo", "usuarioId": "usr-002" }
   },
   {
-    "metadata": {
-      "eventId": "evt-m-i3",
-      "eventType": "movilidad.viaje.iniciado",
-      "occurredAt": "2026-08-28T07:33:36.727Z",
-      "source": "mobility-service",
-      "version": "1"
-    },
-    "data": {
-      "correlationId": "corr-m-03",
-      "viajeId": "VJ-303",
-      "bicicletaId": "BK-201",
-      "estacionOrigenId": "Estación Universidad",
-      "usuarioId": "usr-anon-5566"
-    }
+    "metadata": { "eventId": "evt-i-07c", "eventType": "movilidad.viaje.iniciado", "occurredAt": "2026-09-20T07:45:00.000Z", "source": "mobility-service", "version": "1" },
+    "data": { "correlationId": "corr-07c", "viajeId": "VJ-703", "bicicletaId": "bk-301", "estacionOrigenId": "Estación Retiro", "usuarioId": "usr-003" }
   },
   {
-    "metadata": {
-      "eventId": "evt-m-i4",
-      "eventType": "movilidad.viaje.iniciado",
-      "occurredAt": "2026-08-28T02:33:36.727Z",
-      "source": "mobility-service",
-      "version": "1"
-    },
-    "data": {
-      "correlationId": "corr-m-04",
-      "viajeId": "VJ-304",
-      "bicicletaId": "BK-089",
-      "estacionOrigenId": "Estación Retiro",
-      "usuarioId": "usr-anon-1122"
-    }
+    "metadata": { "eventId": "evt-i-08a", "eventType": "movilidad.viaje.iniciado", "occurredAt": "2026-09-20T08:10:00.000Z", "source": "mobility-service", "version": "1" },
+    "data": { "correlationId": "corr-08a", "viajeId": "VJ-801", "bicicletaId": "bk-102", "estacionOrigenId": "Estación Universidad", "usuarioId": "usr-004" }
   },
   {
-    "metadata": {
-      "eventId": "evt-m-i5",
-      "eventType": "movilidad.viaje.iniciado",
-      "occurredAt": "2026-08-28T01:33:36.727Z",
-      "source": "mobility-service",
-      "version": "1"
-    },
-    "data": {
-      "correlationId": "corr-m-05",
-      "viajeId": "VJ-305",
-      "bicicletaId": "BK-304",
-      "estacionOrigenId": "Estación San Telmo",
-      "usuarioId": "usr-anon-7788"
-    }
+    "metadata": { "eventId": "evt-i-08b", "eventType": "movilidad.viaje.iniciado", "occurredAt": "2026-09-20T08:20:00.000Z", "source": "mobility-service", "version": "1" },
+    "data": { "correlationId": "corr-08b", "viajeId": "VJ-802", "bicicletaId": "bk-202", "estacionOrigenId": "Estación Palermo", "usuarioId": "usr-005" }
   },
   {
-    "metadata": {
-      "eventId": "evt-m-i6",
-      "eventType": "movilidad.viaje.iniciado",
-      "occurredAt": "2026-08-28T18:53:36.727Z",
-      "source": "mobility-service",
-      "version": "1"
-    },
-    "data": {
-      "correlationId": "corr-m-06",
-      "viajeId": "VJ-306",
-      "bicicletaId": "BK-412",
-      "estacionOrigenId": "Estación Palermo",
-      "usuarioId": "usr-anon-9900"
-    }
+    "metadata": { "eventId": "evt-i-08c", "eventType": "movilidad.viaje.iniciado", "occurredAt": "2026-09-20T08:40:00.000Z", "source": "mobility-service", "version": "1" },
+    "data": { "correlationId": "corr-08c", "viajeId": "VJ-803", "bicicletaId": "bk-401", "estacionOrigenId": "Estación San Telmo", "usuarioId": "usr-006" }
+  },
+  {
+    "metadata": { "eventId": "evt-i-09a", "eventType": "movilidad.viaje.iniciado", "occurredAt": "2026-09-20T09:10:00.000Z", "source": "mobility-service", "version": "1" },
+    "data": { "correlationId": "corr-09a", "viajeId": "VJ-901", "bicicletaId": "bk-203", "estacionOrigenId": "Estación Palermo", "usuarioId": "usr-007" }
+  },
+  {
+    "metadata": { "eventId": "evt-i-09b", "eventType": "movilidad.viaje.iniciado", "occurredAt": "2026-09-20T09:30:00.000Z", "source": "mobility-service", "version": "1" },
+    "data": { "correlationId": "corr-09b", "viajeId": "VJ-902", "bicicletaId": "bk-302", "estacionOrigenId": "Estación Retiro", "usuarioId": "usr-008" }
+  },
+  {
+    "metadata": { "eventId": "evt-i-12a", "eventType": "movilidad.viaje.iniciado", "occurredAt": "2026-09-20T12:10:00.000Z", "source": "mobility-service", "version": "1" },
+    "data": { "correlationId": "corr-12a", "viajeId": "VJ-1201", "bicicletaId": "bk-104", "estacionOrigenId": "Estación Universidad", "usuarioId": "usr-009" }
+  },
+  {
+    "metadata": { "eventId": "evt-i-12b", "eventType": "movilidad.viaje.iniciado", "occurredAt": "2026-09-20T12:30:00.000Z", "source": "mobility-service", "version": "1" },
+    "data": { "correlationId": "corr-12b", "viajeId": "VJ-1202", "bicicletaId": "bk-204", "estacionOrigenId": "Estación Palermo", "usuarioId": "usr-010" }
+  },
+  {
+    "metadata": { "eventId": "evt-i-17a", "eventType": "movilidad.viaje.iniciado", "occurredAt": "2026-09-20T17:10:00.000Z", "source": "mobility-service", "version": "1" },
+    "data": { "correlationId": "corr-17a", "viajeId": "VJ-1701", "bicicletaId": "bk-206", "estacionOrigenId": "Estación Palermo", "usuarioId": "usr-011" }
+  },
+  {
+    "metadata": { "eventId": "evt-i-17b", "eventType": "movilidad.viaje.iniciado", "occurredAt": "2026-09-20T17:30:00.000Z", "source": "mobility-service", "version": "1" },
+    "data": { "correlationId": "corr-17b", "viajeId": "VJ-1702", "bicicletaId": "bk-106", "estacionOrigenId": "Estación Universidad", "usuarioId": "usr-012" }
   }
 ]
