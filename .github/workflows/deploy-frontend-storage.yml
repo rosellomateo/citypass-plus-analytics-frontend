@@ -1,13 +1,9 @@
 name: Deploy frontend to Azure Storage
 
 on:
-  workflow_dispatch:
-    inputs:
-      ref:
-        description: Branch or commit to deploy
-        required: true
-        default: develop
-        type: string
+  push:
+    tags:
+      - frontend-test-v*
 
 permissions:
   contents: read
@@ -23,10 +19,8 @@ jobs:
     timeout-minutes: 15
 
     steps:
-      - name: Checkout selected revision
+      - name: Checkout tagged revision
         uses: actions/checkout@v6
-        with:
-          ref: ${{ inputs.ref }}
 
       - name: Configure Node.js
         uses: actions/setup-node@v7
