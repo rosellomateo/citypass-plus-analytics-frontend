@@ -193,7 +193,7 @@ export function getDailyTripsTrend(
     .map(([fecha, data]) => ({
       fecha,
       cantidadViajes: data.count,
-      totalDuration: Number(data.totalDuration.toFixed(1)),
+      duracionTotal: Number(data.totalDuration.toFixed(1)),
     }))
     .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
 }

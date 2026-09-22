@@ -39,7 +39,6 @@ export function MobilityDashboard() {
   const resolved = useResolvedUiState(mobilityAsync);
 
   // Filtros locales independientes por gráfico
-  const [selectedStationChart1, setSelectedStationChart1] = useState<string>('ALL');
   const [selectedStationChart2, setSelectedStationChart2] = useState<string>('ALL');
 
   // Registros planos filtrados
@@ -47,8 +46,8 @@ export function MobilityDashboard() {
 
   // Gráfico 1: Viajes por Estación de Inicio (con nombres formateados)
   const tripsByStationData = useMemo(() => {
-    return getTripsByStation(records, selectedStationChart1);
-  }, [records, selectedStationChart1]);
+    return getTripsByStation(records);
+  }, [records]);
 
   // Gráfico 2: Distribución por Duración de Viaje (PieChart sin solapamiento de etiquetas)
   const tripsByDurationData = useMemo(() => {

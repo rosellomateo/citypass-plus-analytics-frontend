@@ -225,6 +225,51 @@ describe('Domain Services Aggregations', () => {
     expect(filteredTrips[0].station).toBe(firstStation);
   });
 
+  it('Mobility service filters records by date and search text', () => {
+    const records = getFilteredMobilityRecords(
+      {
+        dateRange: 'custom',
+        from: '2026-09-01',
+        to: '2026-09-30',
+        search: 'palermo',
+      },
+      mockMobilityRecords
+    );
+
+    expect(records.length).toBeGreaterThan(0);
+    expect(records.every((record) => record.estacionInicio.toLowerCase().includes('palermo'))).toBe(
+      true
+    );
+  });
+
+  it('Mobility service calculates and sorts the daily trips trend', () => {
+    const trend = getDailyTripsTrend([
+      {
+        fechaInicio: '2026-09-19',
+        estacionInicio: 'palermo-05',
+        duracionViaje: '15-30min',
+        cantidadViajes: 2,
+        duracionTotalViajes: 40,
+        promDuracion: 20,
+        fecha_snapshot: '2026-09-20',
+      },
+      {
+        fechaInicio: '2026-09-18',
+        estacionInicio: 'palermo-05',
+        duracionViaje: '<15min',
+        cantidadViajes: 3,
+        duracionTotalViajes: 30,
+        promDuracion: 10,
+        fecha_snapshot: '2026-09-20',
+      },
+    ]);
+
+    expect(trend).toEqual([
+      { fecha: '2026-09-18', cantidadViajes: 3, duracionTotal: 30 },
+      { fecha: '2026-09-19', cantidadViajes: 2, duracionTotal: 40 },
+    ]);
+  });
+
   it('Mobility service handles empty records gracefully avoiding NaN or division by zero', async () => {
     const emptyData = await getMobilityAnalyticsData(defaultFilters, []);
     expect(emptyData.weightedAvgDurationMinutes).toBe(0);
@@ -240,6 +285,7 @@ describe('Domain Services Aggregations', () => {
     expect(data.totalDurationMinutes).toBeGreaterThan(0);
     expect(data.weightedAvgDurationMinutes).toBeGreaterThan(0);
     expect(data.availableStations.length).toBeGreaterThan(0);
+    expect(data.executiveReport).toEqual(mockMobilityLLMReport.analisis[0]);
   });
 
   it('Culture service calculates CU-C1 (reservations/cancellation rate) and CU-C2 (inscriptions/occupancy rate)', async () => {
