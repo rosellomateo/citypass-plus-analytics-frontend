@@ -13,14 +13,12 @@ import {
 } from '../services/emergencyService';
 import {
   getMobilityAnalyticsData,
-  getBikesPerStationDistribution,
-  getBikesStatusDistributionFiltered,
-  getTripsByTimeSlotDualSeries,
-  getStationAvailabilityOccupancy,
-  getHistoricalAvailabilityTimeSeries,
-  getIncidentsByTypeDistribution,
-  getAvgMaintenanceTimeByStation,
-  getTopProblematicBikes,
+  deduplicateMobilityRecords,
+  getFilteredMobilityRecords,
+  getTripsByStation,
+  getTripsByDurationBucket,
+  getDailyTripsTrend,
+  getStationAvgDuration,
 } from '../services/mobilityService';
 import { getCultureAnalyticsData } from '../services/cultureService';
 import { mockClaimRecords } from '../data/mocks/claims.mock';
@@ -28,17 +26,8 @@ import {
   mockEmergenciaCreadaEvents,
   mockEmergenciaPriorizadaEvents,
 } from '../data/mocks/emergencies.mock';
-import {
-  mockStationsEntities,
-  mockBikesEntities,
-  mockIncidentTypesEntities,
-  mockBikeIncidentsEntities,
-  mockMaintenanceRecordsEntities,
-  mockStationAvailabilityHistoryEntities,
-  mockViajeIniciadoEvents,
-  mockViajeFinalizadoEvents,
-} from '../data/mocks/mobility.mock';
-import type { EmergencyPriority, EmergencyState } from '../types';
+import { mockMobilityRecords, mockMobilityLLMReport } from '../data/mocks/mobility.mock';
+import type { EmergencyPriority, EmergencyState, BackendMobilityRecord } from '../types';
 
 const defaultFilters = { dateRange: '7d' as const };
 
@@ -140,83 +129,117 @@ describe('Domain Services Aggregations', () => {
     expect(emptyCombined[0].total).toBe(0);
   });
 
-  it('Mobility service calculates CU-M1 & CU-M2 composite analytics correctly', async () => {
+  /* ---------------------- MOVILIDAD TESTS ---------------------- */
+
+  it('Mobility service deduplicates records by selecting the latest fecha_snapshot', () => {
+    const duplicateRecords: BackendMobilityRecord[] = [
+      {
+        fechaInicio: '2026-07-27',
+        estacionInicio: 'est-almagro-01',
+        duracionViaje: '<15min',
+        cantidadViajes: 1,
+        duracionTotalViajes: 12.0,
+        promDuracion: 12.0,
+        fecha_snapshot: '2026-08-02',
+      },
+      {
+        fechaInicio: '2026-07-27',
+        estacionInicio: 'est-almagro-01',
+        duracionViaje: '<15min',
+        cantidadViajes: 1,
+        duracionTotalViajes: 12.0,
+        promDuracion: 12.0,
+        fecha_snapshot: '2026-09-22', // más reciente
+      },
+    ];
+
+    const deduplicated = deduplicateMobilityRecords(duplicateRecords);
+    expect(deduplicated.length).toBe(1);
+    expect(deduplicated[0].fecha_snapshot).toBe('2026-09-22');
+  });
+
+  it('Mobility service calculates exact weighted average for trip duration SUM(totalMinutes)/SUM(trips)', () => {
+    const records: BackendMobilityRecord[] = [
+      {
+        fechaInicio: '2026-09-18',
+        estacionInicio: 'estacion-A',
+        duracionViaje: '15-30min',
+        cantidadViajes: 10,
+        duracionTotalViajes: 200,
+        promDuracion: 20,
+        fecha_snapshot: '2026-09-20',
+      },
+      {
+        fechaInicio: '2026-09-18',
+        estacionInicio: 'estacion-A',
+        duracionViaje: '30-60min',
+        cantidadViajes: 2,
+        duracionTotalViajes: 100,
+        promDuracion: 50,
+        fecha_snapshot: '2026-09-20',
+      },
+    ];
+
+    // Weighted average: (200 + 100) / (10 + 2) = 300 / 12 = 25 min.
+    // Simple average would be (20 + 50) / 2 = 35 min. We verify it's 25!
+    const avgDurationItems = getStationAvgDuration(records);
+    expect(avgDurationItems.length).toBe(1);
+    expect(avgDurationItems[0].promDuracionPonderada).toBe(25);
+  });
+
+  it('Mobility service respects strict duration bucket ordering', () => {
+    const records: BackendMobilityRecord[] = [
+      {
+        fechaInicio: '2026-09-18',
+        estacionInicio: 'liniers-02',
+        duracionViaje: '>1h',
+        cantidadViajes: 5,
+        duracionTotalViajes: 350,
+        promDuracion: 70,
+        fecha_snapshot: '2026-09-20',
+      },
+      {
+        fechaInicio: '2026-09-18',
+        estacionInicio: 'liniers-02',
+        duracionViaje: '<15min',
+        cantidadViajes: 10,
+        duracionTotalViajes: 100,
+        promDuracion: 10,
+        fecha_snapshot: '2026-09-20',
+      },
+    ];
+
+    const buckets = getTripsByDurationBucket(records);
+    expect(buckets.map((b) => b.bucket)).toEqual(['<15min', '15-30min', '30-60min', '>1h']);
+    expect(buckets.find((b) => b.bucket === '<15min')?.cantidadViajes).toBe(10);
+    expect(buckets.find((b) => b.bucket === '>1h')?.cantidadViajes).toBe(5);
+  });
+
+  it('Mobility service supports station filtering dynamically without hardcoded stations', () => {
+    const stations = getTripsByStation(mockMobilityRecords);
+    expect(stations.length).toBeGreaterThan(0);
+
+    const firstStation = stations[0].station;
+    const filteredTrips = getTripsByStation(mockMobilityRecords, firstStation);
+    expect(filteredTrips.length).toBe(1);
+    expect(filteredTrips[0].station).toBe(firstStation);
+  });
+
+  it('Mobility service handles empty records gracefully avoiding NaN or division by zero', async () => {
+    const emptyData = await getMobilityAnalyticsData(defaultFilters, []);
+    expect(emptyData.weightedAvgDurationMinutes).toBe(0);
+    expect(emptyData.tripsByStation.length).toBe(0);
+    expect(emptyData.topStationName).toBe('N/A');
+    expect(emptyData.predominantDurationBucket).toBe('N/A');
+  });
+
+  it('Mobility service composes analytics data dynamically from filtered records', async () => {
     const data = await getMobilityAnalyticsData(defaultFilters);
-    expect(data.totalTripsStarted).toBeGreaterThan(0);
-    expect(data.totalTripsCompleted).toBeGreaterThan(0);
-    expect(data.totalBikes).toBeGreaterThan(0);
-    expect(data.availableBikesCount).toBeGreaterThan(0);
-    expect(data.totalFreeSlots).toBeGreaterThan(0);
-    expect(data.bikesByStation.length).toBe(mockStationsEntities.length);
-    expect(data.bikesStatusDistribution.length).toBe(5);
-    expect(data.timeSlotDualSeries.length).toBeGreaterThan(0);
-    expect(data.stationAvailabilityOccupancy.length).toBe(mockStationsEntities.length);
-    expect(data.historicalAvailability.length).toBeGreaterThan(0);
-    expect(data.incidentsByTypeDistribution.length).toBe(mockIncidentTypesEntities.length);
-    expect(data.avgMaintenanceTimeByStation.length).toBe(mockStationsEntities.length);
-    expect(data.topProblematicBikes.length).toBeGreaterThan(0);
-  });
-
-  it('Mobility service supports bikes per station distribution (horizontal bar data)', () => {
-    const bikesByStation = getBikesPerStationDistribution(mockBikesEntities, mockStationsEntities);
-    expect(bikesByStation.length).toBe(mockStationsEntities.length);
-    const sumCount = bikesByStation.reduce((acc, curr) => acc + curr.count, 0);
-    const assignedBikesCount = mockBikesEntities.filter((b) => b.stationId !== null).length;
-    expect(sumCount).toBe(assignedBikesCount);
-  });
-
-  it('Mobility service calculates dynamic station availability and free slots', () => {
-    const occupancy = getStationAvailabilityOccupancy(mockStationsEntities, mockBikesEntities);
-    expect(occupancy.length).toBe(mockStationsEntities.length);
-
-    occupancy.forEach((item) => {
-      const station = mockStationsEntities.find((s) => s.name === item.station)!;
-      const bikesAtStation = mockBikesEntities.filter((b) => b.stationId === station.id);
-      const manualAvailable = bikesAtStation.filter((b) => b.status === 'AVAILABLE').length;
-      const manualFree = Math.max(0, station.capacity - bikesAtStation.length);
-
-      expect(item.availableBikes).toBe(manualAvailable);
-      expect(item.freeSlots).toBe(manualFree);
-      expect(item.capacity).toBe(station.capacity);
-    });
-  });
-
-  it('Mobility service supports station filtering for bike status distribution', () => {
-    const allDist = getBikesStatusDistributionFiltered(mockBikesEntities, mockStationsEntities);
-    const totalAll = allDist.reduce((acc, curr) => acc + curr.value, 0);
-    expect(totalAll).toBe(mockBikesEntities.length);
-
-    const stName = mockStationsEntities[0].name;
-    const filteredDist = getBikesStatusDistributionFiltered(mockBikesEntities, mockStationsEntities, stName);
-    const totalFiltered = filteredDist.reduce((acc, curr) => acc + curr.value, 0);
-    const manualStationBikes = mockBikesEntities.filter((b) => b.stationId === mockStationsEntities[0].id).length;
-    expect(totalFiltered).toBe(manualStationBikes);
-  });
-
-  it('Mobility service calculates dual-series trips by time slot in chronological order', () => {
-    const timeSlots = getTripsByTimeSlotDualSeries(mockViajeIniciadoEvents, mockViajeFinalizadoEvents);
-    expect(timeSlots.length).toBeGreaterThan(0);
-
-    // Verify chronological order
-    for (let i = 0; i < timeSlots.length - 1; i++) {
-      const hCurr = parseInt(timeSlots[i].slot.slice(0, 2), 10);
-      const hNext = parseInt(timeSlots[i + 1].slot.slice(0, 2), 10);
-      expect(hCurr).toBeLessThan(hNext);
-    }
-  });
-
-  it('Mobility service ranks top problematic bikes by incidents and maintenance entries', () => {
-    const topBikes = getTopProblematicBikes(
-      mockBikesEntities,
-      mockBikeIncidentsEntities,
-      mockMaintenanceRecordsEntities,
-      mockStationsEntities,
-      5
-    );
-    expect(topBikes.length).toBeLessThanOrEqual(5);
-    expect(topBikes[0].incidentCount + topBikes[0].maintenanceCount).toBeGreaterThanOrEqual(
-      topBikes[topBikes.length - 1].incidentCount + topBikes[topBikes.length - 1].maintenanceCount
-    );
+    expect(data.totalTrips).toBeGreaterThan(0);
+    expect(data.weeklyTrips).toBeGreaterThan(0);
+    expect(data.totalDurationMinutes).toBeGreaterThan(0);
+    expect(data.weightedAvgDurationMinutes).toBeGreaterThan(0);
+    expect(data.availableStations.length).toBeGreaterThan(0);
   });
 
   it('Culture service calculates CU-C1 (reservations/cancellation rate) and CU-C2 (inscriptions/occupancy rate)', async () => {
@@ -228,4 +251,3 @@ describe('Domain Services Aggregations', () => {
     expect(data.avgOccupancyRatePct).toBeGreaterThan(0);
   });
 });
-

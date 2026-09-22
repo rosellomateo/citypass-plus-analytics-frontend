@@ -1,187 +1,111 @@
 // src/types/mobility.ts
-import type { EventEnvelope } from './common';
 
-export type StationStatus = 'ACTIVE' | 'INACTIVE' | 'MAINTENANCE';
-export type BikeStatus = 'AVAILABLE' | 'IN_USE' | 'MAINTENANCE' | 'OUT_OF_SERVICE' | 'STOLEN';
-export type TripStatus = 'ACTIVE' | 'COMPLETED' | 'CANCELLED' | 'INCIDENT';
-export type IncidentSeverity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-export type IncidentStatus = 'REPORTED' | 'UNDER_REVIEW' | 'RESOLVED' | 'DISCARDED';
-
-export interface StationEntity {
-  id: string;
-  externalId?: string;
-  name: string;
-  address: string;
-  latitude: number;
-  longitude: number;
-  capacity: number;
-  status: StationStatus;
-  source: 'DATASET' | 'MANUAL';
-  createdAt?: string;
+/**
+ * Registros estructurados del dataset Parquet de viajes (gold/Movilidad Urbana/viajes_resumen_XX_2026.parquet).
+ * DTO exacto enviado por el backend sin atributos inventados.
+ */
+export interface BackendMobilityRecord {
+  fechaInicio: string;
+  estacionInicio: string;
+  duracionViaje: string; // e.g. '<15min' | '15-30min' | '30-60min' | '>1h'
+  cantidadViajes: number;
+  duracionTotalViajes: number;
+  promDuracion: number;
+  fecha_snapshot: string;
 }
 
-export interface BikeEntity {
-  id: string;
-  code: string;
-  stationId?: string | null; // NULL while bike is IN_USE
-  status: BikeStatus;
-  model?: string;
-  purchaseDate?: string;
-  lastMaintenanceAt?: string;
+/**
+ * Estructuras del Reporte Sintético Analítico generado por el LLM.
+ */
+export interface MobilityLLMResumen {
+  parrafo_ejecutivo: string;
+  puntos_destacados: string[];
+  recomendaciones: string[];
+  riesgos: string[];
 }
 
-export interface BikeStatusHistoryEntity {
-  id: string;
-  bikeId: string;
-  previousStatus: BikeStatus;
-  newStatus: BikeStatus;
-  changedByUserId?: string;
-  reason?: string;
-  changedAt: string;
+export interface MobilityLLMCifras {
+  acumulado_total: number;
+  altas_semana: number;
+  duracionTotalViajes: number;
 }
 
-export interface TripEntity {
-  id: string;
-  userId: string;
-  bikeId: string;
-  originStationId: string;
-  destinationStationId?: string;
-  startedAt: string;
-  endedAt?: string;
-  status: TripStatus;
-  distanceKm?: number;
-  durationSeconds?: number;
+export interface MobilityLLMMetadata {
+  avisos: string[];
+  caso_de_uso: string;
+  cifras: MobilityLLMCifras;
+  corte: string;
+  filas_enviadas: number;
+  fuentes: string[];
+  llm: {
+    deployment: string;
+    finish_reason: string;
+    input_tokens: number;
+    modelo_respuesta: string;
+    output_tokens: number;
+    proveedor: string;
+    request_id: string;
+  };
+  semana_actual: string;
+  semanas_comparadas: string[];
+  snapshot_base: string;
+  version_esquema: string;
 }
 
-export interface IncidentTypeEntity {
-  id: string;
-  code: string;
-  name: string;
-  description?: string;
-  severity: IncidentSeverity;
+export interface MobilityWeeklyAnalysis {
+  generado_en: string;
+  metadata: MobilityLLMMetadata;
+  resumen: MobilityLLMResumen;
+  semana: string;
 }
 
-export interface BikeIncidentEntity {
-  id: string;
-  bikeId: string;
-  incidentTypeId: string;
-  reporterUserId?: string;
-  stationId?: string;
-  tripId?: string;
-  status: IncidentStatus;
-  description?: string;
-  reportedAt: string;
-  resolvedAt?: string;
+export interface MobilityLLMReport {
+  actualizado_en: string;
+  analisis: MobilityWeeklyAnalysis[];
+  caso_de_uso: string;
+  semanas: string[];
+  ultima_semana: string;
+  version_esquema: string;
 }
 
-export interface MaintenanceRecordEntity {
-  id: string;
-  bikeId: string;
-  startedAt: string;
-  endedAt?: string;
-  description?: string;
-  cost?: number;
-  performedBy?: string;
-}
-
-export interface StationAvailabilityHistoryEntity {
-  id: string;
-  stationId: string;
-  recordedAt: string;
-  availableBikes: number;
-  availableSlots: number;
-  occupiedSlots: number;
-}
-
-export interface StationPredictionEntity {
-  stationId: string;
-  predictedHour: string;
-  predictedDemand: number;
-  predictedAvailableBikes: number;
-}
-
-// Event Envelopes for compatibility with backend stream listeners
-export interface ViajeIniciadoData {
-  viajeId: string;
-  bicicletaId: string;
-  estacionOrigenId: string;
-  usuarioId: string;
-}
-
-export interface ViajeFinalizadoData {
-  viajeId: string;
-  bicicletaId: string;
-  estacionDestinoId: string;
-  duracionSegundos?: number;
-}
-
-export type ViajeIniciadoEvent = EventEnvelope<ViajeIniciadoData>;
-export type ViajeFinalizadoEvent = EventEnvelope<ViajeFinalizadoData>;
-
-// Dashboard Aggregation Interfaces
-export interface StationBikesCount {
+/**
+ * Métricas agregadas y modelos para componentes de UI (independientes de los DTOs recibidos).
+ */
+export interface TripsByStationItem {
   station: string;
-  count: number;
+  cantidadViajes: number;
 }
 
-export interface BikeStatusDistributionItem {
-  name: string;
-  value: number;
-  color: string;
+export interface TripsByDurationBucketItem {
+  bucket: string;
+  cantidadViajes: number;
+  porcentaje: number;
 }
 
-export interface DualSeriesTimeSlotItem {
-  slot: string;
-  iniciados: number;
-  finalizados: number;
+export interface DailyTripsTrendItem {
+  fecha: string;
+  cantidadViajes: number;
+  duracionTotal: number;
 }
 
-export interface StationAvailabilityOccupancyItem {
+export interface StationAvgDurationItem {
   station: string;
-  availableBikes: number;
-  freeSlots: number;
-  capacity: number;
-}
-
-export interface HistoricalAvailabilityPoint {
-  timestamp: string;
-  availableBikes: number;
-  freeSlots: number;
-}
-
-export interface IncidentTypeDistributionItem {
-  typeName: string;
-  count: number;
-  severity: IncidentSeverity;
-}
-
-export interface AvgMaintenanceTimeByStation {
-  station: string;
-  avgHours: number;
-}
-
-export interface TopProblematicBikeItem {
-  bikeCode: string;
-  stationName: string;
-  incidentCount: number;
-  maintenanceCount: number;
-  status: BikeStatus;
+  promDuracionPonderada: number; // SUM(duracionTotalViajes) / SUM(cantidadViajes)
+  cantidadViajes: number;
 }
 
 export interface MobilityAnalyticsData {
-  totalTripsStarted: number;
-  totalTripsCompleted: number;
-  avgTripDurationMinutes: number;
-  totalBikes: number;
-  availableBikesCount: number;
-  totalFreeSlots: number;
-  bikesByStation: StationBikesCount[];
-  bikesStatusDistribution: BikeStatusDistributionItem[];
-  timeSlotDualSeries: DualSeriesTimeSlotItem[];
-  stationAvailabilityOccupancy: StationAvailabilityOccupancyItem[];
-  historicalAvailability: HistoricalAvailabilityPoint[];
-  incidentsByTypeDistribution: IncidentTypeDistributionItem[];
-  avgMaintenanceTimeByStation: AvgMaintenanceTimeByStation[];
-  topProblematicBikes: TopProblematicBikeItem[];
+  totalTrips: number;
+  weeklyTrips: number;
+  totalDurationMinutes: number;
+  weightedAvgDurationMinutes: number; // SUM(duracionTotalViajes) / SUM(cantidadViajes)
+  topStationName: string;
+  predominantDurationBucket: string;
+  tripsByStation: TripsByStationItem[];
+  tripsByDurationBucket: TripsByDurationBucketItem[];
+  dailyTripsTrend: DailyTripsTrendItem[];
+  stationAvgDuration: StationAvgDurationItem[];
   availableStations: string[];
+  records: BackendMobilityRecord[];
+  executiveReport?: MobilityWeeklyAnalysis;
 }
