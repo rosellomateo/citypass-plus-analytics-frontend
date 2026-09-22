@@ -53,7 +53,7 @@ export type {
   CollectionTimeByZone,
   CriticalContainerDetail,
   WasteMetrics,
+  WasteAnalyticsData,
 } from './waste';
 
 export type * from './ai';
-

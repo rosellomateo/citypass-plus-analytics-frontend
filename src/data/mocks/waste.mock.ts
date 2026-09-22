@@ -7,4 +7,4 @@ import rawWasteSummary from '../../../testingDatos/waste_summary.json';
  * IMPORTANTE: La carpeta testingDatos será eliminada más adelante y reemplazada por la conexión con el backend.
  */
 export const mockWasteInputJson: WasteInputJson = rawWasteJson as WasteInputJson;
-export const mockWasteAIReport: AIAnalysisReport = rawWasteSummary as unknown as AIAnalysisReport;
+export const mockWasteAIReport: AIAnalysisReport = rawWasteSummary;

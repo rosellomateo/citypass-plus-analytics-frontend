@@ -104,4 +104,4 @@ export const mockClaimRecords: BackendAnalyticsRecord[] = [
   },
 ];
 
-export const mockClaimsAIReport: AIAnalysisReport = rawClaimsSummary as unknown as AIAnalysisReport;
+export const mockClaimsAIReport: AIAnalysisReport = rawClaimsSummary;

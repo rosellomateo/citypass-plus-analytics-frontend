@@ -1,4 +1,4 @@
-import type { DashboardFilters, WasteMetrics, ContainerStatus, WasteInputJson, AIAnalysisReport } from '../types';
+import type { DashboardFilters, WasteMetrics, ContainerStatus, WasteInputJson } from '../types';
 import rawWasteJson from '../../testingDatos/waste_records.json';
 import { mockWasteAIReport } from '../data/mocks/waste.mock';
 import { adaptWasteInput } from '../adapters/wasteAdapter';
@@ -148,6 +148,6 @@ export async function getWasteAnalyticsData(filters: DashboardFilters): Promise<
     volumeByWasteType,
     avgCollectionTimeByZone,
     criticalContainersDetail,
-    aiReport: mockWasteAIReport as unknown as AIAnalysisReport,
+    aiReport: mockWasteAIReport,
   };
 }

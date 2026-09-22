@@ -4,6 +4,7 @@ import {
   Home,
   Bike,
   Trash2,
+  Drama,
   User,
   Bell,
   Settings,
@@ -71,6 +72,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Reclamos', path: '/analytics/claims', icon: <ReclamosIcon size={18} /> },
   { label: 'Emergencias', path: '/analytics/emergencies', icon: <EmergenciasIcon size={18} /> },
   { label: 'Espacios Publicos', path: '/analytics/culture', icon: <EspaciosPublicosIcon size={18} /> },
+  { label: 'Cultura y Eventos', path: '/analytics/culture?tab=events', icon: <Drama size={18} /> },
   { label: 'Analitica Urbana', path: '/analytics', icon: <AnaliticaUrbanaIcon size={18} /> },
 ];
 
@@ -86,12 +88,19 @@ export function Sidebar() {
 
   const isItemActive = (itemPath: string) => {
     const currentPath = location.pathname;
+    const currentSearch = location.search;
 
     if (itemPath === '/') {
       return currentPath === '/';
     }
     if (itemPath === '/analytics') {
       return currentPath === '/analytics';
+    }
+    if (itemPath === '/analytics/culture') {
+      return currentPath === '/analytics/culture' && !currentSearch.includes('tab=events');
+    }
+    if (itemPath === '/analytics/culture?tab=events') {
+      return currentPath === '/analytics/culture' && currentSearch.includes('tab=events');
     }
     return currentPath === itemPath;
   };

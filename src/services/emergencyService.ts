@@ -5,7 +5,6 @@ import type {
   EmergencyState,
   EmergencyPriority,
   CategoryPriorityStackedData,
-  AIAnalysisReport,
 } from '../types';
 import {
   mockEmergenciaCreadaEvents,
@@ -268,6 +267,6 @@ export async function getEmergencyAnalyticsData(
     avgDispatchTimeByPriority,
     emergenciesByCategoryStacked,
     availableCategories,
-    aiReport: mockEmergenciesAIReport as unknown as AIAnalysisReport,
+    aiReport: mockEmergenciesAIReport,
   };
 }

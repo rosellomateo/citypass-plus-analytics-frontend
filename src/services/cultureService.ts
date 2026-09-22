@@ -1,5 +1,5 @@
 // src/services/cultureService.ts
-import type { DashboardFilters, CultureAnalyticsData, AIAnalysisReport } from '../types';
+import type { DashboardFilters, CultureAnalyticsData } from '../types';
 import {
   mockReservaConfirmadaEvents,
   mockReservaCanceladaEvents,
@@ -117,6 +117,6 @@ export async function getCultureAnalyticsData(filters: DashboardFilters): Promis
     inscriptionsByEvent,
     inscriptionsByCategory,
     avgOccupancyRatePct,
-    aiReport: mockCultureAIReport as unknown as AIAnalysisReport,
+    aiReport: mockCultureAIReport,
   };
 }

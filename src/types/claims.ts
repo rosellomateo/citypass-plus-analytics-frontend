@@ -1,5 +1,6 @@
 // src/types/claims.ts
 import type { EventEnvelope } from './common';
+import type { AIAnalysisReport } from './ai';
 
 export type ClaimCategory =
   | 'alumbrado'

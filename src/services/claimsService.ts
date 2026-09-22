@@ -1,5 +1,5 @@
 // src/services/claimsService.ts
-import type { DashboardFilters, ClaimsAnalyticsData, BackendAnalyticsRecord, AIAnalysisReport } from '../types';
+import type { DashboardFilters, ClaimsAnalyticsData, BackendAnalyticsRecord } from '../types';
 import { mockClaimRecords, mockClaimsAIReport } from '../data/mocks/claims.mock';
 import { delay } from '../utils';
 import { isWithinDateRange } from '../utils/dates';
@@ -164,6 +164,6 @@ export async function getClaimsAnalyticsData(
     avgResolutionTimeHours,
     avgResolutionByCategory,
     availableCategories,
-    aiReport: mockClaimsAIReport as unknown as AIAnalysisReport,
+    aiReport: mockClaimsAIReport,
   };
 }

@@ -250,4 +250,4 @@ export const mockInscripcionCanceladaEvents: InscripcionCanceladaEvent[] = [
 
 export const mockEventoCanceladoEvents: EventoCanceladoEvent[] = [];
 
-export const mockCultureAIReport: AIAnalysisReport = rawCultureSummary as unknown as AIAnalysisReport;
+export const mockCultureAIReport: AIAnalysisReport = rawCultureSummary;

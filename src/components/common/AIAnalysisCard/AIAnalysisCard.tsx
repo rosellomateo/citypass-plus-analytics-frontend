@@ -33,7 +33,6 @@ export function AIAnalysisCard({ report, item: directItem, defaultExpanded = tru
 
   const { resumen, metadata, semana } = activeItem;
   const llmInfo = metadata?.llm;
-  const cifras = metadata?.cifras;
   const semanaDisplay = semana || metadata?.semana_actual || report?.ultima_semana;
   const casoDeUsoDisplay = metadata?.caso_de_uso || report?.caso_de_uso;
 

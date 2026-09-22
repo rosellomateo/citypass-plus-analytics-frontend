@@ -1,4 +1,5 @@
 // src/types/waste.ts
+import type { AIAnalysisReport } from './ai';
 
 /**
  * Estructura provisional JSON de entrada (simulación de datos recibidos del backend).

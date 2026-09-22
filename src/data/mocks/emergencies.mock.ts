@@ -105,4 +105,4 @@ export const mockEmergenciaCerradaEvents: EmergenciaCerradaEvent[] = [
   { metadata: { eventId: 'evt-em-z2', eventType: 'EmergenciaCerrada', occurredAt: hoursAgo(19), source: 'emergency-service', version: '1' }, data: { correlationId: 'corr-em-12', emergenciaId: 'EMG-912', resultado: 'RESUELTA' } },
 ];
 
-export const mockEmergenciesAIReport: AIAnalysisReport = rawEmergenciesSummary as unknown as AIAnalysisReport;
+export const mockEmergenciesAIReport: AIAnalysisReport = rawEmergenciesSummary;
