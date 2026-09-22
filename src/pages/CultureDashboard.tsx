@@ -1,6 +1,3 @@
-// src/pages/CultureDashboard.tsx
-import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 import { DashboardHeader } from '../components/common/DashboardHeader/DashboardHeader';
 import { MetricCard } from '../components/common/MetricCard/MetricCard';
 import { ChartCard } from '../components/common/ChartCard/ChartCard';
@@ -17,19 +14,6 @@ export function CultureDashboard() {
   const { filters, updateFilter, updateDateRange } = useFilters();
   const cultureAsync = useCultureData(filters);
   const resolved = useResolvedUiState(cultureAsync);
-  const location = useLocation();
-
-  useEffect(() => {
-    if (location.search.includes('tab=events')) {
-      const timer = setTimeout(() => {
-        const el = document.getElementById('cultura-eventos-section');
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 150);
-      return () => clearTimeout(timer);
-    }
-  }, [location]);
 
   return (
     <div>
@@ -37,6 +21,7 @@ export function CultureDashboard() {
         title="Espacios Públicos y Cultura"
         subtitle="CU-C1: Ocupación de espacios públicos | CU-C2: Convocatoria de eventos comunitarios"
         filters={filters}
+        aiReport={resolved.data?.aiReport}
         onDateRangeChange={(range) => updateFilter('dateRange', range)}
         onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)}
       />

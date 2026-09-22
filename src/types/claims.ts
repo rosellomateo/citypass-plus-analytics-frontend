@@ -57,4 +57,5 @@ export interface ClaimsAnalyticsData {
   avgResolutionTimeHours: number;
   avgResolutionByCategory: { category: string; hours: number }[];
   availableCategories: string[];
+  aiReport?: AIAnalysisReport;
 }

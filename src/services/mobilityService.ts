@@ -9,6 +9,7 @@ import type {
   DailyTripsTrendItem,
   StationAvgDurationItem,
   MobilityWeeklyAnalysis,
+  AIAnalysisReport,
 } from '../types';
 import { mockMobilityRecords, mockMobilityLLMReport } from '../data/mocks/mobility.mock';
 import { delay } from '../utils';
@@ -286,5 +287,6 @@ export async function getMobilityAnalyticsData(
     availableStations,
     records: filteredRecords,
     executiveReport,
+    aiReport: llmReport as unknown as AIAnalysisReport,
   };
 }

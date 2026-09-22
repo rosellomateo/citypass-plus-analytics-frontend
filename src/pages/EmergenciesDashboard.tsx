@@ -120,6 +120,7 @@ export function EmergenciesDashboard() {
         title="Tablero de Emergencias"
         subtitle="CU-E1: Emergencias por estado y prioridad | CU-E2: Tiempo de despacho"
         filters={filters}
+        aiReport={resolved.data?.aiReport}
         onDateRangeChange={(range) => updateFilter('dateRange', range)}
         onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)}
       />

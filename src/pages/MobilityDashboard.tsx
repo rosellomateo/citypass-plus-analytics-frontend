@@ -72,6 +72,7 @@ export function MobilityDashboard() {
         title="Tablero de Movilidad Urbana"
         subtitle="Analítica de Viajes, Demanda Estacional y Trazabilidad por Estación"
         filters={filters}
+        aiReport={resolved.data?.aiReport}
         onDateRangeChange={(range) => updateFilter('dateRange', range)}
         onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)}
       />

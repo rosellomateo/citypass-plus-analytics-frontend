@@ -73,5 +73,7 @@ export interface EmergencyAnalyticsData {
   avgDispatchTimeByPriority: { priority: string; minutes: number }[];
   emergenciesByCategoryStacked: CategoryPriorityStackedData[];
   availableCategories: string[];
+  aiReport?: AIAnalysisReport;
 }
+
 
