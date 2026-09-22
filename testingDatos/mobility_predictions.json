@@ -1,0 +1,5 @@
+[
+  { "stationId": "st-01", "predictedHour": "18:00", "predictedDemand": 15, "predictedAvailableBikes": 4 },
+  { "stationId": "st-02", "predictedHour": "18:00", "predictedDemand": 22, "predictedAvailableBikes": 5 },
+  { "stationId": "st-03", "predictedHour": "18:00", "predictedDemand": 19, "predictedAvailableBikes": 2 }
+]

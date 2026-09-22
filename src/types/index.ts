@@ -31,11 +31,7 @@ export type {
   EmergencyAnalyticsData,
 } from './emergencies';
 
-export type {
-  ViajeIniciadoEvent,
-  ViajeFinalizadoEvent,
-  MobilityAnalyticsData,
-} from './mobility';
+export type * from './mobility';
 
 export type {
   EventCategory,
