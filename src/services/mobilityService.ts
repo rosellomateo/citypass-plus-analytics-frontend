@@ -286,5 +286,6 @@ export async function getMobilityAnalyticsData(
     availableStations,
     records: filteredRecords,
     executiveReport,
+    aiReport: llmReport,
   };
 }

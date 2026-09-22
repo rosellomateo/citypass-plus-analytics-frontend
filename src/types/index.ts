@@ -56,3 +56,4 @@ export type {
   WasteAnalyticsData,
 } from './waste';
 
+export type * from './ai';

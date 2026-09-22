@@ -11,6 +11,7 @@ import {
   mockEmergenciaPriorizadaEvents,
   mockEmergenciaEstadoActualizadoEvents,
   mockEmergenciaDespachadaEvents,
+  mockEmergenciesAIReport,
 } from '../data/mocks/emergencies.mock';
 import { delay } from '../utils';
 import { isWithinDateRange } from '../utils/dates';
@@ -266,5 +267,6 @@ export async function getEmergencyAnalyticsData(
     avgDispatchTimeByPriority,
     emergenciesByCategoryStacked,
     availableCategories,
+    aiReport: mockEmergenciesAIReport,
   };
 }

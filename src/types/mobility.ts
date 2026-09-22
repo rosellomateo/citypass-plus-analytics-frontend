@@ -1,4 +1,5 @@
 // src/types/mobility.ts
+import type { AIAnalysisReport } from './ai';
 
 /**
  * Registros estructurados del dataset Parquet de viajes (gold/Movilidad Urbana/viajes_resumen_XX_2026.parquet).
@@ -25,6 +26,7 @@ export interface MobilityLLMResumen {
 }
 
 export interface MobilityLLMCifras {
+  [key: string]: number;
   acumulado_total: number;
   altas_semana: number;
   duracionTotalViajes: number;
@@ -108,4 +110,5 @@ export interface MobilityAnalyticsData {
   availableStations: string[];
   records: BackendMobilityRecord[];
   executiveReport?: MobilityWeeklyAnalysis;
+  aiReport?: AIAnalysisReport;
 }

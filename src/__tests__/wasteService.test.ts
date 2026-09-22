@@ -70,4 +70,10 @@ describe('Waste Service Analytics (wasteService.ts)', () => {
     const filteredByType = await getWasteAnalyticsData({ ...defaultFilters, wasteType: 'Orgánico' });
     expect(filteredByType.criticalContainersDetail.every((c) => c.wasteType === 'Orgánico')).toBe(true);
   });
+
+  it('10. Includes the AI analysis report', async () => {
+    const data = await getWasteAnalyticsData(defaultFilters);
+
+    expect(data.aiReport?.analisis?.length).toBeGreaterThan(0);
+  });
 });

@@ -39,6 +39,7 @@ describe('Domain Services Aggregations', () => {
     expect(data.claimsByStatus.length).toBe(4);
     expect(data.avgResolutionTimeHours).toBeGreaterThanOrEqual(0);
     expect(data.availableCategories.length).toBeGreaterThan(0);
+    expect(data.aiReport?.analisis?.length).toBeGreaterThan(0);
   });
 
   it('Reclamos service supports local category filtering for status distribution', () => {
@@ -87,6 +88,7 @@ describe('Domain Services Aggregations', () => {
     expect(data.avgDispatchTimeMinutes).toBeGreaterThanOrEqual(0);
     expect(data.emergenciesByCategoryStacked.length).toBeGreaterThan(0);
     expect(data.availableCategories.length).toBeGreaterThan(0);
+    expect(data.aiReport?.analisis?.length).toBeGreaterThan(0);
   });
 
   it('Emergency service supports combined category and state pill filtering for stacked distribution', () => {
@@ -286,6 +288,7 @@ describe('Domain Services Aggregations', () => {
     expect(data.weightedAvgDurationMinutes).toBeGreaterThan(0);
     expect(data.availableStations.length).toBeGreaterThan(0);
     expect(data.executiveReport).toEqual(mockMobilityLLMReport.analisis[0]);
+    expect(data.aiReport).toBe(mockMobilityLLMReport);
   });
 
   it('Culture service calculates CU-C1 (reservations/cancellation rate) and CU-C2 (inscriptions/occupancy rate)', async () => {
@@ -295,5 +298,6 @@ describe('Domain Services Aggregations', () => {
     expect(data.totalInscriptions).toBeGreaterThan(0);
     expect(data.inscriptionsByEvent.length).toBeGreaterThan(0);
     expect(data.avgOccupancyRatePct).toBeGreaterThan(0);
+    expect(data.aiReport?.analisis?.length).toBeGreaterThan(0);
   });
 });

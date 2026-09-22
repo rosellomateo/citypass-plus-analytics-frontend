@@ -2,7 +2,8 @@
 import type { ReactNode } from 'react';
 import { Breadcrumbs } from '../../layout/Breadcrumbs/Breadcrumbs';
 import { DateRangeSelector } from '../DateRangeSelector/DateRangeSelector';
-import type { DashboardFilters } from '../../../types';
+import { AIAnalysisCard } from '../AIAnalysisCard/AIAnalysisCard';
+import type { DashboardFilters, AIAnalysisReport } from '../../../types';
 import styles from './DashboardHeader.module.css';
 
 interface DashboardHeaderProps {
@@ -13,6 +14,7 @@ interface DashboardHeaderProps {
   onCustomDateSelect?: (from: string, to: string) => void;
   actions?: ReactNode;
   filters_extra?: ReactNode;
+  aiReport?: AIAnalysisReport;
 }
 
 export function DashboardHeader({
@@ -23,6 +25,7 @@ export function DashboardHeader({
   onCustomDateSelect,
   actions,
   filters_extra,
+  aiReport,
 }: DashboardHeaderProps) {
   return (
     <div className={styles.header}>
@@ -45,6 +48,11 @@ export function DashboardHeader({
           {actions}
         </div>
       </div>
+      {aiReport && (
+        <div style={{ marginTop: '16px' }}>
+          <AIAnalysisCard report={aiReport} />
+        </div>
+      )}
       {filters_extra && (
         <div className={styles.filtersRow}>{filters_extra}</div>
       )}

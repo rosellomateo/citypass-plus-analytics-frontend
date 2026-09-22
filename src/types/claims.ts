@@ -1,5 +1,6 @@
 // src/types/claims.ts
 import type { EventEnvelope } from './common';
+import type { AIAnalysisReport } from './ai';
 
 export type ClaimCategory =
   | 'alumbrado'
@@ -57,4 +58,5 @@ export interface ClaimsAnalyticsData {
   avgResolutionTimeHours: number;
   avgResolutionByCategory: { category: string; hours: number }[];
   availableCategories: string[];
+  aiReport?: AIAnalysisReport;
 }
