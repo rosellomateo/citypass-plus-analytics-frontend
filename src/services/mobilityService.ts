@@ -1,465 +1,290 @@
 // src/services/mobilityService.ts
 import type {
   DashboardFilters,
+  BackendMobilityRecord,
+  MobilityLLMReport,
   MobilityAnalyticsData,
-  StationEntity,
-  BikeEntity,
-  BikeStatus,
-  BikeStatusDistributionItem,
-  StationBikesCount,
-  DualSeriesTimeSlotItem,
-  StationAvailabilityOccupancyItem,
-  HistoricalAvailabilityPoint,
-  IncidentTypeDistributionItem,
-  AvgMaintenanceTimeByStation,
-  TopProblematicBikeItem,
-  IncidentTypeEntity,
-  BikeIncidentEntity,
-  MaintenanceRecordEntity,
-  StationAvailabilityHistoryEntity,
-  ViajeIniciadoEvent,
-  ViajeFinalizadoEvent,
+  TripsByStationItem,
+  TripsByDurationBucketItem,
+  DailyTripsTrendItem,
+  StationAvgDurationItem,
+  MobilityWeeklyAnalysis,
 } from '../types';
-import {
-  mockStationsEntities,
-  mockBikesEntities,
-  mockIncidentTypesEntities,
-  mockBikeIncidentsEntities,
-  mockMaintenanceRecordsEntities,
-  mockStationAvailabilityHistoryEntities,
-  mockViajeIniciadoEvents,
-  mockViajeFinalizadoEvents,
-  mockStations,
-} from '../data/mocks/mobility.mock';
+import { mockMobilityRecords, mockMobilityLLMReport } from '../data/mocks/mobility.mock';
 import { delay } from '../utils';
 import { isWithinDateRange } from '../utils/dates';
 
-export const BIKE_STATUS_LABELS: Record<BikeStatus, string> = {
-  AVAILABLE: 'Disponible',
-  IN_USE: 'En uso',
-  MAINTENANCE: 'En mantenimiento',
-  OUT_OF_SERVICE: 'Fuera de servicio',
-  STOLEN: 'Reportada como robada',
+export const STANDARD_DURATION_BUCKETS = ['<15min', '15-30min', '30-60min', '>1h'];
+
+export const STATION_NAME_MAP: Record<string, string> = {
+  'belgrano-03': 'Belgrano',
+  'est-almagro-01': 'Almagro',
+  'est-alagro-033': 'Almagro',
+  'est-boedo-01': 'Boedo',
+  'est-chacarita-02': 'Chacarita',
+  'est-devoto-03': 'Devoto',
+  'est-flores-01': 'Flores',
+  'liniers-02': 'Liniers',
+  'palermo-05': 'Palermo',
+  'recoleta-04': 'Recoleta',
 };
 
-export const BIKE_STATUS_COLORS: Record<BikeStatus, string> = {
-  AVAILABLE: '#10B981',
-  IN_USE: '#2563A6',
-  MAINTENANCE: '#F59E0B',
-  OUT_OF_SERVICE: '#8B5CF6',
-  STOLEN: '#EF4444',
-};
+/**
+ * Traduce y formaliza los nombres de estaciones para la UI (e.g. belgrano-03 -> Belgrano).
+ */
+export function formatStationName(rawName: string): string {
+  if (!rawName) return 'Sin Estación';
+  const lower = rawName.toLowerCase().trim();
+  if (STATION_NAME_MAP[lower]) return STATION_NAME_MAP[lower];
 
-const STANDARD_TIME_SLOTS = [
-  '07:00 - 08:00',
-  '08:00 - 09:00',
-  '09:00 - 10:00',
-  '10:00 - 11:00',
-  '11:00 - 12:00',
-  '12:00 - 13:00',
-  '13:00 - 14:00',
-  '14:00 - 15:00',
-  '15:00 - 16:00',
-  '16:00 - 17:00',
-  '17:00 - 18:00',
-  '18:00 - 19:00',
-  '19:00 - 20:00',
-  '20:00 - 21:00',
-  '21:00 - 22:00',
-];
-
-// Helper: map station ID to station name
-function getStationNameMap(stations: StationEntity[] = mockStationsEntities): Map<string, string> {
-  return new Map(stations.map((s) => [s.id, s.name]));
+  let cleaned = rawName.replace(/^est-?/i, '').replace(/-\d+$/i, '');
+  if (!cleaned) cleaned = rawName;
+  return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
 }
 
-// 1. Total bikes per station (for Horizontal BarChart)
-export function getBikesPerStationDistribution(
-  bikes: BikeEntity[] = mockBikesEntities,
-  stations: StationEntity[] = mockStationsEntities
-): StationBikesCount[] {
-  const stationNameMap = getStationNameMap(stations);
+/**
+ * Compara si un nombre de estación (crudo o formateado) coincide con el filtro seleccionado.
+ */
+export function isStationMatch(rawStation: string, stationFilter?: string): boolean {
+  if (!stationFilter || stationFilter === 'ALL' || stationFilter === 'Todas las estaciones') {
+    return true;
+  }
+  const formatted = formatStationName(rawStation);
+  return rawStation === stationFilter || formatted === stationFilter;
+}
+
+/**
+ * Deduplica registros analíticos reteniendo únicamente el registro con la fecha_snapshot más reciente
+ * para cada clave única (fechaInicio + estacionInicio + duracionViaje).
+ */
+export function deduplicateMobilityRecords(records: BackendMobilityRecord[]): BackendMobilityRecord[] {
+  if (!records || records.length === 0) return [];
+
+  const mapKeyToRecord = new Map<string, BackendMobilityRecord>();
+
+  records.forEach((record) => {
+    const key = `${record.fechaInicio}|${record.estacionInicio}|${record.duracionViaje}`;
+    const existing = mapKeyToRecord.get(key);
+
+    if (!existing) {
+      mapKeyToRecord.set(key, record);
+    } else {
+      const existingDate = new Date(existing.fecha_snapshot).getTime();
+      const currentDate = new Date(record.fecha_snapshot).getTime();
+      if (currentDate > existingDate) {
+        mapKeyToRecord.set(key, record);
+      }
+    }
+  });
+
+  return Array.from(mapKeyToRecord.values());
+}
+
+/**
+ * Filtra registros deduplicados según filtros globales de fecha (aplicados a fechaInicio) y búsqueda.
+ */
+export function getFilteredMobilityRecords(
+  filters: DashboardFilters,
+  records: BackendMobilityRecord[] = mockMobilityRecords
+): BackendMobilityRecord[] {
+  const deduplicated = deduplicateMobilityRecords(records);
+
+  let filtered = deduplicated.filter((r) => isWithinDateRange(r.fechaInicio, filters));
+
+  if (filters.search) {
+    const q = filters.search.toLowerCase();
+    filtered = filtered.filter(
+      (r) =>
+        r.estacionInicio.toLowerCase().includes(q) ||
+        formatStationName(r.estacionInicio).toLowerCase().includes(q) ||
+        r.duracionViaje.toLowerCase().includes(q) ||
+        r.fechaInicio.toLowerCase().includes(q)
+    );
+  }
+
+  return filtered;
+}
+
+/**
+ * Calcula SUM(cantidadViajes) por estación de inicio (con nombres traducidos).
+ */
+export function getTripsByStation(
+  records: BackendMobilityRecord[],
+  stationFilter?: string
+): TripsByStationItem[] {
+  const filtered = records.filter((r) => isStationMatch(r.estacionInicio, stationFilter));
+
   const counts: Record<string, number> = {};
 
-  stations.forEach((s) => {
-    counts[s.name] = 0;
+  filtered.forEach((r) => {
+    const formattedName = formatStationName(r.estacionInicio);
+    counts[formattedName] = (counts[formattedName] || 0) + (r.cantidadViajes || 0);
   });
 
-  bikes.forEach((b) => {
-    if (b.stationId) {
-      const stName = stationNameMap.get(b.stationId) || 'Sin Estación';
-      counts[stName] = (counts[stName] || 0) + 1;
-    }
-  });
-
-  return Object.entries(counts).map(([station, count]) => ({ station, count }));
+  return Object.entries(counts)
+    .map(([station, count]) => ({ station, cantidadViajes: count }))
+    .sort((a, b) => b.cantidadViajes - a.cantidadViajes);
 }
 
-// 2. Bikes status distribution (with local station filter)
-export function getBikesStatusDistributionFiltered(
-  bikes: BikeEntity[] = mockBikesEntities,
-  stations: StationEntity[] = mockStationsEntities,
+/**
+ * Agrupa SUM(cantidadViajes) por rango de duración manteniendo el orden estricto:
+ * [<15min, 15-30min, 30-60min, >1h]
+ */
+export function getTripsByDurationBucket(
+  records: BackendMobilityRecord[],
   stationFilter?: string
-): BikeStatusDistributionItem[] {
-  const stationNameMap = getStationNameMap(stations);
+): TripsByDurationBucketItem[] {
+  const filtered = records.filter((r) => isStationMatch(r.estacionInicio, stationFilter));
 
-  const filteredBikes =
-    !stationFilter || stationFilter === 'ALL' || stationFilter === 'Todas las estaciones'
-      ? bikes
-      : bikes.filter((b) => b.stationId && stationNameMap.get(b.stationId) === stationFilter);
-
-  const statusCounts: Record<BikeStatus, number> = {
-    AVAILABLE: 0,
-    IN_USE: 0,
-    MAINTENANCE: 0,
-    OUT_OF_SERVICE: 0,
-    STOLEN: 0,
+  const bucketCounts: Record<string, number> = {
+    '<15min': 0,
+    '15-30min': 0,
+    '30-60min': 0,
+    '>1h': 0,
   };
 
-  filteredBikes.forEach((b) => {
-    if (statusCounts[b.status] !== undefined) {
-      statusCounts[b.status] += 1;
+  let totalTrips = 0;
+
+  filtered.forEach((r) => {
+    const count = r.cantidadViajes || 0;
+    totalTrips += count;
+    if (bucketCounts[r.duracionViaje] !== undefined) {
+      bucketCounts[r.duracionViaje] += count;
+    } else {
+      bucketCounts[r.duracionViaje] = (bucketCounts[r.duracionViaje] || 0) + count;
     }
   });
 
-  return (Object.keys(statusCounts) as BikeStatus[]).map((status) => ({
-    name: BIKE_STATUS_LABELS[status],
-    value: statusCounts[status],
-    color: BIKE_STATUS_COLORS[status],
-  }));
-}
+  const allBucketKeys = Array.from(
+    new Set([...STANDARD_DURATION_BUCKETS, ...Object.keys(bucketCounts)])
+  );
 
-// 3. Trips by time slot Dual Series (Iniciados vs Finalizados, ordered chronologically, local station filter)
-export function getTripsByTimeSlotDualSeries(
-  startedEvents: ViajeIniciadoEvent[] = mockViajeIniciadoEvents,
-  finishedEvents: ViajeFinalizadoEvent[] = mockViajeFinalizadoEvents,
-  stationFilter?: string
-): DualSeriesTimeSlotItem[] {
-  const isAll = !stationFilter || stationFilter === 'ALL' || stationFilter === 'Todas las estaciones';
-
-  const filteredStarted = isAll
-    ? startedEvents
-    : startedEvents.filter((e) => e.data.estacionOrigenId === stationFilter);
-
-  const filteredFinished = isAll
-    ? finishedEvents
-    : finishedEvents.filter((e) => e.data.estacionDestinoId === stationFilter);
-
-  const slotMap: Record<string, { iniciados: number; finalizados: number }> = {};
-  STANDARD_TIME_SLOTS.forEach((slot) => {
-    slotMap[slot] = { iniciados: 0, finalizados: 0 };
-  });
-
-  filteredStarted.forEach((e) => {
-    const hour = new Date(e.metadata.occurredAt).getHours();
-    const slot = `${hour.toString().padStart(2, '0')}:00 - ${(hour + 1).toString().padStart(2, '0')}:00`;
-    if (!slotMap[slot]) slotMap[slot] = { iniciados: 0, finalizados: 0 };
-    slotMap[slot].iniciados += 1;
-  });
-
-  filteredFinished.forEach((e) => {
-    const hour = new Date(e.metadata.occurredAt).getHours();
-    const slot = `${hour.toString().padStart(2, '0')}:00 - ${(hour + 1).toString().padStart(2, '0')}:00`;
-    if (!slotMap[slot]) slotMap[slot] = { iniciados: 0, finalizados: 0 };
-    slotMap[slot].finalizados += 1;
-  });
-
-  return Object.entries(slotMap)
-    .map(([slot, data]) => ({
-      slot,
-      iniciados: data.iniciados,
-      finalizados: data.finalizados,
-    }))
-    .sort((a, b) => {
-      const hA = parseInt(a.slot.slice(0, 2), 10);
-      const hB = parseInt(b.slot.slice(0, 2), 10);
-      return hA - hB;
-    });
-}
-
-// 4. Station availability & occupancy (Dynamic calculation from capacity and current bikes)
-export function getStationAvailabilityOccupancy(
-  stations: StationEntity[] = mockStationsEntities,
-  bikes: BikeEntity[] = mockBikesEntities
-): StationAvailabilityOccupancyItem[] {
-  return stations.map((st) => {
-    const bikesAtStation = bikes.filter((b) => b.stationId === st.id);
-    const availableBikes = bikesAtStation.filter((b) => b.status === 'AVAILABLE').length;
-    const freeSlots = Math.max(0, st.capacity - bikesAtStation.length);
-
+  return allBucketKeys.map((bucket) => {
+    const count = bucketCounts[bucket] || 0;
+    const porcentaje = totalTrips > 0 ? Number(((count / totalTrips) * 100).toFixed(1)) : 0;
     return {
-      station: st.name,
-      availableBikes,
-      freeSlots,
-      capacity: st.capacity,
+      bucket,
+      cantidadViajes: count,
+      porcentaje,
     };
   });
 }
 
-// 5. Historical availability evolution (from station_availability_history)
-export function getHistoricalAvailabilityTimeSeries(
-  history: StationAvailabilityHistoryEntity[] = mockStationAvailabilityHistoryEntities,
-  stations: StationEntity[] = mockStationsEntities,
+/**
+ * Calcula la evolución diaria de SUM(cantidadViajes) y SUM(duracionTotalViajes) por fechaInicio.
+ */
+export function getDailyTripsTrend(
+  records: BackendMobilityRecord[],
   stationFilter?: string
-): HistoricalAvailabilityPoint[] {
-  const stationNameMap = getStationNameMap(stations);
-  const isAll = !stationFilter || stationFilter === 'ALL' || stationFilter === 'Todas las estaciones';
+): DailyTripsTrendItem[] {
+  const filtered = records.filter((r) => isStationMatch(r.estacionInicio, stationFilter));
 
-  const filtered = isAll
-    ? history
-    : history.filter((h) => stationNameMap.get(h.stationId) === stationFilter);
+  const dateMap: Record<string, { count: number; totalDuration: number }> = {};
 
-  const timeMap: Record<string, { available: number; slots: number; count: number }> = {};
-
-  filtered.forEach((item) => {
-    const dateObj = new Date(item.recordedAt);
-    const timeLabel = `${dateObj.getHours().toString().padStart(2, '0')}:00`;
-
-    if (!timeMap[timeLabel]) {
-      timeMap[timeLabel] = { available: 0, slots: 0, count: 0 };
+  filtered.forEach((r) => {
+    if (!dateMap[r.fechaInicio]) {
+      dateMap[r.fechaInicio] = { count: 0, totalDuration: 0 };
     }
-    timeMap[timeLabel].available += item.availableBikes;
-    timeMap[timeLabel].slots += item.availableSlots;
-    timeMap[timeLabel].count += 1;
+    dateMap[r.fechaInicio].count += r.cantidadViajes || 0;
+    dateMap[r.fechaInicio].totalDuration += r.duracionTotalViajes || 0;
   });
 
-  return Object.entries(timeMap)
-    .map(([timestamp, data]) => ({
-      timestamp,
-      availableBikes: Math.round(data.available / (data.count || 1)),
-      freeSlots: Math.round(data.slots / (data.count || 1)),
+  return Object.entries(dateMap)
+    .map(([fecha, data]) => ({
+      fecha,
+      cantidadViajes: data.count,
+      totalDuration: Number(data.totalDuration.toFixed(1)),
     }))
-    .sort((a, b) => parseInt(a.timestamp.slice(0, 2), 10) - parseInt(b.timestamp.slice(0, 2), 10));
+    .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
 }
 
-// 6. Incidents by type distribution (with local station filter)
-export function getIncidentsByTypeDistribution(
-  incidents: BikeIncidentEntity[] = mockBikeIncidentsEntities,
-  types: IncidentTypeEntity[] = mockIncidentTypesEntities,
-  stations: StationEntity[] = mockStationsEntities,
+/**
+ * Calcula la Duración Promedio Ponderada por Estación:
+ * SUM(duracionTotalViajes) / SUM(cantidadViajes) (con nombres traducidos).
+ */
+export function getStationAvgDuration(
+  records: BackendMobilityRecord[],
   stationFilter?: string
-): IncidentTypeDistributionItem[] {
-  const stationNameMap = getStationNameMap(stations);
-  const typeMap = new Map(types.map((t) => [t.id, t]));
+): StationAvgDurationItem[] {
+  const filtered = records.filter((r) => isStationMatch(r.estacionInicio, stationFilter));
 
-  const filteredIncidents =
-    !stationFilter || stationFilter === 'ALL' || stationFilter === 'Todas las estaciones'
-      ? incidents
-      : incidents.filter((i) => i.stationId && stationNameMap.get(i.stationId) === stationFilter);
+  const stationTotals: Record<string, { totalDuration: number; totalTrips: number }> = {};
 
-  const typeCounts: Record<string, number> = {};
-  filteredIncidents.forEach((inc) => {
-    const t = typeMap.get(inc.incidentTypeId);
-    const name = t ? t.name : 'Otro';
-    typeCounts[name] = (typeCounts[name] || 0) + 1;
-  });
-
-  return types.map((t) => ({
-    typeName: t.name,
-    count: typeCounts[t.name] || 0,
-    severity: t.severity,
-  }));
-}
-
-// 7. Single Metric: Average Maintenance Hours (overall or filtered by station)
-export function getAvgMaintenanceHours(
-  records: MaintenanceRecordEntity[] = mockMaintenanceRecordsEntities,
-  bikes: BikeEntity[] = mockBikesEntities,
-  stations: StationEntity[] = mockStationsEntities,
-  stationFilter?: string
-): number {
-  const bikeStationMap = new Map(bikes.map((b) => [b.id, b.stationId]));
-  const stationNameMap = getStationNameMap(stations);
-
-  const isAll = !stationFilter || stationFilter === 'ALL' || stationFilter === 'Todas las estaciones';
-
-  const filteredRecords = isAll
-    ? records
-    : records.filter((r) => {
-        const stId = bikeStationMap.get(r.bikeId);
-        return stId && stationNameMap.get(stId) === stationFilter;
-      });
-
-  if (filteredRecords.length === 0) return 0;
-
-  let totalHours = 0;
-  let count = 0;
-
-  filteredRecords.forEach((r) => {
-    if (r.startedAt && r.endedAt) {
-      const diffMs = new Date(r.endedAt).getTime() - new Date(r.startedAt).getTime();
-      const hours = Math.max(0, diffMs / 3600000);
-      if (hours > 0) {
-        totalHours += hours;
-        count += 1;
-      }
+  filtered.forEach((r) => {
+    const formattedName = formatStationName(r.estacionInicio);
+    if (!stationTotals[formattedName]) {
+      stationTotals[formattedName] = { totalDuration: 0, totalTrips: 0 };
     }
+    stationTotals[formattedName].totalDuration += r.duracionTotalViajes || 0;
+    stationTotals[formattedName].totalTrips += r.cantidadViajes || 0;
   });
 
-  return count > 0 ? Number((totalHours / count).toFixed(1)) : 0;
+  return Object.entries(stationTotals)
+    .map(([station, { totalDuration, totalTrips }]) => ({
+      station,
+      promDuracionPonderada:
+        totalTrips > 0 ? Number((totalDuration / totalTrips).toFixed(1)) : 0,
+      cantidadViajes: totalTrips,
+    }))
+    .sort((a, b) => b.promDuracionPonderada - a.promDuracionPonderada);
 }
 
-export function getAvgMaintenanceTimeByStation(
-  records: MaintenanceRecordEntity[] = mockMaintenanceRecordsEntities,
-  bikes: BikeEntity[] = mockBikesEntities,
-  stations: StationEntity[] = mockStationsEntities,
-  stationFilter?: string
-): AvgMaintenanceTimeByStation[] {
-  const bikeStationMap = new Map(bikes.map((b) => [b.id, b.stationId]));
-  const stationNameMap = getStationNameMap(stations);
-
-  const stationTotals: Record<string, { totalHours: number; count: number }> = {};
-  stations.forEach((s) => {
-    stationTotals[s.name] = { totalHours: 0, count: 0 };
-  });
-
-  records.forEach((r) => {
-    const stId = bikeStationMap.get(r.bikeId);
-    if (stId) {
-      const stName = stationNameMap.get(stId);
-      if (stName) {
-        let durationHours = 0;
-        if (r.endedAt && r.startedAt) {
-          const diffMs = new Date(r.endedAt).getTime() - new Date(r.startedAt).getTime();
-          durationHours = Math.max(0, diffMs / 3600000);
-        }
-        if (durationHours > 0) {
-          stationTotals[stName].totalHours += durationHours;
-          stationTotals[stName].count += 1;
-        }
-      }
-    }
-  });
-
-  const result = Object.entries(stationTotals).map(([station, { totalHours, count }]) => ({
-    station,
-    avgHours: count > 0 ? Number((totalHours / count).toFixed(1)) : 0,
-  }));
-
-  if (!stationFilter || stationFilter === 'ALL' || stationFilter === 'Todas las estaciones') {
-    return result;
-  }
-  return result.filter((r) => r.station === stationFilter);
-}
-
-// 8. Top problematic bikes ranking (most incidents & maintenance entries, station filter, top limit = 5)
-export function getTopProblematicBikes(
-  bikes: BikeEntity[] = mockBikesEntities,
-  incidents: BikeIncidentEntity[] = mockBikeIncidentsEntities,
-  records: MaintenanceRecordEntity[] = mockMaintenanceRecordsEntities,
-  stations: StationEntity[] = mockStationsEntities,
-  stationFilterOrLimit?: string | number,
-  limitParam = 5
-): TopProblematicBikeItem[] {
-  let stationFilter: string | undefined;
-  let limit = limitParam;
-
-  if (typeof stationFilterOrLimit === 'number') {
-    limit = stationFilterOrLimit;
-    stationFilter = undefined;
-  } else {
-    stationFilter = stationFilterOrLimit;
-  }
-
-  const stationNameMap = getStationNameMap(stations);
-  const isAll = !stationFilter || stationFilter === 'ALL' || stationFilter === 'Todas las estaciones';
-
-  const incidentCounts: Record<string, number> = {};
-  const maintenanceCounts: Record<string, number> = {};
-
-  incidents.forEach((i) => {
-    incidentCounts[i.bikeId] = (incidentCounts[i.bikeId] || 0) + 1;
-  });
-
-  records.forEach((r) => {
-    maintenanceCounts[r.bikeId] = (maintenanceCounts[r.bikeId] || 0) + 1;
-  });
-
-  const filteredBikes = isAll
-    ? bikes
-    : bikes.filter((b) => b.stationId && stationNameMap.get(b.stationId) === stationFilter);
-
-  const scoredBikes = filteredBikes.map((b) => {
-    const incCount = incidentCounts[b.id] || 0;
-    const mntCount = maintenanceCounts[b.id] || 0;
-    const stName = b.stationId ? stationNameMap.get(b.stationId) || 'En Tránsito' : 'En Tránsito';
-
-    return {
-      bikeCode: b.code,
-      stationName: stName,
-      incidentCount: incCount,
-      maintenanceCount: mntCount,
-      status: b.status,
-    };
-  });
-
-  return scoredBikes
-    .filter((b) => b.incidentCount > 0 || b.maintenanceCount > 0)
-    .sort((a, b) => {
-      if (b.incidentCount !== a.incidentCount) {
-        return b.incidentCount - a.incidentCount;
-      }
-      return b.maintenanceCount - a.maintenanceCount;
-    })
-    .slice(0, limit);
-}
-
-// Main API Composite Fetcher
-export async function getMobilityAnalyticsData(filters: DashboardFilters): Promise<MobilityAnalyticsData> {
+/**
+ * Servicio analítico principal que compone los KPIs calculados dinámicamente según los filtros activos.
+ */
+export async function getMobilityAnalyticsData(
+  filters: DashboardFilters,
+  records: BackendMobilityRecord[] = mockMobilityRecords,
+  llmReport: MobilityLLMReport = mockMobilityLLMReport
+): Promise<MobilityAnalyticsData> {
   await delay();
 
-  const started = mockViajeIniciadoEvents.filter((e) => isWithinDateRange(e.metadata.occurredAt, filters));
-  const finished = mockViajeFinalizadoEvents.filter((e) => isWithinDateRange(e.metadata.occurredAt, filters));
+  const filteredRecords = getFilteredMobilityRecords(filters, records);
 
-  const startedMap = new Map(started.map((e) => [e.data.viajeId, e]));
+  // Extraer lista única de estaciones formateadas/traducidas
+  const availableStations = Array.from(
+    new Set(records.map((r) => formatStationName(r.estacionInicio)))
+  ).sort();
 
-  // Avg trip duration
-  const durationsMinutes: number[] = [];
-  finished.forEach((f) => {
-    let durationMin = 0;
-    if (f.data.duracionSegundos !== undefined) {
-      durationMin = f.data.duracionSegundos / 60;
-    } else {
-      const sEvt = startedMap.get(f.data.viajeId);
-      if (sEvt) {
-        const sTime = new Date(sEvt.metadata.occurredAt).getTime();
-        const fTime = new Date(f.metadata.occurredAt).getTime();
-        durationMin = Math.max(0, (fTime - sTime) / 60000);
-      }
-    }
+  // Todos los KPIs calculados 100% dinámicamente sobre los registros del período filtrado
+  const totalDurationSum = filteredRecords.reduce((acc, r) => acc + (r.duracionTotalViajes || 0), 0);
+  const totalTripsSum = filteredRecords.reduce((acc, r) => acc + (r.cantidadViajes || 0), 0);
 
-    if (durationMin > 0) {
-      durationsMinutes.push(durationMin);
-    }
-  });
+  const weightedAvgDurationMinutes =
+    totalTripsSum > 0 ? Number((totalDurationSum / totalTripsSum).toFixed(1)) : 0;
 
-  const avgTripDurationMinutes =
-    durationsMinutes.length > 0
-      ? Number((durationsMinutes.reduce((a, b) => a + b, 0) / durationsMinutes.length).toFixed(1))
-      : 0;
+  const tripsByStation = getTripsByStation(filteredRecords);
+  const tripsByDurationBucket = getTripsByDurationBucket(filteredRecords);
+  const dailyTripsTrend = getDailyTripsTrend(filteredRecords);
+  const stationAvgDuration = getStationAvgDuration(filteredRecords);
 
-  // Bikes & station metrics
-  const totalBikes = mockBikesEntities.length;
-  const availableBikesCount = mockBikesEntities.filter((b) => b.status === 'AVAILABLE').length;
+  const topStationName =
+    tripsByStation.length > 0 && totalTripsSum > 0 ? tripsByStation[0].station : 'N/A';
 
-  const availabilityOccupancy = getStationAvailabilityOccupancy(mockStationsEntities, mockBikesEntities);
-  const totalFreeSlots = availabilityOccupancy.reduce((acc, curr) => acc + curr.freeSlots, 0);
+  const predominantBucketObj =
+    totalTripsSum > 0
+      ? [...tripsByDurationBucket].sort((a, b) => b.cantidadViajes - a.cantidadViajes)[0]
+      : undefined;
+  const predominantDurationBucket = predominantBucketObj ? predominantBucketObj.bucket : 'N/A';
+
+  const executiveReport: MobilityWeeklyAnalysis | undefined =
+    llmReport && llmReport.analisis && llmReport.analisis.length > 0
+      ? llmReport.analisis[0]
+      : undefined;
 
   return {
-    totalTripsStarted: started.length,
-    totalTripsCompleted: finished.length,
-    avgTripDurationMinutes,
-    totalBikes,
-    availableBikesCount,
-    totalFreeSlots,
-    bikesByStation: getBikesPerStationDistribution(mockBikesEntities, mockStationsEntities),
-    bikesStatusDistribution: getBikesStatusDistributionFiltered(mockBikesEntities, mockStationsEntities),
-    timeSlotDualSeries: getTripsByTimeSlotDualSeries(started, finished),
-    stationAvailabilityOccupancy: availabilityOccupancy,
-    historicalAvailability: getHistoricalAvailabilityTimeSeries(mockStationAvailabilityHistoryEntities, mockStationsEntities),
-    incidentsByTypeDistribution: getIncidentsByTypeDistribution(mockBikeIncidentsEntities, mockIncidentTypesEntities, mockStationsEntities),
-    avgMaintenanceTimeByStation: getAvgMaintenanceTimeByStation(mockMaintenanceRecordsEntities, mockBikesEntities, mockStationsEntities),
-    topProblematicBikes: getTopProblematicBikes(mockBikesEntities, mockBikeIncidentsEntities, mockMaintenanceRecordsEntities, mockStationsEntities, undefined, 5),
-    availableStations: mockStations,
+    totalTrips: totalTripsSum,
+    weeklyTrips: totalTripsSum,
+    totalDurationMinutes: Number(totalDurationSum.toFixed(1)),
+    weightedAvgDurationMinutes,
+    topStationName,
+    predominantDurationBucket,
+    tripsByStation,
+    tripsByDurationBucket,
+    dailyTripsTrend,
+    stationAvgDuration,
+    availableStations,
+    records: filteredRecords,
+    executiveReport,
   };
 }

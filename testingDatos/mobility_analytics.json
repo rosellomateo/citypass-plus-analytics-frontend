@@ -1,0 +1,173 @@
+[
+  {
+    "fechaInicio": "2026-07-27",
+    "estacionInicio": "est-almagro-01",
+    "duracionViaje": "<15min",
+    "cantidadViajes": 1,
+    "duracionTotalViajes": 12.0066,
+    "promDuracion": 12.0066,
+    "fecha_snapshot": "2026-08-02"
+  },
+  {
+    "fechaInicio": "2026-07-27",
+    "estacionInicio": "est-almagro-01",
+    "duracionViaje": "<15min",
+    "cantidadViajes": 1,
+    "duracionTotalViajes": 12.0066,
+    "promDuracion": 12.0066,
+    "fecha_snapshot": "2026-09-22"
+  },
+  {
+    "fechaInicio": "2026-07-27",
+    "estacionInicio": "est-boedo-01",
+    "duracionViaje": "15-30min",
+    "cantidadViajes": 1,
+    "duracionTotalViajes": 20.6058,
+    "promDuracion": 20.6058,
+    "fecha_snapshot": "2026-09-22"
+  },
+  {
+    "fechaInicio": "2026-07-27",
+    "estacionInicio": "est-boedo-01",
+    "duracionViaje": "<15min",
+    "cantidadViajes": 1,
+    "duracionTotalViajes": 10.3664,
+    "promDuracion": 10.3664,
+    "fecha_snapshot": "2026-09-22"
+  },
+  {
+    "fechaInicio": "2026-07-27",
+    "estacionInicio": "est-chacarita-02",
+    "duracionViaje": "30-60min",
+    "cantidadViajes": 1,
+    "duracionTotalViajes": 56.4099,
+    "promDuracion": 56.4099,
+    "fecha_snapshot": "2026-09-22"
+  },
+  {
+    "fechaInicio": "2026-07-27",
+    "estacionInicio": "est-devoto-03",
+    "duracionViaje": "15-30min",
+    "cantidadViajes": 1,
+    "duracionTotalViajes": 21.9152,
+    "promDuracion": 21.9152,
+    "fecha_snapshot": "2026-09-22"
+  },
+  {
+    "fechaInicio": "2026-07-27",
+    "estacionInicio": "est-flores-01",
+    "duracionViaje": "<15min",
+    "cantidadViajes": 3,
+    "duracionTotalViajes": 32.6585,
+    "promDuracion": 10.8861,
+    "fecha_snapshot": "2026-09-22"
+  },
+  {
+    "fechaInicio": "2026-09-17",
+    "estacionInicio": "liniers-02",
+    "duracionViaje": "15-30min",
+    "cantidadViajes": 15,
+    "duracionTotalViajes": 330.0,
+    "promDuracion": 22.0,
+    "fecha_snapshot": "2026-09-20"
+  },
+  {
+    "fechaInicio": "2026-09-17",
+    "estacionInicio": "recoleta-04",
+    "duracionViaje": "<15min",
+    "cantidadViajes": 15,
+    "duracionTotalViajes": 165.0,
+    "promDuracion": 11.0,
+    "fecha_snapshot": "2026-09-20"
+  },
+  {
+    "fechaInicio": "2026-09-17",
+    "estacionInicio": "belgrano-03",
+    "duracionViaje": "30-60min",
+    "cantidadViajes": 10,
+    "duracionTotalViajes": 420.0,
+    "promDuracion": 42.0,
+    "fecha_snapshot": "2026-09-20"
+  },
+  {
+    "fechaInicio": "2026-09-18",
+    "estacionInicio": "liniers-02",
+    "duracionViaje": "15-30min",
+    "cantidadViajes": 20,
+    "duracionTotalViajes": 442.0,
+    "promDuracion": 22.1,
+    "fecha_snapshot": "2026-09-20"
+  },
+  {
+    "fechaInicio": "2026-09-18",
+    "estacionInicio": "recoleta-04",
+    "duracionViaje": "<15min",
+    "cantidadViajes": 15,
+    "duracionTotalViajes": 180.0,
+    "promDuracion": 12.0,
+    "fecha_snapshot": "2026-09-20"
+  },
+  {
+    "fechaInicio": "2026-09-18",
+    "estacionInicio": "palermo-05",
+    "duracionViaje": "30-60min",
+    "cantidadViajes": 6,
+    "duracionTotalViajes": 270.0,
+    "promDuracion": 45.0,
+    "fecha_snapshot": "2026-09-20"
+  },
+  {
+    "fechaInicio": "2026-09-19",
+    "estacionInicio": "palermo-05",
+    "duracionViaje": "30-60min",
+    "cantidadViajes": 13,
+    "duracionTotalViajes": 585.0,
+    "promDuracion": 45.0,
+    "fecha_snapshot": "2026-09-20"
+  },
+  {
+    "fechaInicio": "2026-09-19",
+    "estacionInicio": "belgrano-03",
+    "duracionViaje": "15-30min",
+    "cantidadViajes": 9,
+    "duracionTotalViajes": 207.0,
+    "promDuracion": 23.0,
+    "fecha_snapshot": "2026-09-20"
+  },
+  {
+    "fechaInicio": "2026-09-19",
+    "estacionInicio": "recoleta-04",
+    "duracionViaje": "<15min",
+    "cantidadViajes": 16,
+    "duracionTotalViajes": 176.0,
+    "promDuracion": 11.0,
+    "fecha_snapshot": "2026-09-20"
+  },
+  {
+    "fechaInicio": "2026-09-20",
+    "estacionInicio": "liniers-02",
+    "duracionViaje": ">1h",
+    "cantidadViajes": 5,
+    "duracionTotalViajes": 375.0,
+    "promDuracion": 75.0,
+    "fecha_snapshot": "2026-09-20"
+  },
+  {
+    "fechaInicio": "2026-09-20",
+    "estacionInicio": "est-devoto-03",
+    "duracionViaje": "15-30min",
+    "cantidadViajes": 32,
+    "duracionTotalViajes": 704.0,
+    "promDuracion": 22.0,
+    "fecha_snapshot": "2026-09-20"
+  },
+  {
+    "fechaInicio": "2026-09-20",
+    "estacionInicio": "est-flores-01",
+    "duracionViaje": "<15min",
+    "cantidadViajes": 37,
+    "duracionTotalViajes": 370.0,
+    "promDuracion": 10.0,
+    "fecha_snapshot": "2026-09-20"
+  }
+]
