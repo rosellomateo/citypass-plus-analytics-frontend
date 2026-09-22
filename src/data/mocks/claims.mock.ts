@@ -1,5 +1,5 @@
-// src/data/mocks/claims.mock.ts
-import type { BackendAnalyticsRecord } from '../../types';
+import type { BackendAnalyticsRecord, AIAnalysisReport } from '../../types';
+import rawClaimsSummary from '../../../testingDatos/claims_summary.json';
 
 export const mockClaimRecords: BackendAnalyticsRecord[] = [
   {
@@ -103,3 +103,5 @@ export const mockClaimRecords: BackendAnalyticsRecord[] = [
     fecha_snapshot: '2026-09-19T15:00:00.000Z',
   },
 ];
+
+export const mockClaimsAIReport: AIAnalysisReport = rawClaimsSummary as unknown as AIAnalysisReport;

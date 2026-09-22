@@ -1,0 +1,81 @@
+{
+  "actualizado_en": "2026-09-21T10:01:40+00:00",
+  "analisis": [
+    {
+      "generado_en": "2026-09-21T10:01:23+00:00",
+      "metadata": {
+        "avisos": [],
+        "caso_de_uso": "residuos",
+        "cifras": {
+          "acumulado_total": 397,
+          "altas_semana": 68,
+          "cantidadResueltas": 293
+        },
+        "corte": "2026-09-20",
+        "filas_enviadas": 184,
+        "fuentes": [
+          "gold/Gestion de Residuos Inteligente/alertas_resumen_31_2026.parquet",
+          "gold/Gestion de Residuos Inteligente/alertas_resumen_32_2026.parquet",
+          "gold/Gestion de Residuos Inteligente/alertas_resumen_33_2026.parquet",
+          "gold/Gestion de Residuos Inteligente/alertas_resumen_34_2026.parquet",
+          "gold/Gestion de Residuos Inteligente/alertas_resumen_35_2026.parquet",
+          "gold/Gestion de Residuos Inteligente/alertas_resumen_36_2026.parquet",
+          "gold/Gestion de Residuos Inteligente/alertas_resumen_37_2026.parquet",
+          "gold/Gestion de Residuos Inteligente/alertas_resumen_38_2026.parquet"
+        ],
+        "llm": {
+          "deployment": "gpt-5-mini",
+          "finish_reason": "stop",
+          "input_tokens": 3832,
+          "modelo_respuesta": "gpt-5-mini-2025-08-07",
+          "output_tokens": 1882,
+          "proveedor": "azure_openai",
+          "request_id": "chatcmpl-EQV7rGQ2PJIUYeo5zPJIFKQpebXm6"
+        },
+        "semana_actual": "2026-W38",
+        "semanas_comparadas": [
+          "2026-W32",
+          "2026-W33",
+          "2026-W34",
+          "2026-W35",
+          "2026-W36",
+          "2026-W37",
+          "2026-W38"
+        ],
+        "snapshot_base": "2026-W31",
+        "version_esquema": "3.0"
+      },
+      "resumen": {
+        "parrafo_ejecutivo": "La semana 2026-W38 mostró un aumento claro de altas: 68 nuevas alertas frente a 51 la semana previa y un promedio histórico (semanas W32–W37) de 48, es decir +20 sobre el promedio. El stock acumulado subió a 397 (coherente con las 68 altas) y se registraron 46 recolecciones completadas nuevas, por lo que aproximadamente 67% de las altas de la semana ya aparecen resueltas en la foto; el tiempo promedio de resolución se mantuvo estable alrededor de 804 horas (valor acumulado). Por tipo, las altas fueron mayormente LLENO (35), seguida por FALLA_SENSOR (17) y VOLCADO (14), con un salto notable en LLENO y en VOLCADO respecto de la semana previa; la prioridad MEDIA creció a 24 (desde 12). Las zonas con más altas fueron Caballito (10), Parque Chacabuco (9), Almagro (8) y Flores (8). Hipótesis: aumento de llenado y problemas puntuales de sensores en Almagro/Parque Chacabuco; conviene validar con logs operativos.",
+        "puntos_destacados": [
+          "Altas de la semana: 68 (vs 51 la semana anterior y promedio 48 en W32–W37).",
+          "Composición por tipo: LLENO 35, FALLA_SENSOR 17, VOLCADO 14 e INCENDIO 2.",
+          "Resoluciones nuevas: 46 recolecciones completadas de las 68 altas (~67%).",
+          "Prioridad MEDIA se duplicó a 24 (de 12 la semana previa).",
+          "Zonas con más casos: Caballito 10, Parque Chacabuco 9, Almagro 8, Flores 8."
+        ],
+        "recomendaciones": [
+          "Reforzar recolección en Caballito, Parque Chacabuco, Almagro y Flores en las próximas 1–2 semanas y monitorear efecto en nuevas altas.",
+          "Enviar equipo técnico a inspeccionar sensores en Almagro y Parque Chacabuco (FALLA_SENSOR: 4 en cada barrio) antes de aplicar cambios operativos.",
+          "Investigar el origen del aumento de VOLCADO (14 altas esta semana) cruzando recorridos y autorizaciones para decidir medidas de control o comunicación.",
+          "Priorizar turnos o frecuencias en contenedores con rango 60–80 (21 altas en ese rango) para evitar escalada a 80–100.",
+          "Mantener el seguimiento semanal de la tasa de resolución (actual ~67%) y fijar objetivo operativo para aumentarla mediante reasignación de recursos si no mejora en dos semanas."
+        ],
+        "riesgos": [
+          "Aumento sostenido de alertas LLENO podría indicar frecuencia de recolección insuficiente en sectores clave.",
+          "Concentración de FALLA_SENSOR en Almagro y Parque Chacabuco puede dejar vacíos de información y generar reacciones operativas innecesarias.",
+          "El incremento de VOLCADO (14) requiere validar si es acumulación por mal uso o por operaciones autorizadas.",
+          "TiempoPromResolucion (~804 h) es alto en términos absolutos y, aunque estable, indica que el acumulado histórico arrastra demoras significativas.",
+          "Muchas subcategorías tienen volúmenes pequeños (<20), por lo que las variaciones porcentuales pueden exagerar señales y deben interpretarse con cautela."
+        ]
+      },
+      "semana": "2026-W38"
+    }
+  ],
+  "caso_de_uso": "residuos",
+  "semanas": [
+    "2026-W38"
+  ],
+  "ultima_semana": "2026-W38",
+  "version_esquema": "3.0"
+}

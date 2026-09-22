@@ -58,6 +58,7 @@ export interface WasteMetrics {
   volumeByWasteType: WasteVolumeByType[];
   avgCollectionTimeByZone: CollectionTimeByZone[];
   criticalContainersDetail: CriticalContainerDetail[];
+  aiReport?: AIAnalysisReport;
 }
 
 export type WasteAnalyticsData = WasteMetrics;

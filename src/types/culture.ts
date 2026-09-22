@@ -67,4 +67,5 @@ export interface CultureAnalyticsData {
   inscriptionsByEvent: { eventTitle: string; registered: number; capacity: number; occupancyPct: number }[];
   inscriptionsByCategory: { category: string; count: number }[];
   avgOccupancyRatePct: number;
+  aiReport?: AIAnalysisReport;
 }

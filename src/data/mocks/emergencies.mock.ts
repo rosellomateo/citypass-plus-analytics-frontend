@@ -1,11 +1,12 @@
-// src/data/mocks/emergencies.mock.ts
 import type {
   EmergenciaCreadaEvent,
   EmergenciaPriorizadaEvent,
   EmergenciaEstadoActualizadoEvent,
   EmergenciaDespachadaEvent,
   EmergenciaCerradaEvent,
+  AIAnalysisReport,
 } from '../../types';
+import rawEmergenciesSummary from '../../../testingDatos/emergencies_summary.json';
 
 const now = new Date();
 function minsAgo(m: number) {
@@ -103,3 +104,5 @@ export const mockEmergenciaCerradaEvents: EmergenciaCerradaEvent[] = [
   { metadata: { eventId: 'evt-em-z1', eventType: 'EmergenciaCerrada', occurredAt: hoursAgo(2), source: 'emergency-service', version: '1' }, data: { correlationId: 'corr-em-05', emergenciaId: 'EMG-905', resultado: 'RESUELTA' } },
   { metadata: { eventId: 'evt-em-z2', eventType: 'EmergenciaCerrada', occurredAt: hoursAgo(19), source: 'emergency-service', version: '1' }, data: { correlationId: 'corr-em-12', emergenciaId: 'EMG-912', resultado: 'RESUELTA' } },
 ];
+
+export const mockEmergenciesAIReport: AIAnalysisReport = rawEmergenciesSummary as unknown as AIAnalysisReport;

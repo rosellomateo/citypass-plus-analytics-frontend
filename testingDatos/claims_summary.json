@@ -1,0 +1,63 @@
+{
+  "actualizado_en": "2026-09-21T10:00:43+00:00",
+  "analisis": [
+    {
+      "generado_en": "2026-09-21T10:00:27+00:00",
+      "metadata": {
+        "avisos": [],
+        "caso_de_uso": "reclamos",
+        "cifras": {
+          "creados": 154,
+          "en_curso": 48,
+          "cerrados": 89,
+          "tiempo_promedio_hs": 16.4
+        },
+        "corte": "2026-09-20",
+        "filas_enviadas": 154,
+        "fuentes": [
+          "gold/Atencion Ciudadana/reclamos_resumen_38_2026.parquet"
+        ],
+        "llm": {
+          "deployment": "gpt-5-mini",
+          "finish_reason": "stop",
+          "input_tokens": 3890,
+          "modelo_respuesta": "gpt-5-mini-2025-08-07",
+          "output_tokens": 1420,
+          "proveedor": "azure_openai",
+          "request_id": "chatcmpl-CLAIMS7712"
+        },
+        "semana_actual": "2026-W38",
+        "semanas_comparadas": [
+          "2026-W36",
+          "2026-W37",
+          "2026-W38"
+        ],
+        "snapshot_base": "2026-W31",
+        "version_esquema": "3.0"
+      },
+      "resumen": {
+        "parrafo_ejecutivo": "Durante la semana 2026-W38 se registraron 154 nuevos reclamos ciudadanos. La categoría Alumbrado Público presentó la mayor concentración de casos (38%), seguida por Residuos Urbano (26%). El tiempo promedio de resolución se ubicó en 16.4 horas, mostrando una mejora de 2.1 horas respecto a la semana previa.",
+        "puntos_destacados": [
+          "89 reclamos cerrados satisfactoriamente dentro del SLA previsto.",
+          "Alumbrado y Residuos representan más del 64% de las solicitudes activas.",
+          "Reducción del tiempo de respuesta en solicitudes categorizadas como ALTA prioridad."
+        ],
+        "recomendaciones": [
+          "Reforzar las cuadrillas de reparación nocturna de luminarias en el barrio de Balvanera.",
+          "Automatizar el despacho de reclamos repetidos por fallas semafóricas."
+        ],
+        "riesgos": [
+          "Acumulación de reclamos de categoría Tránsito (216 hs promedio en casos críticos asignados).",
+          "Aumento del stock de casos pendientes en comuna Balvanera durante días de lluvia."
+        ]
+      },
+      "semana": "2026-W38"
+    }
+  ],
+  "caso_de_uso": "reclamos",
+  "semanas": [
+    "2026-W38"
+  ],
+  "ultima_semana": "2026-W38",
+  "version_esquema": "3.0"
+}

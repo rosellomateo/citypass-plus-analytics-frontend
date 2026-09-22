@@ -9,6 +9,7 @@ import type {
   DailyTripsTrendItem,
   StationAvgDurationItem,
   MobilityWeeklyAnalysis,
+  AIAnalysisReport,
 } from '../types';
 import { mockMobilityRecords, mockMobilityLLMReport } from '../data/mocks/mobility.mock';
 import { delay } from '../utils';
@@ -193,6 +194,7 @@ export function getDailyTripsTrend(
     .map(([fecha, data]) => ({
       fecha,
       cantidadViajes: data.count,
+      duracionTotal: Number(data.totalDuration.toFixed(1)),
       totalDuration: Number(data.totalDuration.toFixed(1)),
     }))
     .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
@@ -286,5 +288,6 @@ export async function getMobilityAnalyticsData(
     availableStations,
     records: filteredRecords,
     executiveReport,
+    aiReport: llmReport as unknown as AIAnalysisReport,
   };
 }

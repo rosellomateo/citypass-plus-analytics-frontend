@@ -108,4 +108,5 @@ export interface MobilityAnalyticsData {
   availableStations: string[];
   records: BackendMobilityRecord[];
   executiveReport?: MobilityWeeklyAnalysis;
+  aiReport?: AIAnalysisReport;
 }
