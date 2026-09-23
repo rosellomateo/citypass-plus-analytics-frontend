@@ -1,0 +1,114 @@
+name: Deploy frontend to production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-production
+  cancel-in-progress: false
+
+jobs:
+  quality:
+    name: Validate frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
+
+  deploy:
+    name: Build and deploy frontend
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: production
+      url: ${{ vars.FRONTEND_PUBLIC_URL }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate production configuration
+        env:
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+          AZURE_STORAGE_ACCOUNT_NAME: ${{ vars.AZURE_STORAGE_ACCOUNT_NAME }}
+          FRONTEND_PUBLIC_URL: ${{ vars.FRONTEND_PUBLIC_URL }}
+          AZURE_STORAGE_SAS_TOKEN: ${{ secrets.AZURE_STORAGE_SAS_TOKEN }}
+        run: |
+          : "${VITE_API_BASE_URL:?Define VITE_API_BASE_URL in the production environment}"
+          : "${AZURE_STORAGE_ACCOUNT_NAME:?Define AZURE_STORAGE_ACCOUNT_NAME in the production environment}"
+          : "${FRONTEND_PUBLIC_URL:?Define FRONTEND_PUBLIC_URL in the production environment}"
+          : "${AZURE_STORAGE_SAS_TOKEN:?Define AZURE_STORAGE_SAS_TOKEN in the production environment}"
+          case "$VITE_API_BASE_URL" in
+            https://*) ;;
+            *) echo "VITE_API_BASE_URL must use HTTPS" >&2; exit 1 ;;
+          esac
+          case "$FRONTEND_PUBLIC_URL" in
+            https://*) ;;
+            *) echo "FRONTEND_PUBLIC_URL must use HTTPS" >&2; exit 1 ;;
+          esac
+          if [[ ! "$AZURE_STORAGE_ACCOUNT_NAME" =~ ^[a-z0-9]{3,24}$ ]]; then
+            echo "AZURE_STORAGE_ACCOUNT_NAME is not a valid Storage account name" >&2
+            exit 1
+          fi
+
+      - name: Build production frontend
+        env:
+          VITE_DATA_SOURCE: api
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+        run: npm run build
+
+      - name: Upload frontend to Azure Storage
+        uses: azure/cli@v2
+        env:
+          AZURE_STORAGE_ACCOUNT_NAME: ${{ vars.AZURE_STORAGE_ACCOUNT_NAME }}
+          AZURE_STORAGE_SAS_TOKEN: ${{ secrets.AZURE_STORAGE_SAS_TOKEN }}
+        with:
+          inlineScript: |
+            az storage blob upload-batch \
+              --account-name "$AZURE_STORAGE_ACCOUNT_NAME" \
+              --destination '$web' \
+              --source dist \
+              --sas-token "$AZURE_STORAGE_SAS_TOKEN" \
+              --overwrite true
+
+      - name: Verify production site
+        env:
+          FRONTEND_PUBLIC_URL: ${{ vars.FRONTEND_PUBLIC_URL }}
+        run: |
+          base_url="${FRONTEND_PUBLIC_URL%/}"
+          curl --fail --silent --show-error --location \
+            --retry 12 --retry-all-errors --retry-delay 5 \
+            "${base_url}/"
