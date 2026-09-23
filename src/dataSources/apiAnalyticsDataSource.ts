@@ -7,13 +7,16 @@ import type {
   WasteApiRecord,
 } from '../api/types';
 import { getClaimsAnalyticsData as calculateClaimsAnalyticsData } from '../services/claimsService';
+import { getMobilityAnalyticsData as calculateMobilityAnalyticsData } from '../services/mobilityService';
 import type {
   BackendAnalyticsRecord,
+  BackendMobilityRecord,
   ClaimsAnalyticsData,
   CultureAnalyticsData,
   DashboardFilters,
   EmergencyAnalyticsData,
   MobilityAnalyticsData,
+  MobilityLLMReport,
   WasteAlertMetrics,
 } from '../types';
 import { isWithinDateRange } from '../utils/dates';
@@ -142,54 +145,36 @@ export async function getApiEmergencyAnalyticsData(
   return mapEmergencyApiData(await analyticsApi.getEmergencies(), filters);
 }
 
-export function mapMobilityApiData(
+export async function mapMobilityApiData(
   rows: MobilityApiRecord[],
   filters: DashboardFilters
-): MobilityAnalyticsData {
-  const filtered = rowsInRange(rows, filters);
-  const stationCounts = new Map<string, number>();
-  const slotCounts = new Map<string, number>();
-
-  filtered.forEach((row) => {
-    const count = numberOrZero(row.cantidadViajes);
-    const station = textOrEmpty(row.estacionInicio) || 'SIN ESTACION';
-    stationCounts.set(station, (stationCounts.get(station) ?? 0) + count);
-
-    if (row.fechaInicio) {
-      const date = new Date(row.fechaInicio);
-      if (!Number.isNaN(date.getTime())) {
-        const hour = date.getHours();
-        const slot = `${hour.toString().padStart(2, '0')}:00 - ${((hour + 1) % 24)
-          .toString()
-          .padStart(2, '0')}:00`;
-        slotCounts.set(slot, (slotCounts.get(slot) ?? 0) + count);
-      }
-    }
-  });
-
-  return {
-    totalTripsStarted: filtered.reduce(
-      (total, row) => total + numberOrZero(row.cantidadViajes),
-      0
-    ),
-    tripsByOriginStation: Array.from(stationCounts, ([station, count]) => ({
-      station,
-      count,
-    })),
-    tripsByTimeSlot: Array.from(slotCounts, ([slot, count]) => ({ slot, count })),
-    avgTripDurationMinutes: weightedAverage(
-      filtered.map((row) => ({
-        value: numberOrZero(row.promDuracion),
-        weight: numberOrZero(row.cantidadViajes),
-      }))
-    ),
+): Promise<MobilityAnalyticsData> {
+  const records: BackendMobilityRecord[] = rows.map((row) => ({
+    fechaInicio: textOrEmpty(row.fechaInicio),
+    estacionInicio: textOrEmpty(row.estacionInicio),
+    duracionViaje: textOrEmpty(row.duracionViaje),
+    cantidadViajes: numberOrZero(row.cantidadViajes),
+    duracionTotalViajes: numberOrZero(row.duracionTotalViajes),
+    promDuracion: numberOrZero(row.promDuracion),
+    fecha_snapshot: textOrEmpty(row.fecha_snapshot),
+  }));
+  const emptyLlmReport: MobilityLLMReport = {
+    actualizado_en: '',
+    analisis: [],
+    caso_de_uso: '',
+    semanas: [],
+    ultima_semana: '',
+    version_esquema: '',
   };
+  const analytics = await calculateMobilityAnalyticsData(filters, records, emptyLlmReport);
+
+  return { ...analytics, executiveReport: undefined, aiReport: undefined };
 }
 
 export async function getApiMobilityAnalyticsData(
   filters: DashboardFilters
 ): Promise<MobilityAnalyticsData> {
-  return mapMobilityApiData(await analyticsApi.getMobility(), filters);
+  return await mapMobilityApiData(await analyticsApi.getMobility(), filters);
 }
 
 export function mapCultureApiData(

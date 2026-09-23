@@ -1,0 +1,80 @@
+{
+  "actualizado_en": "2026-09-21T10:00:43+00:00",
+  "analisis": [
+    {
+      "generado_en": "2026-09-21T10:00:27+00:00",
+      "metadata": {
+        "avisos": [],
+        "caso_de_uso": "emergencias",
+        "cifras": {
+          "abiertos": 63,
+          "acumulado_total": 237,
+          "altas_semana": 33,
+          "cerrados": 133,
+          "descartados": 41
+        },
+        "corte": "2026-09-20",
+        "filas_enviadas": 186,
+        "fuentes": [
+          "gold/Emergencias y Seguridad/emergencias_resumen_31_2026.parquet",
+          "gold/Emergencias y Seguridad/emergencias_resumen_32_2026.parquet",
+          "gold/Emergencias y Seguridad/emergencias_resumen_33_2026.parquet",
+          "gold/Emergencias y Seguridad/emergencias_resumen_34_2026.parquet",
+          "gold/Emergencias y Seguridad/emergencias_resumen_35_2026.parquet",
+          "gold/Emergencias y Seguridad/emergencias_resumen_36_2026.parquet",
+          "gold/Emergencias y Seguridad/emergencias_resumen_37_2026.parquet",
+          "gold/Emergencias y Seguridad/emergencias_resumen_38_2026.parquet"
+        ],
+        "llm": {
+          "deployment": "gpt-5-mini",
+          "finish_reason": "stop",
+          "input_tokens": 4972,
+          "modelo_respuesta": "gpt-5-mini-2025-08-07",
+          "output_tokens": 1872,
+          "proveedor": "azure_openai",
+          "request_id": "chatcmpl-EQV6xPbECBU9ZtlPpo2pb6eTQOZIZ"
+        },
+        "semana_actual": "2026-W38",
+        "semanas_comparadas": [
+          "2026-W32",
+          "2026-W33",
+          "2026-W34",
+          "2026-W35",
+          "2026-W36",
+          "2026-W37",
+          "2026-W38"
+        ],
+        "snapshot_base": "2026-W31",
+        "version_esquema": "3.0"
+      },
+      "resumen": {
+        "parrafo_ejecutivo": "La semana 2026-W38 registró 33 altas (totales), dos menos que la semana anterior (35) pero por encima del promedio de las seis semanas previas (≈29.7 altas), lo que indica un ritmo de ingreso levemente superior al habitual; la composición cambió: subieron las ALTA a 13 (desde 9) mientras que las MEDIA bajaron a 17 (desde 20) y las BAJA a 3 (desde 6). El stock acumulado llegó a 237 (no es noticia por sí sola), pero los abiertos aumentaron a 63 (desde 54), y los descartados suman 41 (desde 36), lo que puede aumentar presión operativa. Los tiempos de respuesta se mantienen estables: despacho ~15.1 min (15.2 la semana previa) y llegada ~36.2 min (36.1). Hipótesis: mayor proporción de ALTA puede deberse a cambios en la severidad real de avisos o en la clasificación; el aumento de abiertos y descartados sugiere necesidad de priorizar recursos y revisar triage y calidad de reporte.",
+        "puntos_destacados": [
+          "Altas semana 2026-W38: 33 (–2 vs 2026-W37; +3 frente al promedio 2026-W32–W37 ≈29.7).",
+          "Cambio de prioridad: ALTA 13 (suben desde 9), MEDIA 17 (bajan desde 20), BAJA 3 (bajan desde 6).",
+          "Abiertos al cierre: 63 (suben desde 54); acumulado_total 237 y descartados 41 (desde 36).",
+          "Tiempos de respuesta estables: despacho 15.1 min y llegada 36.2 min, sin variación operativa relevante respecto a la semana previa."
+        ],
+        "recomendaciones": [
+          "Monitorear la tendencia de ALTA (13 en W38) durante las próximas 2 semanas y preparar refuerzos si se mantiene por encima del promedio.",
+          "Analizar causas de los 41 descartados y realizar auditoría de triage para evitar desvíos de recursos por falsas alarmas.",
+          "Priorizar reducción del stock abierto: planificar revisión diaria de pendientes (63) con objetivos de resolución por prioridad.",
+          "Mantener la vigilancia sobre tiempoPromRespuestaLugar (~36.2 min) y, si sube 1 minuto o más en la próxima semana, activar redistribución de móviles o ajuste de turnos."
+        ],
+        "riesgos": [
+          "Aumento de casos abiertos (63) y descartados (41) puede generar congestión en recursos móviles y en gestión de casos.",
+          "Mayor proporción de ALTA (13 de 33) puede implicar más demanda crítica o cambios en clasificación que requieren verificación.",
+          "Bajas absolutos en categoría BAJA (3) hacen volátiles las variaciones porcentuales y reducen fiabilidad de tendencias en ese segmento.",
+          "Si la tendencia de nuevas ALTA continúa, puede incrementarse el tiempo efectivo hasta llegada si no se reasignan unidades."
+        ]
+      },
+      "semana": "2026-W38"
+    }
+  ],
+  "caso_de_uso": "emergencias",
+  "semanas": [
+    "2026-W38"
+  ],
+  "ultima_semana": "2026-W38",
+  "version_esquema": "3.0"
+}

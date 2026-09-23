@@ -67,6 +67,7 @@ export function ClaimsDashboard() {
         title="Tablero de Reclamos"
         subtitle="CU-R1: Volumen por categoría y estado | CU-R2: Tiempo de resolución"
         filters={filters}
+        aiReport={resolved.data?.aiReport}
         onDateRangeChange={(range) => updateFilter('dateRange', range)}
         onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)}
       />

@@ -1,4 +1,5 @@
 // src/types/waste.ts
+import type { AIAnalysisReport } from './ai';
 
 /**
  * Estructura provisional JSON de entrada (simulación de datos recibidos del backend).
@@ -58,6 +59,7 @@ export interface WasteMetrics {
   volumeByWasteType: WasteVolumeByType[];
   avgCollectionTimeByZone: CollectionTimeByZone[];
   criticalContainersDetail: CriticalContainerDetail[];
+  aiReport?: AIAnalysisReport;
 }
 
 export type WasteAnalyticsData = WasteMetrics;

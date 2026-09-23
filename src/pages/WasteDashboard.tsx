@@ -60,6 +60,7 @@ export function WasteDashboard() {
         title="Tablero de Residuos"
         subtitle="Seguimiento analítico de vaciado y volumen recolectado."
         filters={filters}
+        aiReport={resolved.data?.aiReport}
         onDateRangeChange={(range) => updateFilter('dateRange', range)}
         onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)}
         filters_extra={

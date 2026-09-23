@@ -1,0 +1,16 @@
+[
+  { "id": "sah-01", "stationId": "st-01", "recordedAt": "2026-09-20T21:00:00.000Z", "availableBikes": 10, "availableSlots": 15, "occupiedSlots": 10 },
+  { "id": "sah-02", "stationId": "st-01", "recordedAt": "2026-09-21T00:00:00.000Z", "availableBikes": 6, "availableSlots": 19, "occupiedSlots": 6 },
+  { "id": "sah-03", "stationId": "st-01", "recordedAt": "2026-09-21T03:00:00.000Z", "availableBikes": 12, "availableSlots": 13, "occupiedSlots": 12 },
+  { "id": "sah-04", "stationId": "st-01", "recordedAt": "2026-09-21T06:00:00.000Z", "availableBikes": 9, "availableSlots": 16, "occupiedSlots": 9 },
+
+  { "id": "sah-05", "stationId": "st-02", "recordedAt": "2026-09-20T21:00:00.000Z", "availableBikes": 14, "availableSlots": 16, "occupiedSlots": 14 },
+  { "id": "sah-06", "stationId": "st-02", "recordedAt": "2026-09-21T00:00:00.000Z", "availableBikes": 8, "availableSlots": 22, "occupiedSlots": 8 },
+  { "id": "sah-07", "stationId": "st-02", "recordedAt": "2026-09-21T03:00:00.000Z", "availableBikes": 16, "availableSlots": 14, "occupiedSlots": 16 },
+  { "id": "sah-08", "stationId": "st-02", "recordedAt": "2026-09-21T06:00:00.000Z", "availableBikes": 11, "availableSlots": 19, "occupiedSlots": 11 },
+
+  { "id": "sah-09", "stationId": "st-03", "recordedAt": "2026-09-20T21:00:00.000Z", "availableBikes": 9, "availableSlots": 16, "occupiedSlots": 9 },
+  { "id": "sah-10", "stationId": "st-03", "recordedAt": "2026-09-21T00:00:00.000Z", "availableBikes": 4, "availableSlots": 21, "occupiedSlots": 4 },
+  { "id": "sah-11", "stationId": "st-03", "recordedAt": "2026-09-21T03:00:00.000Z", "availableBikes": 10, "availableSlots": 15, "occupiedSlots": 10 },
+  { "id": "sah-12", "stationId": "st-03", "recordedAt": "2026-09-21T06:00:00.000Z", "availableBikes": 6, "availableSlots": 19, "occupiedSlots": 6 }
+]

@@ -95,8 +95,8 @@ describe('API analytics adapters', () => {
     });
   });
 
-  it('uses backend counts for mobility totals and averages', () => {
-    const result = mapMobilityApiData(
+  it('uses backend counts for mobility totals and averages', async () => {
+    const result = await mapMobilityApiData(
       [
         {
           fechaInicio: new Date().toISOString(),
@@ -111,9 +111,9 @@ describe('API analytics adapters', () => {
       filters
     );
 
-    expect(result.totalTripsStarted).toBe(3);
-    expect(result.avgTripDurationMinutes).toBe(12);
-    expect(result.tripsByOriginStation).toEqual([{ station: 'Central', count: 3 }]);
+    expect(result.totalTrips).toBe(3);
+    expect(result.weightedAvgDurationMinutes).toBe(12);
+    expect(result.tripsByStation).toEqual([{ station: 'Central', cantidadViajes: 3 }]);
   });
 
   it('maps culture aggregates to the existing view contract', () => {

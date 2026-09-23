@@ -1,5 +1,6 @@
 // src/types/emergencies.ts
 import type { EventEnvelope } from './common';
+import type { AIAnalysisReport } from './ai';
 
 export type EmergencyPriority = 'CRITICA' | 'ALTA' | 'MEDIA' | 'BAJA';
 export type EmergencyState =
@@ -73,5 +74,5 @@ export interface EmergencyAnalyticsData {
   avgDispatchTimeByPriority: { priority: string; minutes: number }[];
   emergenciesByCategoryStacked: CategoryPriorityStackedData[];
   availableCategories: string[];
+  aiReport?: AIAnalysisReport;
 }
-

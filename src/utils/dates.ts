@@ -16,14 +16,18 @@ export function getDateRangeBounds(filters: DashboardFilters): { from: Date; to:
     const from = new Date(now);
     from.setDate(from.getDate() - 7);
     from.setHours(0, 0, 0, 0);
-    return { from, to: now };
+    const to = new Date(now);
+    to.setHours(23, 59, 59, 999);
+    return { from, to };
   }
 
   if (filters.dateRange === '30d') {
     const from = new Date(now);
     from.setDate(from.getDate() - 30);
     from.setHours(0, 0, 0, 0);
-    return { from, to: now };
+    const to = new Date(now);
+    to.setHours(23, 59, 59, 999);
+    return { from, to };
   }
 
   if (filters.dateRange === 'custom') {
@@ -40,10 +44,13 @@ export function getDateRangeBounds(filters: DashboardFilters): { from: Date; to:
     return { from, to };
   }
 
-  // fallback: 7 días
+  // Fallback 7d
   const from = new Date(now);
   from.setDate(from.getDate() - 7);
-  return { from, to: now };
+  from.setHours(0, 0, 0, 0);
+  const to = new Date(now);
+  to.setHours(23, 59, 59, 999);
+  return { from, to };
 }
 
 export function isWithinDateRange(isoTimestamp: string, filters: DashboardFilters): boolean {
@@ -51,26 +58,36 @@ export function isWithinDateRange(isoTimestamp: string, filters: DashboardFilter
   const date = new Date(isoTimestamp);
   if (isNaN(date.getTime())) return true;
 
+  // Custom filter check uses exact date bounds
   if (filters.dateRange === 'custom') {
     const { from, to } = getDateRangeBounds(filters);
     return date >= from && date <= to;
   }
 
-  // For presets (today, 7d, 30d):
-  // Since mock data uses 2026-09-02 as the base date, we check relative to reference or current date
+  // Presets (today, 7d, 30d):
+  // Since mock data dates across modules span early to late September 2026 (e.g. 2026-09-02 to 2026-09-21),
+  // we anchor refTime relative to the dataset event date or current time to support mock presets cleanly.
   const now = new Date();
-  const mockBaseTime = new Date('2026-09-02T23:59:59Z').getTime();
-  const refTime = date.getTime() <= mockBaseTime ? mockBaseTime : now.getTime();
+  const sep02MockBase = new Date('2026-09-02T23:59:59Z').getTime();
+  const sep21MockBase = new Date('2026-09-21T23:59:59Z').getTime();
+
+  let refTime = now.getTime();
+  if (date.getTime() <= sep02MockBase) {
+    refTime = sep02MockBase;
+  } else if (date.getTime() <= sep21MockBase) {
+    refTime = sep21MockBase;
+  }
+
   const diffDays = (refTime - date.getTime()) / (1000 * 60 * 60 * 24);
 
   if (filters.dateRange === 'today') {
-    return diffDays >= -1 && diffDays <= 1.5;
+    return diffDays >= -0.5 && diffDays <= 1.5;
   }
   if (filters.dateRange === '7d') {
-    return diffDays >= -1 && diffDays <= 7.5;
+    return diffDays >= -0.5 && diffDays <= 7.5;
   }
   if (filters.dateRange === '30d') {
-    return diffDays >= -1 && diffDays <= 30.5;
+    return diffDays >= -0.5 && diffDays <= 30.5;
   }
 
   return true;
@@ -101,7 +118,6 @@ export function formatDate(iso: string): string {
   });
 }
 
-/** Genera N timestamps ISO hacia atrás desde "now" en intervalos de `intervalH` horas */
 export function generateTimeSeries(
   points: number,
   intervalH = 1,

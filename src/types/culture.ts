@@ -1,5 +1,6 @@
 // src/types/culture.ts
 import type { EventEnvelope } from './common';
+import type { AIAnalysisReport } from './ai';
 
 export type EventCategory = 'cultural' | 'deportivo' | 'recreativo';
 
@@ -67,4 +68,5 @@ export interface CultureAnalyticsData {
   inscriptionsByEvent: { eventTitle: string; registered: number; capacity: number; occupancyPct: number }[];
   inscriptionsByCategory: { category: string; count: number }[];
   avgOccupancyRatePct: number;
+  aiReport?: AIAnalysisReport;
 }

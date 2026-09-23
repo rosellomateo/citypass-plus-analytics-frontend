@@ -1,0 +1,61 @@
+{
+  "actualizado_en": "2026-09-21T10:00:43+00:00",
+  "analisis": [
+    {
+      "generado_en": "2026-09-21T10:00:27+00:00",
+      "metadata": {
+        "avisos": [],
+        "caso_de_uso": "espacios_publicos",
+        "cifras": {
+          "reservas_confirmadas": 4,
+          "reservas_canceladas": 1,
+          "ocupacion_promedio": "76.5%"
+        },
+        "corte": "2026-09-20",
+        "filas_enviadas": 285,
+        "fuentes": [
+          "gold/Espacios Publicos/espacios_resumen_38_2026.parquet"
+        ],
+        "llm": {
+          "deployment": "gpt-5-mini",
+          "finish_reason": "stop",
+          "input_tokens": 4120,
+          "modelo_respuesta": "gpt-5-mini-2025-08-07",
+          "output_tokens": 1610,
+          "proveedor": "azure_openai",
+          "request_id": "chatcmpl-CULTURE339"
+        },
+        "semana_actual": "2026-W38",
+        "semanas_comparadas": [
+          "2026-W36",
+          "2026-W37",
+          "2026-W38"
+        ],
+        "snapshot_base": "2026-W31",
+        "version_esquema": "3.0"
+      },
+      "resumen": {
+        "parrafo_ejecutivo": "En la semana 2026-W38, el cupo medio de ocupación en eventos comunitarios y espacios públicos alcanzó un 76.5%. Se destacó la alta convocatoria en festivales culturales de fin de semana en Parque Central y Centro Cultural Sur, registrando una tasa de cancelación de reservas inferior al 20%.",
+        "puntos_destacados": [
+          "Ocupación promedio del 76.5% en talleres y eventos culturales.",
+          "4 reservas de gran envergadura confirmadas en parque y anfiteatro.",
+          "Tasa de cancelación de reservas de espacios estabilizada en 20%."
+        ],
+        "recomendaciones": [
+          "Habilitar lista de espera automatizada para eventos con cupo agotado.",
+          "Reasignar franjas horarias matutinas con baja demanda a actividades deportivas escolares."
+        ],
+        "riesgos": [
+          "Posibles solapamientos de ruido acústico en eventos concurrentes en Plaza San Martín."
+        ]
+      },
+      "semana": "2026-W38"
+    }
+  ],
+  "caso_de_uso": "espacios_publicos",
+  "semanas": [
+    "2026-W38"
+  ],
+  "ultima_semana": "2026-W38",
+  "version_esquema": "3.0"
+}

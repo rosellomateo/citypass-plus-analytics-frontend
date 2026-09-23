@@ -1,4 +1,3 @@
-// src/data/mocks/culture.mock.ts
 import type {
   ReservaConfirmadaEvent,
   ReservaCanceladaEvent,
@@ -6,7 +5,9 @@ import type {
   InscripcionConfirmadaEvent,
   InscripcionCanceladaEvent,
   EventoCanceladoEvent,
+  AIAnalysisReport,
 } from '../../types';
+import rawCultureSummary from '../../../testingDatos/culture_summary.json';
 
 const now = new Date();
 function daysAgo(d: number) {
@@ -248,3 +249,5 @@ export const mockInscripcionCanceladaEvents: InscripcionCanceladaEvent[] = [
 ];
 
 export const mockEventoCanceladoEvents: EventoCanceladoEvent[] = [];
+
+export const mockCultureAIReport: AIAnalysisReport = rawCultureSummary;

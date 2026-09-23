@@ -1,6 +1,6 @@
-// src/services/wasteService.ts
 import type { DashboardFilters, WasteMetrics, ContainerStatus, WasteInputJson } from '../types';
 import rawWasteJson from '../../testingDatos/waste_records.json';
+import { mockWasteAIReport } from '../data/mocks/waste.mock';
 import { adaptWasteInput } from '../adapters/wasteAdapter';
 import { delay } from '../utils';
 import { isWithinDateRange } from '../utils/dates';
@@ -148,5 +148,6 @@ export async function getWasteAnalyticsData(filters: DashboardFilters): Promise<
     volumeByWasteType,
     avgCollectionTimeByZone,
     criticalContainersDetail,
+    aiReport: mockWasteAIReport,
   };
 }

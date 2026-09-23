@@ -1,0 +1,79 @@
+{
+  "actualizado_en": "2026-09-21T10:01:01+00:00",
+  "analisis": [
+    {
+      "generado_en": "2026-09-21T10:00:45+00:00",
+      "metadata": {
+        "avisos": [],
+        "caso_de_uso": "movilidad",
+        "cifras": {
+          "acumulado_total": 1400,
+          "altas_semana": 229,
+          "duracionTotalViajes": 30885
+        },
+        "corte": "2026-09-20",
+        "filas_enviadas": 213,
+        "fuentes": [
+          "gold/Movilidad Urbana/viajes_resumen_31_2026.parquet",
+          "gold/Movilidad Urbana/viajes_resumen_32_2026.parquet",
+          "gold/Movilidad Urbana/viajes_resumen_33_2026.parquet",
+          "gold/Movilidad Urbana/viajes_resumen_34_2026.parquet",
+          "gold/Movilidad Urbana/viajes_resumen_35_2026.parquet",
+          "gold/Movilidad Urbana/viajes_resumen_36_2026.parquet",
+          "gold/Movilidad Urbana/viajes_resumen_37_2026.parquet",
+          "gold/Movilidad Urbana/viajes_resumen_38_2026.parquet"
+        ],
+        "llm": {
+          "deployment": "gpt-5-mini",
+          "finish_reason": "stop",
+          "input_tokens": 4933,
+          "modelo_respuesta": "gpt-5-mini-2025-08-07",
+          "output_tokens": 2100,
+          "proveedor": "azure_openai",
+          "request_id": "chatcmpl-EQV7F9NO4qpmS1K4cve2zV5656rsQ"
+        },
+        "semana_actual": "2026-W38",
+        "semanas_comparadas": [
+          "2026-W32",
+          "2026-W33",
+          "2026-W34",
+          "2026-W35",
+          "2026-W36",
+          "2026-W37",
+          "2026-W38"
+        ],
+        "snapshot_base": "2026-W31",
+        "version_esquema": "3.0"
+      },
+      "resumen": {
+        "parrafo_ejecutivo": "La semana 2026-W38 registró 229 altas, un aumento claro frente a la semana anterior (192; +37 altas, +19%) y por encima del promedio de las seis semanas previas (≈170; +59 altas, +35%). El crecimiento se concentró en pocos días: 18/09 (41), 17/09 (40) y 19/09 (38) sumaron 119 altas (52% del total). Por duración, las altas fueron mayoritariamente cortas: 15-30 min 91 (40%), <15 min 86 (38%), 30-60 min 47 (20%) y >1 h 5 (2%); la franja 30-60 min subió respecto a la semana previa (47 vs 28). Las estaciones con más inicios fueron liniers-02 y recoleta-04 (20 cada una) y belgrano-03 y palermo-05 (19 cada una); las top-5 concentran 96 altas (42% del total). El promDuracion del stock subió levemente a 22.1 min (desde 21.7). Hipótesis: eventos puntuales o cambios operativos explican la concentración por fecha y el aumento de viajes más largos; hay que validar antes de sacar conclusiones operativas.",
+        "puntos_destacados": [
+          "Altas en 2026-W38: 229 viajes, +37 respecto a 2026-W37 (192) y +59 respecto al promedio 2026‑W32–W37 (~170).",
+          "Concentración temporal: 17–19/09 sumaron 119 altas (52% de la semana), con pico el 18/09 (41).",
+          "Duración: 15–30 min 91 (40%), <15 min 86 (38%), 30–60 min 47 (20%); la franja 30–60 min aumentó (47 vs 28 en W37).",
+          "Top estaciones: liniers-02 y recoleta-04 20 cada una; top-5 estaciones acumulan 96 altas (42% del total).",
+          "Promedio de duración del stock subió levemente a 22.1 min (desde 21.7)."
+        ],
+        "recomendaciones": [
+          "Investigar los días 17–19/09 (eventos, obras, incidentes) para confirmar si la concentración es explicación operacional o artefacto.",
+          "Analizar causas del aumento de la franja 30–60 min (47 altas) comparando trazas operativas y reportes de servicio en esas fechas.",
+          "Priorizar monitoreo y gabinete de inspección en las estaciones con más inicios (liniers-02, recoleta-04, belgrano-03, palermo-05) para evaluar capacidad y mantenimiento.",
+          "Marcar como bandera los grupos con muestras pequeñas (valores =1–2) y excluirlos de decisiones operativas hasta obtener series más estables."
+        ],
+        "riesgos": [
+          "Gran concentración de altas en pocos días puede reflejar un evento o un artefacto de datos y distorsionar decisiones si no se valida.",
+          "Variaciones por estación pequeñas (muchos valores=1–2) generan alta volatilidad porcentual; no sobreinterpretar esas filas.",
+          "Los viajes en curso no aparecen hasta terminar; retrasos en cierre pueden alterar la comparativa semanal de altas.",
+          "El aumento en viajes de 30–60 min podría indicar cambios en rutas o incidentes; es una hipótesis que requiere verificación."
+        ]
+      },
+      "semana": "2026-W38"
+    }
+  ],
+  "caso_de_uso": "movilidad",
+  "semanas": [
+    "2026-W38"
+  ],
+  "ultima_semana": "2026-W38",
+  "version_esquema": "3.0"
+}
