@@ -36,8 +36,8 @@ export function ClaimsDashboard() {
 
   // Compute dataset for local interactive filtering based on date range & global search
   const recordsFiltered = useMemo(() => {
-    return getFilteredClaimRecords(filters);
-  }, [filters]);
+    return getFilteredClaimRecords(filters, resolved.data?.records ?? []);
+  }, [filters, resolved.data?.records]);
 
   // Derived data for Chart 2: Status distribution (locally filtered by category)
   const statusDistChartData = useMemo(() => {

@@ -12,6 +12,7 @@ import { FilterBar } from '../components/common/FilterBar/FilterBar';
 import { useFilters } from '../hooks/useFilters';
 import { useWasteData } from '../hooks/useWasteData';
 import { useResolvedUiState } from '../hooks/useUiState';
+import { WasteAlertsDashboard } from '../components/waste/WasteAlertsDashboard';
 
 const ZONE_OPTIONS = [
   { value: 'Centro', label: 'Centro' },
@@ -40,6 +41,18 @@ export function WasteDashboard() {
   const { filters, updateFilter, updateDateRange } = useFilters();
   const wasteAsync = useWasteData(filters);
   const resolved = useResolvedUiState(wasteAsync);
+
+  if (resolved.data?.mode === 'alerts') {
+    return (
+      <WasteAlertsDashboard
+        data={resolved.data}
+        filters={filters}
+        onFilterChange={updateFilter}
+        onDateRangeChange={(range) => updateFilter('dateRange', range)}
+        onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)}
+      />
+    );
+  }
 
   return (
     <div>

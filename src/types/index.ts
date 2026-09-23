@@ -54,6 +54,10 @@ export type {
   CriticalContainerDetail,
   WasteMetrics,
   WasteAnalyticsData,
+  WasteAlertDetail,
+  WasteAlertMetrics,
+  WasteMockMetrics,
+  WasteDashboardData,
 } from './waste';
 
 export type * from './ai';
