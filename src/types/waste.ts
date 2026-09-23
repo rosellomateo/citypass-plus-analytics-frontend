@@ -61,3 +61,32 @@ export interface WasteMetrics {
 }
 
 export type WasteAnalyticsData = WasteMetrics;
+
+export interface WasteAlertDetail {
+  id: string;
+  zone: string;
+  alertType: string;
+  priority: string;
+  fillRange: string;
+  alerts: number;
+  resolved: number;
+  avgResolutionTime: number;
+}
+
+export interface WasteAlertMetrics {
+  mode: 'alerts';
+  totalAlerts: number;
+  resolvedAlerts: number;
+  resolutionRatePct: number;
+  avgResolutionTime: number;
+  alertsByFillRange: { range: string; count: number }[];
+  alertsByType: { alertType: string; count: number }[];
+  alertsByPriority: { priority: string; count: number }[];
+  avgResolutionTimeByZone: { zone: string; value: number }[];
+  details: WasteAlertDetail[];
+  availableZones: string[];
+  availableAlertTypes: string[];
+}
+
+export type WasteMockMetrics = WasteMetrics & { mode: 'mock' };
+export type WasteDashboardData = WasteAlertMetrics | WasteMockMetrics;
