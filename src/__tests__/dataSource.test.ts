@@ -8,6 +8,24 @@ import {
   mapWasteApiData,
 } from '../dataSources/apiAnalyticsDataSource';
 
+const informeMock = {
+  actualizado_en: '2026-09-24T12:00:00Z',
+  caso_de_uso: 'reclamos',
+  semanas: ['2026-W39'],
+  ultima_semana: '2026-W39',
+  version_esquema: '1.0',
+  analisis: [{
+    generado_en: '2026-09-24T12:00:00Z',
+    semana: '2026-W39',
+    metadata: {},
+    resumen: {
+      parrafo_ejecutivo: 'Los reclamos se concentran en alumbrado.',
+      puntos_destacados: ['Se registraron 15 reclamos.'],
+      recomendaciones: [],
+      riesgos: [],
+    },
+  }],
+};
 const filters = { dateRange: '30d' as const };
 
 afterEach(() => {
@@ -48,7 +66,9 @@ describe('data source selection', () => {
       vi.fn().mockResolvedValue({
         ok: true,
         status: 200,
-        json: vi.fn().mockResolvedValue([
+        json: vi.fn().mockResolvedValue({
+          informe: informeMock,
+          datos: [
           {
             barrio: 'Palermo',
             categoria: 'Alumbrado',
@@ -59,7 +79,8 @@ describe('data source selection', () => {
             tiempo_prom_hasta_estado_actual: 24.5,
             fecha_snapshot: new Date().toISOString(),
           },
-        ]),
+          ],
+        }),
       })
     );
 
@@ -68,6 +89,7 @@ describe('data source selection', () => {
     expect(result.totalClaims).toBe(15);
     expect(result.records).toHaveLength(1);
     expect(result.records[0].categoria).toBe('Alumbrado');
+    expect(result.aiReport).toEqual(informeMock);
   });
 });
 

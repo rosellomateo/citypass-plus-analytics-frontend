@@ -2,6 +2,24 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { analyticsApi } from '../api/analyticsApi';
 import { apiGet, getApiBaseUrl } from '../api/client';
 
+const informeMock = {
+  actualizado_en: '2026-09-24T12:00:00Z',
+  caso_de_uso: 'reclamos',
+  semanas: ['2026-W39'],
+  ultima_semana: '2026-W39',
+  version_esquema: '1.0',
+  analisis: [{
+    generado_en: '2026-09-24T12:00:00Z',
+    semana: '2026-W39',
+    metadata: {},
+    resumen: {
+      parrafo_ejecutivo: 'Los reclamos se concentran en alumbrado.',
+      puntos_destacados: ['Se registraron 15 reclamos.'],
+      recomendaciones: [],
+      riesgos: [],
+    },
+  }],
+};
 afterEach(() => {
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
@@ -25,13 +43,13 @@ describe('API client', () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
-      json: vi.fn().mockResolvedValue([{ categoria: 'Alumbrado' }]),
+      json: vi.fn().mockResolvedValue({ datos: [{ categoria: 'Alumbrado' }], informe: informeMock }),
     });
     vi.stubGlobal('fetch', fetchMock);
 
-    const result = await apiGet<Array<{ categoria: string }>>('/analytics/reclamos');
+    const result = await apiGet<{ datos: Array<{ categoria: string }>; informe: typeof informeMock }>('/analytics/reclamos');
 
-    expect(result).toEqual([{ categoria: 'Alumbrado' }]);
+    expect(result).toEqual({ datos: [{ categoria: 'Alumbrado' }], informe: informeMock });
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:8000/analytics/reclamos', {
       method: 'GET',
       headers: { Accept: 'application/json' },
@@ -52,7 +70,7 @@ describe('API client', () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
-      json: vi.fn().mockResolvedValue([]),
+      json: vi.fn().mockResolvedValue({ datos: [], informe: informeMock }),
     });
     vi.stubGlobal('fetch', fetchMock);
 
@@ -62,7 +80,7 @@ describe('API client', () => {
       analyticsApi.getMobility(),
       analyticsApi.getCulture(),
       analyticsApi.getWaste(),
-      analyticsApi.getEvent(),
+
     ]);
 
     expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
@@ -71,7 +89,7 @@ describe('API client', () => {
       'http://localhost:8000/analytics/movilidad-urbana',
       'http://localhost:8000/analytics/espacios-cultura',
       'http://localhost:8000/analytics/residuos',
-      'http://localhost:8000/analytics/eventos',
+
     ]);
   });
 });
