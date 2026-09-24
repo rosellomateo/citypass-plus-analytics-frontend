@@ -1,0 +1,151 @@
+name: Build and deploy frontend container to Azure Web App - test
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-test
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  AZURE_WEBAPP_NAME: citypass-frontend-test
+  AZURE_RESOURCE_GROUP: rg-citypass-frontend
+  BACKEND_PUBLIC_URL: ${{ vars.TEST_BACKEND_PUBLIC_URL || 'https://rg-citypass-backend-test-g0hdacdxccbdb6g5.brazilsouth-01.azurewebsites.net' }}
+  FRONTEND_PUBLIC_URL: ${{ vars.TEST_FRONTEND_PUBLIC_URL || 'https://citypass-frontend-test-eagbdnh6afdqakac.brazilsouth-01.azurewebsites.net' }}
+
+jobs:
+  quality:
+    name: Validate frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
+
+  build:
+    name: Build and publish container
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and publish test image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          target: production
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          build-args: |
+            VITE_DATA_SOURCE=api
+            VITE_API_BASE_URL=${{ env.BACKEND_PUBLIC_URL }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy test container
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Validate deployment secrets
+        env:
+          GHCR_PULL_TOKEN: ${{ secrets.GHCR_PULL_TOKEN }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        run: |
+          : "${GHCR_PULL_TOKEN:?Define GHCR_PULL_TOKEN as a repository secret}"
+          : "${AZURE_CLIENT_ID:?Define AZURE_CLIENT_ID as a repository secret}"
+          : "${AZURE_TENANT_ID:?Define AZURE_TENANT_ID as a repository secret}"
+          : "${AZURE_SUBSCRIPTION_ID:?Define AZURE_SUBSCRIPTION_ID as a repository secret}"
+
+      - name: Log in to Azure with OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Configure private registry
+        env:
+          GHCR_PULL_TOKEN: ${{ secrets.GHCR_PULL_TOKEN }}
+          GHCR_PULL_USERNAME: ${{ github.repository_owner }}
+        run: |
+          az webapp config container set \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$AZURE_WEBAPP_NAME" \
+            --container-image-name "$REGISTRY/$IMAGE_NAME:$GITHUB_SHA" \
+            --container-registry-url "https://$REGISTRY" \
+            --container-registry-user "$GHCR_PULL_USERNAME" \
+            --container-registry-password "$GHCR_PULL_TOKEN" \
+            --output none
+
+      - name: Deploy container to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          slot-name: Production
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+      - name: Verify frontend health
+        run: |
+          base_url="${FRONTEND_PUBLIC_URL%/}"
+          curl --fail --silent --show-error \
+            --retry 18 --retry-all-errors --retry-delay 10 \
+            "${base_url}/health"
+
+      - name: Verify frontend site
+        run: |
+          base_url="${FRONTEND_PUBLIC_URL%/}"
+          curl --fail --silent --show-error --location --output /dev/null \
+            --retry 6 --retry-all-errors --retry-delay 5 \
+            "${base_url}/"
+
+      - name: Log out from Azure
+        if: always()
+        run: az logout
