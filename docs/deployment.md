@@ -5,19 +5,47 @@
 | Archivo | Disparador | Resultado |
 | --- | --- | --- |
 | `.github/workflows/ci.yml` | Push o pull request a `develop` y `main` | Lint, pruebas con cobertura, build y validación de la imagen Docker. |
+| `.github/workflows/develop_citypass-frontend-test.yml` | Push a `develop` o ejecución manual | Construye el frontend en modo API, publica la imagen en GHCR y la despliega en el Web App de test. |
 | `.github/workflows/cd.yml` | Tag `v*.*.*` | Publica una imagen versionada en GitHub Container Registry. |
 | `.github/workflows/deploy-frontend-storage.yml` | Tag `frontend-test-v*` | Compila `dist/` y lo sube al sitio estático de Azure Storage. |
 | `.github/workflows/deploy-production.yml` | Push a `main` o ejecución manual | Valida, compila en modo API, sube al Storage productivo y comprueba el sitio público. |
 
-La imagen se publica como:
+La imagen de test se publica como:
 
 ```text
-ghcr.io/rosellomateo/citypass-plus-analytics-frontend:<version>
+ghcr.io/rosellomateo/citypass-plus-analytics-frontend:<commit-sha>
 ```
 
-El despliegue de test usa la cuenta `stcitypassfronttest` y el contenedor `$web`.
-El nombre de la cuenta productiva se obtiene del GitHub Environment
-`production`.
+El despliegue de test usa el Web App `citypass-frontend-test`, dentro del resource
+group `rg-citypass-frontend`. La imagen se compila con el backend de test como
+`VITE_API_BASE_URL`. El flujo anterior de Azure Storage por tag se conserva,
+pero no interviene en este despliegue.
+
+Las variables opcionales `TEST_BACKEND_PUBLIC_URL` y
+`TEST_FRONTEND_PUBLIC_URL` permiten reemplazar los dominios de test desde
+GitHub sin editar el workflow. Mientras no se definan, se utilizan los dominios
+actuales de Azure Web Apps.
+
+## Entorno de test en Azure Web App
+
+Crear estos secretos en el repositorio de GitHub:
+
+| Secreto | Uso |
+| --- | --- |
+| `GHCR_PULL_TOKEN` | PAT de GitHub con `read:packages`, usado por Azure para descargar la imagen privada. |
+| `AZURE_CLIENT_ID` | Client ID de la identidad usada por GitHub Actions. |
+| `AZURE_TENANT_ID` | Tenant de Microsoft Entra. |
+| `AZURE_SUBSCRIPTION_ID` | Suscripción donde existe el Web App. |
+
+La identidad necesita `Website Contributor` sobre el Web App y una credencial
+federada para:
+
+```text
+repo:rosellomateo/citypass-plus-analytics-frontend:ref:refs/heads/develop
+```
+
+El frontend sirve Nginx en el puerto `80`, por lo que App Service no necesita
+un puerto alternativo. El pipeline valida tanto `/health` como `/`.
 
 ## Entorno de producción
 
