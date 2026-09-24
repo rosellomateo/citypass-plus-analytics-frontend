@@ -8,7 +8,7 @@
 | `.github/workflows/develop_citypass-frontend-test.yml` | Push a `develop` o ejecución manual | Construye el frontend en modo API, publica la imagen en GHCR y la despliega en el Web App de test. |
 | `.github/workflows/cd.yml` | Tag `v*.*.*` | Publica una imagen versionada en GitHub Container Registry. |
 | `.github/workflows/deploy-frontend-storage.yml` | Tag `frontend-test-v*` | Compila `dist/` y lo sube al sitio estático de Azure Storage. |
-| `.github/workflows/deploy-production.yml` | Push a `main` o ejecución manual | Valida, compila en modo API, sube al Storage productivo y comprueba el sitio público. |
+| `.github/workflows/deploy-production.yml` | Push a `main` o ejecución manual | Valida, construye la imagen en modo API, la publica en GHCR y la despliega en el Web App productivo. |
 
 La imagen de test se publica como:
 
@@ -53,12 +53,16 @@ Crear en GitHub un environment llamado `production` con estos valores:
 
 | Tipo | Nombre | Uso |
 | --- | --- | --- |
+| Variable | `AZURE_WEBAPP_NAME` | Nombre del Web App productivo del frontend. |
+| Variable | `AZURE_RESOURCE_GROUP` | Resource group que contiene el Web App productivo. |
 | Variable | `VITE_API_BASE_URL` | URL HTTPS pública del backend productivo. |
-| Variable | `AZURE_STORAGE_ACCOUNT_NAME` | Nombre de la Storage Account productiva. |
-| Variable | `FRONTEND_PUBLIC_URL` | URL pública del Static Website. |
-| Secreto | `AZURE_STORAGE_SAS_TOKEN` | SAS con permisos para cargar archivos en `$web`. |
+| Variable | `FRONTEND_PUBLIC_URL` | URL HTTPS pública del frontend productivo. |
+| Secreto | `GHCR_PULL_TOKEN` | PAT con `read:packages`, usado por Azure para descargar la imagen privada. |
+| Secreto | `AZURE_CLIENT_ID` | Client ID de la identidad usada por GitHub Actions. |
+| Secreto | `AZURE_TENANT_ID` | Tenant de Microsoft Entra. |
+| Secreto | `AZURE_SUBSCRIPTION_ID` | Suscripción donde existe el Web App. |
 
-El workflow comprueba que todos estén definidos antes del build y la carga.
+El workflow comprueba que todos estén definidos antes del build y el despliegue.
 Opcionalmente se pueden exigir revisores para aprobar cada despliegue mediante
 las reglas de protección del environment.
 
@@ -67,17 +71,6 @@ las reglas de protección del environment.
 El frontend es estático. `VITE_DATA_SOURCE` y `VITE_API_BASE_URL` deben existir
 en el paso que ejecuta el build; definirlas después en el servidor no modifica
 los archivos generados.
-
-Para Azure Storage, el paso de build debe recibir una configuración equivalente
-a:
-
-```yaml
-- name: Build production frontend
-  run: npm run build
-  env:
-    VITE_DATA_SOURCE: api
-    VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
-```
 
 `VITE_API_BASE_URL` puede guardarse como una variable de GitHub del entorno, no
 como secreto, porque su valor queda público en el navegador.
@@ -104,19 +97,18 @@ condiciones:
 Estas limitaciones afectan al despliegue de test por tag y a las imágenes de
 GHCR, no al nuevo despliegue productivo desde `main`.
 
-## Preparar Azure Static Website
+## Preparar Azure Web App productivo
 
-En la cuenta de Storage:
+Crear un Web App Linux de tipo Container y mantener deshabilitado el soporte de
+sidecar. Puede usarse Nginx Quickstart como imagen inicial; el workflow la
+reemplaza por la imagen publicada en GHCR.
 
-1. habilitar Static website;
-2. configurar `index.html` como documento principal;
-3. configurar `index.html` también como documento de error para que React Router
-   pueda resolver recargas directas;
-4. confirmar la URL pública resultante;
-5. agregar esa URL exacta a `CORS_ALLOWED_ORIGINS` del backend.
+La identidad de GitHub Actions necesita `Website Contributor` sobre el Web App
+y una credencial federada que coincida con el environment `production`. El
+frontend sirve Nginx por el puerto `80` y expone `/health`.
 
-El endpoint `/health` documentado para Docker lo sirve Nginx. Azure Storage no
-ejecuta Nginx, por lo que ese health check no forma parte del sitio estático.
+Agregar la URL pública exacta del frontend a `CORS_ALLOWED_ORIGINS` del backend
+productivo antes de desplegar la interfaz.
 
 ## Orden recomendado de despliegue
 
@@ -128,7 +120,8 @@ ejecuta Nginx, por lo que ese health check no forma parte del sitio estático.
 6. Esperar que el workflow finalice correctamente.
 7. Recorrer los cinco tableros y revisar Network y Console en el navegador.
 
-Ejemplo para Azure Storage de prueba:
+El workflow antiguo de Azure Storage puede ejecutarse únicamente mediante sus
+tags históricos y no participa en producción. Ejemplo:
 
 ```bash
 git tag frontend-test-v1.0.0
@@ -152,13 +145,13 @@ manualmente desde Actions sobre el commit actual de `main`.
 - [ ] El build usa `VITE_DATA_SOURCE=api`.
 - [ ] El build recibe la URL pública correcta en `VITE_API_BASE_URL`.
 - [ ] CORS del backend contiene el origen exacto del frontend.
-- [ ] Azure Storage resuelve las rutas SPA con `index.html`.
+- [ ] El Web App obtiene la imagen privada desde GHCR.
+- [ ] `/health` del frontend responde `200`.
 - [ ] Ninguna variable `VITE_*` contiene secretos.
 - [ ] Los tableros muestran datos reales y no mocks.
 - [ ] Se reconoce que login y tokens todavía no están implementados.
 
 ## Rollback
 
-Para Storage, volver a desplegar un tag creado desde el último commit estable.
-Para contenedores, desplegar una etiqueta de imagen estable anterior. Si un SAS
-de Azure fue expuesto, revocarlo o rotarlo inmediatamente.
+Para volver atrás, desplegar una etiqueta de imagen estable anterior. Si un PAT
+de GHCR fue expuesto, revocarlo o rotarlo inmediatamente.
