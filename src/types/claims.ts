@@ -1,15 +1,44 @@
 // src/types/claims.ts
 import type { EventEnvelope } from './common';
+import type { AIAnalysisReport } from './ai';
 
-export type ClaimCategory = 'alumbrado' | 'residuos' | 'calles' | 'transito' | 'espacios_publicos' | 'ruido' | 'otros';
-export type ClaimStatus = 'creado' | 'en curso' | 'cerrado' | 'cancelado';
+export type ClaimCategory =
+  | 'alumbrado'
+  | 'residuos'
+  | 'calles'
+  | 'transito'
+  | 'espacios_publicos'
+  | 'ruido'
+  | 'otros'
+  | string;
 
+export type ClaimStatus =
+  | 'creado'
+  | 'en curso'
+  | 'cerrado'
+  | 'cancelado'
+  | 'ASIGNADO'
+  | 'RECHAZADO'
+  | string;
+
+export interface BackendAnalyticsRecord {
+  barrio: string;
+  categoria: string;
+  prioridad: string;
+  origenClasificacion: string;
+  estado_actual: string;
+  row_count: number;
+  tiempo_prom_hasta_estado_actual: number;
+  fecha_snapshot: string;
+}
+
+// Event envelope wrappers for backwards compatibility
 export interface ClaimCreatedData {
   reclamoId: string;
   categoria: ClaimCategory;
   estado: 'creado';
   zona: string;
-  ciudadanoId: string; // anonimizado
+  ciudadanoId: string;
 }
 
 export interface ClaimUpdatedData {
@@ -28,4 +57,6 @@ export interface ClaimsAnalyticsData {
   claimsByStatus: { status: string; count: number }[];
   avgResolutionTimeHours: number;
   avgResolutionByCategory: { category: string; hours: number }[];
+  availableCategories: string[];
+  aiReport?: AIAnalysisReport;
 }

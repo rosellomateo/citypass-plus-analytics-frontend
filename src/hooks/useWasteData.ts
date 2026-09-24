@@ -1,7 +1,7 @@
 // src/hooks/useWasteData.ts
 import type { DashboardFilters } from '../types';
 import { useAsync } from './useAsync';
-import { getWasteAnalyticsData } from '../services/wasteService';
+import { getWasteAnalyticsData } from '../dataSources/analyticsDataSource';
 
 export function useWasteData(filters: DashboardFilters) {
   return useAsync(

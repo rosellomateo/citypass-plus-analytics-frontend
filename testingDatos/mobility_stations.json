@@ -1,0 +1,8 @@
+[
+  { "id": "st-01", "name": "Estación Universidad", "address": "Av. Corrientes 2030", "latitude": -34.6037, "longitude": -58.3816, "capacity": 25, "status": "ACTIVE", "source": "MANUAL" },
+  { "id": "st-02", "name": "Estación Palermo", "address": "Av. Santa Fe 3200", "latitude": -34.5889, "longitude": -58.4101, "capacity": 30, "status": "ACTIVE", "source": "DATASET" },
+  { "id": "st-03", "name": "Estación Retiro", "address": "Av. Ramos Mejía 1300", "latitude": -34.5912, "longitude": -58.3752, "capacity": 25, "status": "ACTIVE", "source": "DATASET" },
+  { "id": "st-04", "name": "Estación San Telmo", "address": "Defensa 800", "latitude": -34.6180, "longitude": -58.3712, "capacity": 20, "status": "ACTIVE", "source": "MANUAL" },
+  { "id": "st-05", "name": "Estación Microcentro", "address": "Florida 450", "latitude": -34.6050, "longitude": -58.3740, "capacity": 20, "status": "ACTIVE", "source": "DATASET" },
+  { "id": "st-06", "name": "Estación Constitución", "address": "Av. Brasil 1100", "latitude": -34.6275, "longitude": -58.3815, "capacity": 20, "status": "ACTIVE", "source": "DATASET" }
+]

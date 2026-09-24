@@ -16,6 +16,7 @@ export type {
   ClaimCreatedEvent,
   ClaimUpdatedEvent,
   ClaimsAnalyticsData,
+  BackendAnalyticsRecord,
 } from './claims';
 
 export type {
@@ -26,14 +27,11 @@ export type {
   EmergenciaEstadoActualizadoEvent,
   EmergenciaDespachadaEvent,
   EmergenciaCerradaEvent,
+  CategoryPriorityStackedData,
   EmergencyAnalyticsData,
 } from './emergencies';
 
-export type {
-  ViajeIniciadoEvent,
-  ViajeFinalizadoEvent,
-  MobilityAnalyticsData,
-} from './mobility';
+export type * from './mobility';
 
 export type {
   EventCategory,
@@ -56,5 +54,10 @@ export type {
   CriticalContainerDetail,
   WasteMetrics,
   WasteAnalyticsData,
+  WasteAlertDetail,
+  WasteAlertMetrics,
+  WasteMockMetrics,
+  WasteDashboardData,
 } from './waste';
 
+export type * from './ai';

@@ -12,6 +12,7 @@ import { FilterBar } from '../components/common/FilterBar/FilterBar';
 import { useFilters } from '../hooks/useFilters';
 import { useWasteData } from '../hooks/useWasteData';
 import { useResolvedUiState } from '../hooks/useUiState';
+import { WasteAlertsDashboard } from '../components/waste/WasteAlertsDashboard';
 
 const ZONE_OPTIONS = [
   { value: 'Centro', label: 'Centro' },
@@ -41,12 +42,25 @@ export function WasteDashboard() {
   const wasteAsync = useWasteData(filters);
   const resolved = useResolvedUiState(wasteAsync);
 
+  if (resolved.data?.mode === 'alerts') {
+    return (
+      <WasteAlertsDashboard
+        data={resolved.data}
+        filters={filters}
+        onFilterChange={updateFilter}
+        onDateRangeChange={(range) => updateFilter('dateRange', range)}
+        onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)}
+      />
+    );
+  }
+
   return (
     <div>
       <DashboardHeader
         title="Tablero de Residuos"
-        subtitle="Seguimiento analítico de vaciado, volumen recolectado y contenedores críticos."
+        subtitle="Seguimiento analítico de vaciado y volumen recolectado."
         filters={filters}
+        aiReport={resolved.data?.aiReport}
         onDateRangeChange={(range) => updateFilter('dateRange', range)}
         onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)}
         filters_extra={
@@ -79,7 +93,7 @@ export function WasteDashboard() {
 
       {resolved.loading ? (
         <div className="section">
-          <MetricsGridSkeleton count={4} />
+          <MetricsGridSkeleton count={3} />
           <ChartSkeleton />
         </div>
       ) : resolved.error ? (
@@ -92,7 +106,7 @@ export function WasteDashboard() {
         <>
           {/* KPIs Principales */}
           <div className="section">
-            <div className="metrics-grid-4">
+            <div className="metrics-grid-3">
               <MetricCard
                 metric={{
                   label: 'Total Residuos Recolectados',
@@ -100,14 +114,6 @@ export function WasteDashboard() {
                   unit: ' ton',
                   sublabel: 'Volumen acumulado en el período',
                   status: 'info',
-                }}
-              />
-              <MetricCard
-                metric={{
-                  label: 'Contenedores Críticos',
-                  value: resolved.data.criticalContainersCount,
-                  sublabel: 'Llenado > 80% o Desbordados',
-                  status: resolved.data.criticalContainersCount > 0 ? 'critical' : 'normal',
                 }}
               />
               <MetricCard

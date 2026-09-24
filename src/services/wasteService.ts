@@ -1,6 +1,6 @@
-// src/services/wasteService.ts
 import type { DashboardFilters, WasteMetrics, ContainerStatus, WasteInputJson } from '../types';
 import rawWasteJson from '../../testingDatos/waste_records.json';
+import { mockWasteAIReport } from '../data/mocks/waste.mock';
 import { adaptWasteInput } from '../adapters/wasteAdapter';
 import { delay } from '../utils';
 import { isWithinDateRange } from '../utils/dates';
@@ -52,9 +52,7 @@ export async function getWasteAnalyticsData(filters: DashboardFilters): Promise<
   const totalTonsRaw = filtered.reduce((acc, r) => acc + r.collectedTons, 0);
   const totalCollectedTons = Number(totalTonsRaw.toFixed(1));
 
-  // 4. KPI 2: Contenedores Críticos (criticalContainersCount) -> >80% (CRÍTICO + DESBORDADO)
   const criticalRecords = filtered.filter((r) => r.status === 'CRÍTICO' || r.status === 'DESBORDADO');
-  const criticalContainersCount = criticalRecords.length;
 
   // 5. KPI 3: Tasa de Recolección a Tiempo (onTimeCollectionRatePct)
   const totalCount = filtered.length;
@@ -144,12 +142,12 @@ export async function getWasteAnalyticsData(filters: DashboardFilters): Promise<
 
   return {
     totalCollectedTons,
-    criticalContainersCount,
     onTimeCollectionRatePct,
     avgCollectionTimeHours,
     containersByStatus,
     volumeByWasteType,
     avgCollectionTimeByZone,
     criticalContainersDetail,
+    aiReport: mockWasteAIReport,
   };
 }

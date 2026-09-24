@@ -1,4 +1,3 @@
-// src/pages/CultureDashboard.tsx
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { DashboardHeader } from '../components/common/DashboardHeader/DashboardHeader';
@@ -37,6 +36,7 @@ export function CultureDashboard() {
         title="Espacios Públicos y Cultura"
         subtitle="CU-C1: Ocupación de espacios públicos | CU-C2: Convocatoria de eventos comunitarios"
         filters={filters}
+        aiReport={resolved.data?.aiReport}
         onDateRangeChange={(range) => updateFilter('dateRange', range)}
         onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)}
       />

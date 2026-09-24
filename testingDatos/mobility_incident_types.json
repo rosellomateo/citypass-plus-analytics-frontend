@@ -1,0 +1,8 @@
+[
+  { "id": "it-01", "code": "BRAKES_FAULT", "name": "Falla en Frenos", "description": "Sistema de frenado desgastado o cortado", "severity": "HIGH" },
+  { "id": "it-02", "code": "FLAT_TIRE", "name": "Neumático Pinchado", "description": "Perdida de presión de aire o rotura de cámara", "severity": "MEDIUM" },
+  { "id": "it-03", "code": "CHAIN_BROKEN", "name": "Cadena Desprendida", "description": "Rotura o caida de la cadena de transmisión", "severity": "LOW" },
+  { "id": "it-04", "code": "LOCK_FAILURE", "name": "Falla de Anclaje/Candado", "description": "Imposibilidad de traba en el dock de la estación", "severity": "HIGH" },
+  { "id": "it-05", "code": "THEFT_REPORT", "name": "Reporte de Robo", "description": "Sustracción no autorizada de la bicicleta", "severity": "CRITICAL" },
+  { "id": "it-06", "code": "VANDALISM", "name": "Vandalismo / Rotura", "description": "Daño intencional en cuadro o asiento", "severity": "MEDIUM" }
+]

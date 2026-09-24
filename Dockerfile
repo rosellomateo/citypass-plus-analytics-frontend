@@ -6,6 +6,12 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
+
+ARG VITE_DATA_SOURCE=api
+ARG VITE_API_BASE_URL=http://localhost:8000
+ENV VITE_DATA_SOURCE=${VITE_DATA_SOURCE} \
+    VITE_API_BASE_URL=${VITE_API_BASE_URL}
+
 RUN npm run build
 
 

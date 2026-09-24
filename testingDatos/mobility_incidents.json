@@ -1,0 +1,17 @@
+[
+  { "id": "inc-01", "bikeId": "bk-112", "incidentTypeId": "it-01", "stationId": "st-01", "status": "UNDER_REVIEW", "description": "Frenos traseros no responden", "reportedAt": "2026-09-19T10:00:00.000Z" },
+  { "id": "inc-02", "bikeId": "bk-112", "incidentTypeId": "it-02", "stationId": "st-01", "status": "RESOLVED", "description": "Pinchadura delantera", "reportedAt": "2026-09-16T14:30:00.000Z" },
+  { "id": "inc-03", "bikeId": "bk-113", "incidentTypeId": "it-04", "stationId": "st-01", "status": "REPORTED", "description": "Traba no libera la bici", "reportedAt": "2026-09-20T09:15:00.000Z" },
+  { "id": "inc-04", "bikeId": "bk-214", "incidentTypeId": "it-01", "stationId": "st-02", "status": "UNDER_REVIEW", "description": "Freno delantero trabado", "reportedAt": "2026-09-20T04:00:00.000Z" },
+  { "id": "inc-05", "bikeId": "bk-215", "incidentTypeId": "it-03", "stationId": "st-02", "status": "REPORTED", "description": "Cadena zafada", "reportedAt": "2026-09-20T18:00:00.000Z" },
+  { "id": "inc-06", "bikeId": "bk-217", "incidentTypeId": "it-05", "stationId": "st-02", "status": "REPORTED", "description": "Bici no devuelta tras 24hs", "reportedAt": "2026-09-18T11:00:00.000Z" },
+  { "id": "inc-07", "bikeId": "bk-310", "incidentTypeId": "it-01", "stationId": "st-03", "status": "UNDER_REVIEW", "description": "Manija de freno rota", "reportedAt": "2026-09-19T18:00:00.000Z" },
+  { "id": "inc-08", "bikeId": "bk-310", "incidentTypeId": "it-06", "stationId": "st-03", "status": "RESOLVED", "description": "Asiento roto", "reportedAt": "2026-09-13T08:00:00.000Z" },
+  { "id": "inc-09", "bikeId": "bk-311", "incidentTypeId": "it-02", "stationId": "st-03", "status": "REPORTED", "description": "Pinchadura trasera", "reportedAt": "2026-09-20T21:00:00.000Z" },
+  { "id": "inc-10", "bikeId": "bk-312", "incidentTypeId": "it-04", "stationId": "st-03", "status": "UNDER_REVIEW", "description": "No registra la devolucion", "reportedAt": "2026-09-19T08:00:00.000Z" },
+  { "id": "inc-11", "bikeId": "bk-409", "incidentTypeId": "it-03", "stationId": "st-04", "status": "RESOLVED", "description": "Cadena oxidada", "reportedAt": "2026-09-17T16:00:00.000Z" },
+  { "id": "inc-12", "bikeId": "bk-410", "incidentTypeId": "it-02", "stationId": "st-04", "status": "REPORTED", "description": "Rueda desinflada", "reportedAt": "2026-09-21T01:00:00.000Z" },
+  { "id": "inc-13", "bikeId": "bk-509", "incidentTypeId": "it-01", "stationId": "st-05", "status": "REPORTED", "description": "Freno suelto", "reportedAt": "2026-09-20T15:00:00.000Z" },
+  { "id": "inc-14", "bikeId": "bk-607", "incidentTypeId": "it-06", "stationId": "st-06", "status": "UNDER_REVIEW", "description": "Cuadro rayado y doblado", "reportedAt": "2026-09-19T23:00:00.000Z" },
+  { "id": "inc-15", "bikeId": "bk-608", "incidentTypeId": "it-05", "stationId": "st-06", "status": "REPORTED", "description": "Robo reportado por usuario", "reportedAt": "2026-09-18T22:00:00.000Z" }
+]

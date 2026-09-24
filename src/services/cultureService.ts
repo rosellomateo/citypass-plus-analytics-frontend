@@ -6,6 +6,7 @@ import {
   mockEventoPublicadoEvents,
   mockInscripcionConfirmadaEvents,
   mockInscripcionCanceladaEvents,
+  mockCultureAIReport,
 } from '../data/mocks/culture.mock';
 import { delay } from '../utils';
 import { isWithinDateRange } from '../utils/dates';
@@ -116,5 +117,6 @@ export async function getCultureAnalyticsData(filters: DashboardFilters): Promis
     inscriptionsByEvent,
     inscriptionsByCategory,
     avgOccupancyRatePct,
+    aiReport: mockCultureAIReport,
   };
 }

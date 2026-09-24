@@ -1,82 +1,30 @@
 [
   {
-    "metadata": {
-      "eventId": "evt-m-f1",
-      "eventType": "movilidad.viaje.finalizado",
-      "occurredAt": "2026-08-28T12:33:36.727Z",
-      "source": "mobility-service",
-      "version": "1"
-    },
-    "data": {
-      "correlationId": "corr-m-01",
-      "viajeId": "VJ-301",
-      "bicicletaId": "BK-102",
-      "estacionDestinoId": "Estación Microcentro",
-      "duracionSegundos": 900
-    }
+    "metadata": { "eventId": "evt-f-07a", "eventType": "movilidad.viaje.finalizado", "occurredAt": "2026-09-20T07:35:00.000Z", "source": "mobility-service", "version": "1" },
+    "data": { "correlationId": "corr-07a", "viajeId": "VJ-701", "bicicletaId": "bk-101", "estacionDestinoId": "Estación Microcentro", "duracionSegundos": 1200 }
   },
   {
-    "metadata": {
-      "eventId": "evt-m-f2",
-      "eventType": "movilidad.viaje.finalizado",
-      "occurredAt": "2026-08-28T12:33:36.727Z",
-      "source": "mobility-service",
-      "version": "1"
-    },
-    "data": {
-      "correlationId": "corr-m-02",
-      "viajeId": "VJ-302",
-      "bicicletaId": "BK-145",
-      "estacionDestinoId": "Estación Retiro",
-      "duracionSegundos": 1440
-    }
+    "metadata": { "eventId": "evt-f-07b", "eventType": "movilidad.viaje.finalizado", "occurredAt": "2026-09-20T07:50:00.000Z", "source": "mobility-service", "version": "1" },
+    "data": { "correlationId": "corr-07b", "viajeId": "VJ-702", "bicicletaId": "bk-201", "estacionDestinoId": "Estación Retiro", "duracionSegundos": 1200 }
   },
   {
-    "metadata": {
-      "eventId": "evt-m-f3",
-      "eventType": "movilidad.viaje.finalizado",
-      "occurredAt": "2026-08-28T08:33:36.727Z",
-      "source": "mobility-service",
-      "version": "1"
-    },
-    "data": {
-      "correlationId": "corr-m-03",
-      "viajeId": "VJ-303",
-      "bicicletaId": "BK-201",
-      "estacionDestinoId": "Estación San Telmo",
-      "duracionSegundos": 720
-    }
+    "metadata": { "eventId": "evt-f-08a", "eventType": "movilidad.viaje.finalizado", "occurredAt": "2026-09-20T08:30:00.000Z", "source": "mobility-service", "version": "1" },
+    "data": { "correlationId": "corr-08a", "viajeId": "VJ-801", "bicicletaId": "bk-102", "estacionDestinoId": "Estación Palermo", "duracionSegundos": 1200 }
   },
   {
-    "metadata": {
-      "eventId": "evt-m-f4",
-      "eventType": "movilidad.viaje.finalizado",
-      "occurredAt": "2026-08-28T03:33:36.727Z",
-      "source": "mobility-service",
-      "version": "1"
-    },
-    "data": {
-      "correlationId": "corr-m-04",
-      "viajeId": "VJ-304",
-      "bicicletaId": "BK-089",
-      "estacionDestinoId": "Estación Palermo",
-      "duracionSegundos": 1080
-    }
+    "metadata": { "eventId": "evt-f-08b", "eventType": "movilidad.viaje.finalizado", "occurredAt": "2026-09-20T08:45:00.000Z", "source": "mobility-service", "version": "1" },
+    "data": { "correlationId": "corr-08b", "viajeId": "VJ-802", "bicicletaId": "bk-202", "estacionDestinoId": "Estación Constitución", "duracionSegundos": 1500 }
   },
   {
-    "metadata": {
-      "eventId": "evt-m-f5",
-      "eventType": "movilidad.viaje.finalizado",
-      "occurredAt": "2026-08-28T02:33:36.727Z",
-      "source": "mobility-service",
-      "version": "1"
-    },
-    "data": {
-      "correlationId": "corr-m-05",
-      "viajeId": "VJ-305",
-      "bicicletaId": "BK-304",
-      "estacionDestinoId": "Estación Constitución",
-      "duracionSegundos": 1800
-    }
+    "metadata": { "eventId": "evt-f-09a", "eventType": "movilidad.viaje.finalizado", "occurredAt": "2026-09-20T09:40:00.000Z", "source": "mobility-service", "version": "1" },
+    "data": { "correlationId": "corr-09a", "viajeId": "VJ-901", "bicicletaId": "bk-203", "estacionDestinoId": "Estación San Telmo", "duracionSegundos": 1800 }
+  },
+  {
+    "metadata": { "eventId": "evt-f-13a", "eventType": "movilidad.viaje.finalizado", "occurredAt": "2026-09-20T13:10:00.000Z", "source": "mobility-service", "version": "1" },
+    "data": { "correlationId": "corr-12a", "viajeId": "VJ-1201", "bicicletaId": "bk-104", "estacionDestinoId": "Estación Microcentro", "duracionSegundos": 3600 }
+  },
+  {
+    "metadata": { "eventId": "evt-f-18a", "eventType": "movilidad.viaje.finalizado", "occurredAt": "2026-09-20T18:10:00.000Z", "source": "mobility-service", "version": "1" },
+    "data": { "correlationId": "corr-17a", "viajeId": "VJ-1701", "bicicletaId": "bk-206", "estacionDestinoId": "Estación Universidad", "duracionSegundos": 2400 }
   }
 ]
