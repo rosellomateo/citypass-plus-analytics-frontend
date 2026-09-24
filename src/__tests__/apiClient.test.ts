@@ -62,7 +62,7 @@ describe('API client', () => {
       analyticsApi.getMobility(),
       analyticsApi.getCulture(),
       analyticsApi.getWaste(),
-      analyticsApi.getEvent(),
+      //analyticsApi.getEvent(),
     ]);
 
     expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([

@@ -76,6 +76,7 @@ export interface WasteAlertDetail {
 }
 
 export interface WasteAlertMetrics {
+  aiReport?: AIAnalysisReport;
   mode: 'alerts';
   totalAlerts: number;
   resolvedAlerts: number;

@@ -33,6 +33,7 @@ export function WasteAlertsDashboard({
         title="Tablero de Residuos"
         subtitle="Seguimiento de alertas de llenado y tiempos de resolución."
         filters={filters}
+        aiReport={data.aiReport}
         onDateRangeChange={onDateRangeChange}
         onCustomDateSelect={onCustomDateSelect}
         filters_extra={

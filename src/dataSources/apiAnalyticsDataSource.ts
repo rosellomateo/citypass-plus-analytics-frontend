@@ -70,11 +70,16 @@ function mapClaimRecord(row: ClaimApiRecord): BackendAnalyticsRecord {
 export async function getApiClaimsAnalyticsData(
   filters: DashboardFilters
 ): Promise<ClaimsDataSourceData> {
-  const rows = await analyticsApi.getClaims();
-  const records = rows.map(mapClaimRecord);
+  const respuesta = await analyticsApi.getClaims();
+
+  const records = respuesta.datos.map(mapClaimRecord);
   const analytics = await calculateClaimsAnalyticsData(filters, records);
 
-  return { ...analytics, records };
+  return {
+    ...analytics,
+    records,
+    aiReport: respuesta.informe,
+  };
 }
 
 export function mapEmergencyApiData(
@@ -142,7 +147,13 @@ export function mapEmergencyApiData(
 export async function getApiEmergencyAnalyticsData(
   filters: DashboardFilters
 ): Promise<EmergencyAnalyticsData> {
-  return mapEmergencyApiData(await analyticsApi.getEmergencies(), filters);
+  const respuesta = await analyticsApi.getEmergencies();
+  const analytics = mapEmergencyApiData(respuesta.datos, filters);
+
+  return {
+    ...analytics,
+    aiReport: respuesta.informe,
+  };
 }
 
 export async function mapMobilityApiData(
@@ -174,7 +185,13 @@ export async function mapMobilityApiData(
 export async function getApiMobilityAnalyticsData(
   filters: DashboardFilters
 ): Promise<MobilityAnalyticsData> {
-  return await mapMobilityApiData(await analyticsApi.getMobility(), filters);
+  const respuesta = await analyticsApi.getMobility();
+  const analytics = await mapMobilityApiData(respuesta.datos, filters);
+
+  return {
+    ...analytics,
+    aiReport: respuesta.informe,
+  };
 }
 
 export function mapCultureApiData(
@@ -239,7 +256,13 @@ export function mapCultureApiData(
 export async function getApiCultureAnalyticsData(
   filters: DashboardFilters
 ): Promise<CultureAnalyticsData> {
-  return mapCultureApiData(await analyticsApi.getCulture(), filters);
+  const respuesta = await analyticsApi.getCulture();
+  const analytics = mapCultureApiData(respuesta.datos, filters);
+
+  return {
+    ...analytics,
+    aiReport: respuesta.informe,
+  };
 }
 
 export function mapWasteApiData(
@@ -362,5 +385,11 @@ export function mapWasteApiData(
 export async function getApiWasteAnalyticsData(
   filters: DashboardFilters
 ): Promise<WasteAlertMetrics> {
-  return mapWasteApiData(await analyticsApi.getWaste(), filters);
+  const respuesta = await analyticsApi.getWaste();
+  const analytics = mapWasteApiData(respuesta.datos, filters);
+
+  return {
+    ...analytics,
+    aiReport: respuesta.informe,
+  };
 }

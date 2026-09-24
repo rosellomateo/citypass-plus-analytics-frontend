@@ -1,3 +1,5 @@
+import type { AIAnalysisReport } from '../types/ai';
+
 export interface ClaimApiRecord {
   barrio: string | null;
   categoria: string | null;
@@ -7,6 +9,31 @@ export interface ClaimApiRecord {
   row_count: number | null;
   tiempo_prom_hasta_estado_actual: number | null;
   fecha_snapshot: string | null;
+}
+
+export interface ClaimsApiResponse {
+  datos: ClaimApiRecord[];
+  informe: AIAnalysisReport;
+}
+
+export interface WasteApiResponse {
+  datos: WasteApiRecord[];
+  informe: AIAnalysisReport;
+}
+
+export interface MobilityApiResponse {
+  datos: MobilityApiRecord[];
+  informe: AIAnalysisReport;
+}
+
+export interface CultureApiResponse {
+  datos: CultureApiRecord[];
+  informe: AIAnalysisReport;
+}
+
+export interface EmergencyApiResponse {
+  datos: EmergencyApiRecord[];
+  informe: AIAnalysisReport;
 }
 
 export interface EmergencyApiRecord {
