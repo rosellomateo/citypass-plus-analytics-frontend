@@ -19,6 +19,25 @@ npm run dev
 La configuración de ejemplo usa datos mock, por lo que el frontend inicia sin el
 backend. Abrir <http://localhost:5173>.
 
+### Modo pruebas (sin backend)
+
+Para ver y probar los gráficos sin levantar la API, ejecutar:
+
+```bash
+npm run dev:mock
+```
+
+Este comando inicia únicamente el servidor de desarrollo de Vite y carga los
+datos de ejemplo de `testingDatos/` a través de `src/data/mocks/`. No requiere
+crear ni modificar `.env.local`. Abrir <http://localhost:5173>.
+
+Para generar una versión estática de demostración, sin dependencia del backend:
+
+```bash
+npm run build:mock
+npm run preview
+```
+
 Para una prueba integrada, editar `.env.local`:
 
 ```dotenv
@@ -33,6 +52,7 @@ backend debe estar disponible y permitir por CORS el origen del frontend.
 
 ```bash
 npm run dev
+npm run dev:mock
 npm run lint
 npm run test
 npm run test:coverage

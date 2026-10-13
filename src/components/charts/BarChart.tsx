@@ -30,6 +30,8 @@ interface BarChartProps {
   colorField?: string; // campo del dato que contiene el color
   scrollable?: boolean;
   minWidth?: number;
+  xAxisTickFormatter?: (value: unknown) => string;
+  xAxisTickAngle?: number;
 }
 
 export function BarChart({
@@ -43,6 +45,8 @@ export function BarChart({
   colorField,
   scrollable = false,
   minWidth,
+  xAxisTickFormatter,
+  xAxisTickAngle,
 }: BarChartProps) {
   const calculatedMinWidth = minWidth ?? (scrollable && data.length > 5 ? Math.max(600, data.length * 80) : undefined);
 
@@ -73,9 +77,21 @@ export function BarChart({
           ))}
         </RechartsBarChart>
       ) : (
-        <RechartsBarChart data={data} margin={{ top: 12, right: 16, bottom: 24, left: 0 }}>
+        <RechartsBarChart
+          data={data}
+          margin={{ top: 12, right: 16, bottom: xAxisTickAngle ? 64 : 24, left: 0 }}
+        >
           <CartesianGrid {...CHART_GRID} vertical={false} />
-          <XAxis dataKey={xKey} {...CHART_AXIS} interval={0} tick={{ fontSize: 12 }} />
+          <XAxis
+            dataKey={xKey}
+            {...CHART_AXIS}
+            interval={0}
+            tick={{ fontSize: 12 }}
+            tickFormatter={xAxisTickFormatter}
+            angle={xAxisTickAngle}
+            textAnchor={xAxisTickAngle ? 'end' : undefined}
+            tickMargin={xAxisTickAngle ? 12 : undefined}
+          />
           <YAxis {...CHART_AXIS} tickFormatter={unit ? (v) => `${v}${unit}` : undefined} />
           <Tooltip
             contentStyle={CHART_TOOLTIP_STYLE}

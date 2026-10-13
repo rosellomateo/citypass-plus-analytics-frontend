@@ -105,7 +105,14 @@ export function CultureDashboard() {
                   { key: 'cancelled', label: 'Canceladas', color: '#C83E4D' },
                 ]}
                 showLegend={true}
-                height={260}
+                height={300}
+                scrollable={true}
+                minWidth={Math.max(800, resolved.data.reservationsBySpace.length * 125)}
+                xAxisTickAngle={-35}
+                xAxisTickFormatter={(value) => {
+                  const label = String(value);
+                  return label.length > 18 ? `${label.slice(0, 18)}…` : label;
+                }}
               />
             </ChartCard>
           </div>

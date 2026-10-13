@@ -9,6 +9,7 @@ const report: AIAnalysisReport = {
   ultima_semana: '2026-W38',
   analisis: [
     {
+      semana: '2026-W38',
       resumen: {
         parrafo_ejecutivo: 'La movilidad mantuvo una demanda estable.',
         puntos_destacados: ['Aumentaron los viajes semanales.'],
@@ -34,6 +35,29 @@ describe('AIAnalysisCard', () => {
     expect(screen.getByText('Reforzar las estaciones con mayor demanda.')).toBeInTheDocument();
     expect(screen.getByText('Posibles demoras en hora pico.')).toBeInTheDocument();
     expect(screen.getByText('Filas procesadas: 42')).toBeInTheDocument();
+  });
+
+  it('renders the analysis identified by ultima_semana instead of the first item', () => {
+    const multiWeekReport: AIAnalysisReport = {
+      ...report,
+      ultima_semana: '2026-W40',
+      analisis: [
+        {
+          semana: '2026-W38',
+          resumen: { parrafo_ejecutivo: 'Análisis antiguo que no debe mostrarse.' },
+        },
+        {
+          semana: '2026-W40',
+          resumen: { parrafo_ejecutivo: 'Análisis de la semana más reciente.' },
+        },
+      ],
+    };
+
+    render(<AIAnalysisCard report={multiWeekReport} />);
+
+    expect(screen.getByText('Análisis de la semana más reciente.')).toBeInTheDocument();
+    expect(screen.queryByText('Análisis antiguo que no debe mostrarse.')).not.toBeInTheDocument();
+    expect(screen.getByText('2026-W40')).toBeInTheDocument();
   });
 
   it('collapses and expands the detailed analysis', async () => {
