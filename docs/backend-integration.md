@@ -10,6 +10,10 @@
 El frontend invoca al backend directamente desde el navegador. La URL base no
 debe terminar con una ruta de analítica y puede llevar o no una barra final.
 
+Con `VITE_AUTH_ENABLED=true`, cada solicitud incluye `Authorization: Bearer
+<access-token>`. Configurar CORS para permitir ese encabezado y no habilitar
+orígenes con comodines en producción.
+
 ## Mapeo de pantallas y endpoints
 
 | Pantalla | Endpoint del backend |

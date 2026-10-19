@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { analyticsApi } from '../api/analyticsApi';
 import { apiGet, getApiBaseUrl } from '../api/client';
+import { clearAccessToken, setAccessToken } from '../auth/session';
 
 const informeMock = {
   actualizado_en: '2026-09-24T12:00:00Z',
@@ -21,9 +22,14 @@ const informeMock = {
   }],
 };
 afterEach(() => {
+  clearAccessToken();
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
 });
+
+function token(payload: object) {
+  return `header.${btoa(JSON.stringify(payload)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')}.signature`;
+}
 
 describe('API client', () => {
   it('uses VITE_API_BASE_URL and removes its trailing slash', () => {
@@ -63,6 +69,20 @@ describe('API client', () => {
     const request = apiGet('/analytics/reclamos');
 
     await expect(request).rejects.toMatchObject({ status: 503, name: 'ApiError' });
+  });
+
+  it('sends a memory-only access token when authentication is enabled', async () => {
+    vi.stubEnv('VITE_API_BASE_URL', 'http://localhost:8000');
+    vi.stubEnv('VITE_AUTH_ENABLED', 'true');
+    setAccessToken(token({ sub: 'U000042', module: 'seguridad-urbana', groups: [], exp: Date.now() / 1000 + 60 }));
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, status: 200, json: vi.fn().mockResolvedValue({}) });
+    vi.stubGlobal('fetch', fetchMock);
+
+    await apiGet('/analytics/reclamos');
+
+    expect(fetchMock).toHaveBeenCalledWith('http://localhost:8000/analytics/reclamos', {
+      method: 'GET', headers: { Accept: 'application/json', Authorization: expect.stringMatching(/^Bearer /) },
+    });
   });
 
   it('defines the current backend endpoint paths', async () => {

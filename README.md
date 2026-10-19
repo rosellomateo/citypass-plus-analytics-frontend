@@ -72,9 +72,10 @@ npm run preview
 
 ## Estado de seguridad
 
-El frontend todavía no integra login ni adjunta tokens a las solicitudes. Las
-variables `VITE_*` quedan visibles en el navegador y nunca deben contener
-credenciales o secretos.
+El login sigue siendo externo. Con `VITE_AUTH_ENABLED=true`, el panel recibe el
+access token únicamente en memoria desde Login y lo adjunta como Bearer token a
+la API; no almacena tokens ni secretos. Consultar el contrato de claims y la
+integración segura en [Configuración](docs/configuration.md).
 
 ## Tecnologías principales
 

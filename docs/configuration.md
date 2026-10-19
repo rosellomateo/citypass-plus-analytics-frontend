@@ -7,6 +7,10 @@ El proyecto requiere estas dos:
 | --- | --- | --- |
 | `VITE_DATA_SOURCE` | `mock` o `api` | Selecciona la fuente utilizada por todos los tableros. |
 | `VITE_API_BASE_URL` | URL HTTP(S) | URL base del backend, sin ruta de endpoint. |
+| `VITE_AUTH_ENABLED` | `true` o vacío | Activa la protección JWT del panel. |
+| `VITE_AUTH_LOGIN_ORIGIN` | origen HTTPS exacto | Origen de Login autorizado a entregar el JWT. |
+| `VITE_AUTH_MODULE` | texto | Módulo que debe figurar en el claim `module`. |
+| `VITE_AUTH_REQUIRED_GROUP` | texto opcional | Grupo al que el código concede acceso. |
 
 ## Configuración local
 
@@ -60,9 +64,22 @@ En Docker también deben enviarse como argumentos de construcción.
 Todo valor `VITE_*` es público para quien descargue la aplicación. No colocar
 tokens, contraseñas, SAS de Azure ni secretos en estas variables.
 
-## Seguridad pendiente
+## Autenticación delegada a Login
 
-El cliente HTTP actual envía solo `Accept: application/json`. No existe flujo de
-login ni encabezado `Authorization`. Cuando se implemente autenticación, deberá
-definirse cómo adquirir, renovar y adjuntar el token sin guardarlo como variable
-de build.
+El panel no implementa login, no cifra ni firma JWT y no conserva tokens en
+`localStorage`, `sessionStorage`, URL ni variables `VITE_*`. Login entrega cada
+access token vigente con `window.postMessage` desde el origen exacto configurado:
+
+```ts
+window.postMessage({ type: 'citypass.auth.token', token }, 'https://analytics.citypass.example');
+```
+
+El token queda solo en memoria y se adjunta como `Authorization: Bearer <token>`
+a la API. Al recargar, Login debe entregarlo de nuevo. El contrato mínimo de
+claims es `sub` (ID permanente `U…`), `module`, `groups` y `exp` (segundos Unix).
+
+El cliente descarta tokens expirados o que no correspondan al módulo/grupo solo
+para proteger la interfaz. La API debe validar siempre firma, algoritmo
+permitido, `iss`, `aud`, `exp`, usuario habilitado y autorización por grupo.
+Los grupos son listas: únicamente un grupo configurado recibe significado de
+permiso en este código.

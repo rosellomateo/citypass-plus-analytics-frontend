@@ -4,6 +4,7 @@ import { lazy, Suspense } from 'react';
 import { AppShell } from '../components/layout/AppShell/AppShell';
 import { NotFound } from '../pages/NotFound';
 import { LoadingFullPage } from '../components/common/LoadingState/LoadingState';
+import { AuthGate } from '../auth/AuthGate';
 
 const AnalyticsOverview = lazy(() => import('../pages/AnalyticsOverview').then((m) => ({ default: m.AnalyticsOverview })));
 const ClaimsDashboard = lazy(() => import('../pages/ClaimsDashboard').then((m) => ({ default: m.ClaimsDashboard })));
@@ -23,7 +24,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/',
-    element: <AppShell />,
+    element: <AuthGate><AppShell /></AuthGate>,
     children: [
       {
         path: 'analytics',
