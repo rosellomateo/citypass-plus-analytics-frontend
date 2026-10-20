@@ -11,6 +11,10 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import styles from './Sidebar.module.css';
+import { useSyncExternalStore } from 'react';
+import { canAccessArea } from '../../../auth/authorization';
+import type { ProtectedArea } from '../../../auth/authorization';
+import { getAuthSnapshot, subscribeToAuth } from '../../../auth/session';
 
 // Icono Reclamos: Globo de texto con signo de exclamación (!)
 function ReclamosIcon({ size = 18 }: { size?: number }) {
@@ -62,18 +66,19 @@ interface NavItem {
   label: string;
   path: string;
   icon: React.ReactNode;
+  area: ProtectedArea;
   isPending?: boolean;
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Inicio', path: '/', icon: <Home size={18} /> },
-  { label: 'Movilidad', path: '/analytics/mobility', icon: <Bike size={18} /> },
-  { label: 'Residuos', path: '/analytics/waste', icon: <Trash2 size={18} /> },
-  { label: 'Reclamos', path: '/analytics/claims', icon: <ReclamosIcon size={18} /> },
-  { label: 'Emergencias', path: '/analytics/emergencies', icon: <EmergenciasIcon size={18} /> },
-  { label: 'Espacios Publicos', path: '/analytics/culture', icon: <EspaciosPublicosIcon size={18} /> },
-  { label: 'Cultura y Eventos', path: '/analytics/culture?tab=events', icon: <Drama size={18} /> },
-  { label: 'Analitica Urbana', path: '/analytics', icon: <AnaliticaUrbanaIcon size={18} /> },
+  { label: 'Inicio', path: '/', icon: <Home size={18} />, area: 'overview' },
+  { label: 'Movilidad', path: '/analytics/mobility', icon: <Bike size={18} />, area: 'mobility' },
+  { label: 'Residuos', path: '/analytics/waste', icon: <Trash2 size={18} />, area: 'waste' },
+  { label: 'Reclamos', path: '/analytics/claims', icon: <ReclamosIcon size={18} />, area: 'claims' },
+  { label: 'Emergencias', path: '/analytics/emergencies', icon: <EmergenciasIcon size={18} />, area: 'emergencies' },
+  { label: 'Espacios Publicos', path: '/analytics/culture', icon: <EspaciosPublicosIcon size={18} />, area: 'culture' },
+  { label: 'Cultura y Eventos', path: '/analytics/culture?tab=events', icon: <Drama size={18} />, area: 'culture' },
+  { label: 'Analitica Urbana', path: '/analytics', icon: <AnaliticaUrbanaIcon size={18} />, area: 'overview' },
 ];
 
 const BOTTOM_NAV_ITEMS = [
@@ -85,6 +90,10 @@ const BOTTOM_NAV_ITEMS = [
 
 export function Sidebar() {
   const location = useLocation();
+  const snapshot = useSyncExternalStore(subscribeToAuth, getAuthSnapshot, getAuthSnapshot);
+  const visibleNavItems = snapshot.status === 'authenticated'
+    ? NAV_ITEMS.filter((item) => canAccessArea(snapshot.claims, item.area))
+    : NAV_ITEMS;
 
   const isItemActive = (itemPath: string) => {
     const currentPath = location.pathname;
@@ -137,7 +146,7 @@ export function Sidebar() {
       <nav className={styles.navSection}>
         <div className={styles.sectionLabel}>SERVICIOS</div>
 
-        {NAV_ITEMS.map((item) => {
+        {visibleNavItems.map((item) => {
           const isActive = isItemActive(item.path);
           return (
             <NavLink

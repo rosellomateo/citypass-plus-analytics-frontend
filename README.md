@@ -73,9 +73,8 @@ npm run preview
 ## Estado de seguridad
 
 El login sigue siendo externo. Con `VITE_AUTH_ENABLED=true`, el panel recibe el
-access token únicamente en memoria desde Login y lo adjunta como Bearer token a
-la API; no almacena tokens ni secretos. Consultar el contrato de claims y la
-integración segura en [Configuración](docs/configuration.md).
+par de tokens sólo en memoria desde Login, adjunta únicamente el access token a
+la API y renueva el par con el IdP. Consultar el [registro JWT para Backend](docs/jwt-security-record.md).
 
 ## Tecnologías principales
 

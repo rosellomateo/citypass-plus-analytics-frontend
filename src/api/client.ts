@@ -1,4 +1,4 @@
-import { getAuthSnapshot, isAuthenticationEnabled } from '../auth/session';
+import { clearTokenPair, getAuthSnapshot, isAuthenticationEnabled, refreshTokenPair } from '../auth/session';
 
 export class ApiError extends Error {
   readonly status: number;
@@ -26,21 +26,32 @@ export function getApiBaseUrl(): string {
 }
 
 export async function apiGet<T>(path: string): Promise<T> {
+  const response = await apiGetResponse(path);
+  if (response.status === 401 && isAuthenticationEnabled()) {
+    const refreshed = await refreshTokenPair();
+    if (!refreshed) throw new AuthenticationError();
+    const retry = await apiGetResponse(path);
+    if (!retry.ok) throw new ApiError(retry.status);
+    return (await retry.json()) as T;
+  }
+
+  if (!response.ok) throw new ApiError(response.status);
+  return (await response.json()) as T;
+}
+
+async function apiGetResponse(path: string): Promise<Response> {
   const headers: Record<string, string> = { Accept: 'application/json' };
   if (isAuthenticationEnabled()) {
     const session = getAuthSnapshot();
-    if (session.status !== 'authenticated') throw new AuthenticationError();
+    if (session.status !== 'authenticated') {
+      clearTokenPair();
+      throw new AuthenticationError();
+    }
     headers.Authorization = `Bearer ${session.token}`;
   }
 
-  const response = await fetch(`${getApiBaseUrl()}${path}`, {
+  return fetch(`${getApiBaseUrl()}${path}`, {
     method: 'GET',
     headers,
   });
-
-  if (!response.ok) {
-    throw new ApiError(response.status);
-  }
-
-  return (await response.json()) as T;
 }

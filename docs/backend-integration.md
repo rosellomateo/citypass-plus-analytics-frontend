@@ -14,6 +14,10 @@ Con `VITE_AUTH_ENABLED=true`, cada solicitud incluye `Authorization: Bearer
 <access-token>`. Configurar CORS para permitir ese encabezado y no habilitar
 orígenes con comodines en producción.
 
+Un `401` hace que el navegador use el refresh token contra el IdP, nunca contra
+esta API, y reintente una sola vez. El backend debe devolver `403` cuando el
+token sea válido pero sus grupos no alcancen para el dominio solicitado.
+
 ## Mapeo de pantallas y endpoints
 
 | Pantalla | Endpoint del backend |
