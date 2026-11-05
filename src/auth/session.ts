@@ -18,6 +18,8 @@ export interface CityPassClaims {
 
 export interface TokenPair { accessToken: string; refreshToken: string; }
 
+export type LoginResult = 'success' | 'rejected' | 'invalid-token' | 'unavailable';
+
 export type AuthSnapshot =
   | { status: 'disabled' }
   | { status: 'anonymous' }
@@ -92,6 +94,35 @@ function getIdpBaseUrl(): string {
   const baseUrl = import.meta.env.VITE_IDP_BASE_URL?.trim();
   if (!baseUrl) throw new Error('Falta configurar VITE_IDP_BASE_URL.');
   return baseUrl.replace(/\/$/, '');
+}
+
+function getClientId(): string {
+  const clientId = import.meta.env.VITE_AUTH_CLIENT_ID?.trim();
+  if (!clientId) throw new Error('Falta configurar VITE_AUTH_CLIENT_ID.');
+  return clientId;
+}
+
+/**
+ * Delegates credential verification to the CityPass+ IdP. This module never
+ * validates, stores or interprets a password beyond this one request.
+ */
+export async function authenticateWithIdp(username: string, password: string): Promise<LoginResult> {
+  try {
+    const response = await fetch(`${getIdpBaseUrl()}/auth/login`, {
+      method: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password, client_id: getClientId() }),
+    });
+    if (!response.ok) return 'rejected';
+    const body: unknown = await response.json();
+    if (!body || typeof body !== 'object') return 'invalid-token';
+    const { access_token, refresh_token } = body as Record<string, unknown>;
+    return setTokenPair({ accessToken: String(access_token ?? ''), refreshToken: String(refresh_token ?? '') })
+      ? 'success'
+      : 'invalid-token';
+  } catch {
+    return 'unavailable';
+  }
 }
 
 async function doRefresh(): Promise<boolean> {

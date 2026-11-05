@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { canAccessArea, getDefaultAuthorizedPath } from '../auth/authorization';
-import { clearTokenPair, getAuthSnapshot, parseCityPassClaims, setTokenPair } from '../auth/session';
+import { authenticateWithIdp, clearTokenPair, getAuthSnapshot, parseCityPassClaims, setTokenPair } from '../auth/session';
 
 function token(overrides: object = {}) {
   const payload = {
@@ -11,7 +11,7 @@ function token(overrides: object = {}) {
   return `header.${btoa(JSON.stringify(payload)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')}.signature`;
 }
 
-afterEach(() => { clearTokenPair(); vi.unstubAllEnvs(); });
+afterEach(() => { clearTokenPair(); vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
 
 describe('CityPass JWT boundary', () => {
   it('accepts the complete documented human-token contract while valid', () => {
@@ -38,5 +38,24 @@ describe('CityPass JWT boundary', () => {
     expect(getDefaultAuthorizedPath(security)).toBe('/analytics/emergencies');
     expect(canAccessArea(global, 'overview')).toBe(true);
     expect(canAccessArea(global, 'waste')).toBe(true);
+  });
+
+  it('delegates credentials to the IdP and keeps only the returned token pair', async () => {
+    vi.stubEnv('VITE_AUTH_ENABLED', 'true');
+    vi.stubEnv('VITE_IDP_BASE_URL', 'https://idp.citypass.local');
+    vi.stubEnv('VITE_AUTH_CLIENT_ID', 'citypass-analytics-web');
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({ access_token: token(), refresh_token: 'opaque-refresh-token' }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(authenticateWithIdp('jperez', 'correcta')).resolves.toBe('success');
+    expect(fetchMock).toHaveBeenCalledWith('https://idp.citypass.local/auth/login', {
+      method: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: 'jperez', password: 'correcta', client_id: 'citypass-analytics-web' }),
+    });
+    expect(getAuthSnapshot().status).toBe('authenticated');
   });
 });

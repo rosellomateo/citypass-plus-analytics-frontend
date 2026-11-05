@@ -76,6 +76,9 @@ El login sigue siendo externo. Con `VITE_AUTH_ENABLED=true`, el panel recibe el
 par de tokens sólo en memoria desde Login, adjunta únicamente el access token a
 la API y renueva el par con el IdP. Consultar el [registro JWT para Backend](docs/jwt-security-record.md).
 
+El portal tiene una ruta `/login` como acceso visual de Analítica Urbana. Esta
+pantalla delega la autenticación al IdP de CityPass+ y no reemplaza al equipo de Login.
+
 ## Tecnologías principales
 
 - React 19 y React Router

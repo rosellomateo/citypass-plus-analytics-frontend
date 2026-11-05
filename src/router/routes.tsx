@@ -6,6 +6,7 @@ import { NotFound } from '../pages/NotFound';
 import { LoadingFullPage } from '../components/common/LoadingState/LoadingState';
 import { AuthGate } from '../auth/AuthGate';
 import { DefaultDashboardRedirect, RouteGuard } from '../auth/RouteGuard';
+import { LoginPage } from '../pages/LoginPage';
 
 const AnalyticsOverview = lazy(() => import('../pages/AnalyticsOverview').then((m) => ({ default: m.AnalyticsOverview })));
 const ClaimsDashboard = lazy(() => import('../pages/ClaimsDashboard').then((m) => ({ default: m.ClaimsDashboard })));
@@ -19,6 +20,10 @@ function SuspenseWrapper({ children }: { children: React.ReactNode }) {
 }
 
 export const router = createBrowserRouter([
+  {
+    path: '/login',
+    element: <LoginPage />,
+  },
   {
     path: '/',
     element: <AuthGate><DefaultDashboardRedirect /></AuthGate>,

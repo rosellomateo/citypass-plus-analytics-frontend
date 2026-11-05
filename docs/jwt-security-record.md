@@ -3,6 +3,7 @@
 ## Flujo que usa el frontend
 
 1. Login autentica a la persona y entrega `access_token` y `refresh_token`.
+   El portal también puede delegar esa misma operación al IdP desde `/login`.
 2. El frontend acepta ese par solamente desde `VITE_AUTH_LOGIN_ORIGIN` y lo deja
    en memoria de la pestaña. No va a URL, logs ni almacenamiento del navegador.
 3. Para consultar analítica, envía `Authorization: Bearer <access_token>`.
@@ -12,6 +13,10 @@
 
 El refresh token no se manda a los endpoints `/analytics/**`. El access token no
 se reenvía a otros sistemas ni al bus de eventos.
+
+La pantalla `/login` pertenece sólo al portal de Analítica Urbana; es una puerta
+de entrada visual, no un servicio de identidad. Envía las credenciales al IdP y
+recibe los tokens; no guarda contraseñas, usuarios ni claves de firma.
 
 ## Pantallas que el frontend habilita
 
