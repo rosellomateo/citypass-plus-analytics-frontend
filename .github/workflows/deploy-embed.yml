@@ -1,0 +1,162 @@
+name: Publish embedded frontend to Blob
+
+on:
+  push:
+    tags:
+      - 'embed-v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-embed-release
+  cancel-in-progress: false
+
+# Preparación externa al pipeline:
+# - Contenedor privado plantillas, creado previamente en Azure.
+# - Environment de GitHub: embed.
+# - Variables: AZURE_STORAGE_ACCOUNT y AZURE_STORAGE_CONTAINER (default plantillas).
+# - Secretos: AZURE_CLIENT_ID, AZURE_TENANT_ID y AZURE_SUBSCRIPTION_ID.
+# - OIDC subject: repo:rosellomateo/citypass-plus-analytics-frontend:environment:embed
+# - Rol de la identidad: Storage Blob Data Contributor sobre el contenedor.
+# - Activar EMBED_BUILD_ENABLED=true a nivel de repositorio cuando exista build:embed.
+jobs:
+  quality:
+    name: Lint and unit tests
+    if: github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Check packaging is enabled
+        env:
+          EMBED_BUILD_ENABLED: ${{ vars.EMBED_BUILD_ENABLED }}
+        run: |
+          if [[ "$EMBED_BUILD_ENABLED" != 'true' ]]; then
+            echo 'Implementar build:embed y activar EMBED_BUILD_ENABLED=true en las variables del repositorio.' >&2
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run lint and unit tests
+        run: |
+          npm run lint
+          npm run test:coverage
+
+  build:
+    name: Build validated package
+    needs: quality
+    uses: ./.github/workflows/build-embed.yml
+
+  publish:
+    name: Upload validated artifact to private Blob Storage
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: embed
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      AZURE_STORAGE_ACCOUNT: ${{ vars.AZURE_STORAGE_ACCOUNT }}
+      AZURE_STORAGE_CONTAINER: ${{ vars.AZURE_STORAGE_CONTAINER || 'plantillas' }}
+    steps:
+      - name: Validate Azure configuration
+        env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        run: |
+          : "${AZURE_STORAGE_ACCOUNT:?Define AZURE_STORAGE_ACCOUNT in the embed environment}"
+          : "${AZURE_CLIENT_ID:?Define AZURE_CLIENT_ID in the embed environment}"
+          : "${AZURE_TENANT_ID:?Define AZURE_TENANT_ID in the embed environment}"
+          : "${AZURE_SUBSCRIPTION_ID:?Define AZURE_SUBSCRIPTION_ID in the embed environment}"
+
+      - name: Download the validated package without rebuilding
+        uses: actions/download-artifact@v8
+        with:
+          name: frontend-embed-${{ github.sha }}
+          path: dist-embed/
+
+      - name: Log in to Azure with OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Publish immutable release and verify remote contents
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$AZURE_STORAGE_CONTAINER" != '$web' ]] || { echo 'Use a private container' >&2; exit 1; }
+          cd dist-embed
+          sha256sum --check SHA256SUMS
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          manifest = json.loads(Path('manifest.json').read_text())
+          assert manifest['commit'] == os.environ['GITHUB_SHA'], 'Artifact commit mismatch'
+          PY
+
+          public_access="$(az storage container show \
+            --account-name "$AZURE_STORAGE_ACCOUNT" --name "$AZURE_STORAGE_CONTAINER" \
+            --auth-mode login --query properties.publicAccess --output tsv)"
+          case "$public_access" in
+            ''|None|null|off) ;;
+            *) echo 'Artifact container must have anonymous access disabled' >&2; exit 1 ;;
+          esac
+
+          verification_directory="$(mktemp -d)"
+          trap 'rm -rf "$verification_directory"' EXIT
+          prefix="releases/$GITHUB_SHA"
+          # Publicar SHA256SUMS al final marca el paquete completo.
+          for filename in embed.html manifest.json SHA256SUMS; do
+            blob="$prefix/$filename"
+            exists="$(az storage blob exists \
+              --account-name "$AZURE_STORAGE_ACCOUNT" --container-name "$AZURE_STORAGE_CONTAINER" \
+              --name "$blob" --auth-mode login --query exists --output tsv)"
+            if [[ "$exists" != 'true' ]]; then
+              case "$filename" in
+                embed.html) content_type='text/html; charset=utf-8' ;;
+                manifest.json) content_type='application/json' ;;
+                *) content_type='text/plain; charset=utf-8' ;;
+              esac
+              az storage blob upload \
+                --account-name "$AZURE_STORAGE_ACCOUNT" --container-name "$AZURE_STORAGE_CONTAINER" \
+                --name "$blob" --file "$filename" --auth-mode login \
+                --overwrite false --if-none-match '*' --content-type "$content_type" --output none
+            fi
+            az storage blob download \
+              --account-name "$AZURE_STORAGE_ACCOUNT" --container-name "$AZURE_STORAGE_CONTAINER" \
+              --name "$blob" --file "$verification_directory/$filename" --auth-mode login \
+              --overwrite true --output none
+            cmp "$filename" "$verification_directory/$filename" || {
+              echo "Existing release differs from artifact: $blob. Publish a new commit." >&2
+              exit 1
+            }
+          done
+
+          {
+            echo '### Embedded frontend published'
+            echo "- Account: $AZURE_STORAGE_ACCOUNT"
+            echo "- Container: $AZURE_STORAGE_CONTAINER (private)"
+            echo "- Template blob: $prefix/embed.html"
+            echo "- Manifest: $prefix/manifest.json"
+            echo '- Remote contents verified. Configure the backend to load this version.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Log out from Azure
+        if: always()
+        run: az logout

@@ -1,0 +1,95 @@
+name: Build embedded frontend
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+# Contrato pendiente del frontend:
+# npm run build:embed debe generar dist-embed/embed.html autocontenido,
+# con __CITYPASS_MODULO__ y __CITYPASS_DATOS__ como marcadores de inyección.
+# El pipeline genera el manifiesto y los checksums, sin guardarlos en Git.
+jobs:
+  package:
+    name: Build and validate self-contained HTML
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Check frontend packaging prerequisite
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs';
+          const { scripts } = JSON.parse(readFileSync('package.json', 'utf8'));
+          if (!scripts?.['build:embed']) {
+            console.error('Falta implementar build:embed en el frontend. El pipeline no modifica el código de la aplicación.');
+            process.exit(1);
+          }
+          NODE
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build embedded frontend
+        run: npm run build:embed
+
+      - name: Validate HTML and generate release metadata
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import { createHash } from 'node:crypto';
+          import { readFile, readdir, writeFile } from 'node:fs/promises';
+          import { JSDOM } from 'jsdom';
+
+          assert.deepEqual(await readdir('dist-embed'), ['embed.html'],
+            'build:embed debe producir solamente dist-embed/embed.html.');
+          const html = await readFile('dist-embed/embed.html');
+          const dom = new JSDOM(html.toString('utf8'));
+          const document = dom.window.document;
+          assert.equal(document.documentElement.dataset.modulo, '__CITYPASS_MODULO__');
+          assert.equal(document.querySelector('#citypass-datos[type="application/json"]')?.textContent,
+            '__CITYPASS_DATOS__');
+          assert.ok(document.querySelector('script[type="module"]')?.textContent);
+          assert.equal(document.querySelectorAll('[src], link[href], [srcset]').length, 0,
+            'El HTML debe incluir todos sus recursos.');
+          for (const style of document.querySelectorAll('style')) {
+            assert.doesNotMatch(style.textContent, /@import\b/i);
+            for (const match of style.textContent.matchAll(/url\(\s*['"]?([^)'"\s]+)/gi)) {
+              assert.match(match[1], /^(data:|#)/i, 'El CSS debe incluir todos sus recursos.');
+            }
+          }
+          dom.window.close();
+
+          const commit = process.env.GITHUB_SHA;
+          assert.match(commit, /^[a-f0-9]{40}$/);
+          const digest = (data) => createHash('sha256').update(data).digest('hex');
+          const manifest = JSON.stringify({
+            schemaVersion: 1,
+            commit,
+            modules: ['reclamos', 'emergencias', 'movilidad', 'espacios', 'residuos'],
+            template: 'embed.html',
+            sha256: digest(html),
+            bytes: html.length,
+          }, null, 2) + '\n';
+          await writeFile('dist-embed/manifest.json', manifest);
+          await writeFile('dist-embed/SHA256SUMS',
+            `${digest(html)}  embed.html\n${digest(manifest)}  manifest.json\n`);
+          console.log(`Paquete validado: ${html.length} bytes, commit ${commit}`);
+          NODE
+
+      - name: Save validated package
+        uses: actions/upload-artifact@v7
+        with:
+          name: frontend-embed-${{ github.sha }}
+          path: dist-embed/
+          if-no-files-found: error
+          retention-days: 14
