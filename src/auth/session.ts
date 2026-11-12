@@ -29,9 +29,15 @@ export type AuthSnapshot =
 let tokenPair: TokenPair | undefined;
 let listenerInstalled = false;
 let refreshInFlight: Promise<boolean> | undefined;
+let refreshTimer: ReturnType<typeof setTimeout> | undefined;
 const subscribers = new Set<() => void>();
 
 function notify() { subscribers.forEach((subscriber) => subscriber()); }
+
+function clearRefreshTimer() {
+  if (refreshTimer) clearTimeout(refreshTimer);
+  refreshTimer = undefined;
+}
 
 function decodeBase64Url(value: string): string | undefined {
   try {
@@ -69,20 +75,37 @@ export function getAuthSnapshot(): AuthSnapshot {
   if (!isAuthenticationEnabled()) return { status: 'disabled' };
   if (!tokenPair) return { status: 'anonymous' };
   const claims = parseCityPassClaims(tokenPair.accessToken);
-  return claims ? { status: 'authenticated', token: tokenPair.accessToken, claims } : { status: 'invalid' };
+  if (!claims || !matchesAnalyticsToken(claims)) return { status: 'invalid' };
+  return { status: 'authenticated', token: tokenPair.accessToken, claims };
+}
+
+function matchesAnalyticsToken(claims: CityPassClaims): boolean {
+  return claims.iss === 'https://idp.citypass.local'
+    && claims.aud.includes('citypass-analitica-api')
+    && claims.module === 'analitica';
+}
+
+function scheduleRefresh(accessToken: string) {
+  clearRefreshTimer();
+  const claims = parseCityPassClaims(accessToken);
+  if (!claims) return;
+  // The IdP issues a 15-minute token; renew two minutes before expiry.
+  const delay = Math.max(30_000, (claims.exp - Date.now() / 1000 - 120) * 1000);
+  refreshTimer = setTimeout(() => { void refreshTokenPair(); }, delay);
 }
 
 /** Login must provide the newest pair together; neither token is persisted. */
 export function setTokenPair(pair: TokenPair): boolean {
   if (!parseCityPassClaims(pair.accessToken) || !isNonEmptyString(pair.refreshToken)) return false;
   tokenPair = pair;
+  scheduleRefresh(pair.accessToken);
   notify();
   return true;
 }
 
 /** Test/support entrypoint. Requests that need refresh still require a real pair. */
 export function setAccessToken(token: string): void { setTokenPair({ accessToken: token, refreshToken: 'not-refreshable' }); }
-export function clearTokenPair(): void { tokenPair = undefined; notify(); }
+export function clearTokenPair(): void { clearRefreshTimer(); tokenPair = undefined; notify(); }
 export const clearAccessToken = clearTokenPair;
 
 export function subscribeToAuth(callback: () => void): () => void {
@@ -117,7 +140,7 @@ export async function authenticateWithIdp(username: string, password: string): P
     const response = await fetch(getLoginEndpoint(), {
       method: 'POST',
       headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password, client_id: getClientId() }),
+      body: JSON.stringify({ username, password, clientId: getClientId() }),
     });
     if (!response.ok) return 'rejected';
     const body: unknown = await response.json();
@@ -132,8 +155,8 @@ export async function authenticateWithIdp(username: string, password: string): P
 }
 
 /**
- * Optional handshake with the Analytics backend. The endpoint is configurable
- * until Backend publishes its contract; data endpoints must still verify JWTs.
+ * Confirms the freshly issued token with the IdP profile endpoint (/me). Data
+ * endpoints must still verify JWTs independently in the Analytics backend.
  */
 export async function verifySessionWithBackend(): Promise<boolean> {
   const endpoint = import.meta.env.VITE_AUTH_VERIFY_ENDPOINT?.trim();
@@ -156,7 +179,7 @@ async function doRefresh(): Promise<boolean> {
   try {
     const response = await fetch(`${getIdpBaseUrl()}/auth/refresh`, {
       method: 'POST', headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refresh_token: tokenPair.refreshToken }),
+      body: JSON.stringify({ refreshToken: tokenPair.refreshToken }),
     });
     if (!response.ok) { clearTokenPair(); return false; }
     const body: unknown = await response.json();
@@ -183,7 +206,7 @@ export async function logout(): Promise<void> {
   try {
     await fetch(`${getIdpBaseUrl()}/auth/logout`, {
       method: 'POST', headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refresh_token: refreshToken }),
+      body: JSON.stringify({ refreshToken }),
     });
   } catch { /* Local logout still succeeds when the IdP is unavailable. */ }
 }

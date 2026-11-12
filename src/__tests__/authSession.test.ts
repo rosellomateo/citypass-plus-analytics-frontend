@@ -4,8 +4,8 @@ import { authenticateWithIdp, clearTokenPair, getAuthSnapshot, parseCityPassClai
 
 function token(overrides: object = {}) {
   const payload = {
-    iss: 'https://idp.citypass.local', sub: 'U000042', aud: ['citypass-analytics-api'], token_use: 'human', ver: 1,
-    preferred_username: 'jperez', module: 'seguridad-urbana', groups: ['seguridad-urbana'],
+    iss: 'https://idp.citypass.local', sub: 'U000042', aud: ['citypass-analitica-api'], token_use: 'human', ver: 1,
+    preferred_username: 'jperez', module: 'analitica', groups: ['seguridad-urbana'],
     iat: Date.now() / 1000 - 10, exp: Date.now() / 1000 + 60, jti: 'test-token', ...overrides,
   };
   return `header.${btoa(JSON.stringify(payload)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')}.signature`;
@@ -15,12 +15,12 @@ afterEach(() => { clearTokenPair(); vi.unstubAllEnvs(); vi.unstubAllGlobals(); }
 
 describe('CityPass JWT boundary', () => {
   it('accepts the complete documented human-token contract while valid', () => {
-    expect(parseCityPassClaims(token())).toMatchObject({ sub: 'U000042', aud: ['citypass-analytics-api'], token_use: 'human', ver: 1 });
+    expect(parseCityPassClaims(token())).toMatchObject({ sub: 'U000042', aud: ['citypass-analitica-api'], token_use: 'human', ver: 1 });
   });
 
   it('rejects expired tokens and incomplete contract claims', () => {
     expect(parseCityPassClaims(token({ exp: Date.now() / 1000 - 1 }))).toBeUndefined();
-    expect(parseCityPassClaims(token({ aud: 'citypass-analytics-api' }))).toBeUndefined();
+    expect(parseCityPassClaims(token({ aud: 'citypass-analitica-api' }))).toBeUndefined();
     expect(parseCityPassClaims(token({ token_use: 'service' }))).toBeUndefined();
   });
 
@@ -28,6 +28,14 @@ describe('CityPass JWT boundary', () => {
     vi.stubEnv('VITE_AUTH_ENABLED', 'true');
     expect(setTokenPair({ accessToken: token(), refreshToken: 'opaque-refresh-token' })).toBe(true);
     expect(getAuthSnapshot().status).toBe('authenticated');
+  });
+
+  it('does not expose a token issued for another audience or module', () => {
+    vi.stubEnv('VITE_AUTH_ENABLED', 'true');
+    setTokenPair({ accessToken: token({ aud: ['citypass-reclamos-api'] }), refreshToken: 'opaque-refresh-token' });
+    expect(getAuthSnapshot().status).toBe('invalid');
+    setTokenPair({ accessToken: token({ module: 'reclamos' }), refreshToken: 'opaque-refresh-token' });
+    expect(getAuthSnapshot().status).toBe('invalid');
   });
 
   it('maps only known groups to their permitted dashboards', () => {
@@ -54,7 +62,7 @@ describe('CityPass JWT boundary', () => {
     expect(fetchMock).toHaveBeenCalledWith('https://login.citypass.local/auth/login', {
       method: 'POST',
       headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: 'jperez', password: 'correcta', client_id: 'citypass-analytics-web' }),
+      body: JSON.stringify({ username: 'jperez', password: 'correcta', clientId: 'citypass-analytics-web' }),
     });
     expect(getAuthSnapshot().status).toBe('authenticated');
   });

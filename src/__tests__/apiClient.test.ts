@@ -29,8 +29,8 @@ afterEach(() => {
 
 function token(overrides: object = {}) {
   const payload = {
-    iss: 'https://idp.citypass.local', sub: 'U000042', aud: ['citypass-analytics-api'], token_use: 'human', ver: 1,
-    preferred_username: 'jperez', module: 'seguridad-urbana', groups: [], iat: Date.now() / 1000 - 10,
+    iss: 'https://idp.citypass.local', sub: 'U000042', aud: ['citypass-analitica-api'], token_use: 'human', ver: 1,
+    preferred_username: 'jperez', module: 'analitica', groups: [], iat: Date.now() / 1000 - 10,
     exp: Date.now() / 1000 + 60, jti: 'test-token', ...overrides,
   };
   return `header.${btoa(JSON.stringify(payload)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')}.signature`;
@@ -92,7 +92,7 @@ describe('API client', () => {
 
   it('rotates the token pair and retries once after a 401', async () => {
     vi.stubEnv('VITE_API_BASE_URL', 'http://localhost:8000');
-    vi.stubEnv('VITE_IDP_BASE_URL', 'https://idp.citypass.local');
+    vi.stubEnv('VITE_IDP_BASE_URL', 'https://api.citypass-login.pp.ua');
     vi.stubEnv('VITE_AUTH_ENABLED', 'true');
     const first = token({ jti: 'first' });
     const refreshed = token({ jti: 'refreshed' });
@@ -107,10 +107,10 @@ describe('API client', () => {
 
     expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
       'http://localhost:8000/analytics/reclamos',
-      'https://idp.citypass.local/auth/refresh',
+      'https://api.citypass-login.pp.ua/auth/refresh',
       'http://localhost:8000/analytics/reclamos',
     ]);
-    expect(fetchMock.mock.calls[1][1]).toMatchObject({ body: JSON.stringify({ refresh_token: 'old-refresh' }) });
+    expect(fetchMock.mock.calls[1][1]).toMatchObject({ body: JSON.stringify({ refreshToken: 'old-refresh' }) });
   });
 
   it('defines the current backend endpoint paths', async () => {

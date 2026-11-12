@@ -8,11 +8,11 @@ El proyecto requiere estas dos:
 | `VITE_DATA_SOURCE` | `mock` o `api` | Selecciona la fuente utilizada por todos los tableros. |
 | `VITE_API_BASE_URL` | URL HTTP(S) | URL base del backend, sin ruta de endpoint. |
 | `VITE_AUTH_ENABLED` | `true` o vacío | Activa la protección JWT del panel. |
-| `VITE_AUTH_LOGIN_ORIGIN` | origen HTTPS exacto | Origen de Login autorizado a entregar el JWT. |
+| `VITE_AUTH_LOGIN_ORIGIN` | origen HTTPS exacto | Origen autorizado para una entrega alternativa por `postMessage`. |
 | `VITE_IDP_BASE_URL` | URL HTTPS | Base del IdP para `auth/refresh` y `auth/logout`. |
 | `VITE_AUTH_CLIENT_ID` | texto asignado por IdP | Identifica a Analítica Urbana al pedir tokens. |
-| `VITE_AUTH_LOGIN_ENDPOINT` | URL HTTPS o vacío | Endpoint del grupo Login que recibe usuario, contraseña y `client_id`. |
-| `VITE_AUTH_VERIFY_ENDPOINT` | URL HTTPS o vacío | Endpoint opcional del backend para el chequeo inicial de sesión. |
+| `VITE_AUTH_LOGIN_ENDPOINT` | URL HTTPS | Endpoint del IdP que recibe usuario, contraseña y `clientId`. |
+| `VITE_AUTH_VERIFY_ENDPOINT` | URL HTTPS | Perfil del IdP (`GET /me`) para confirmar el access token recién emitido. |
 
 ## Configuración local
 
@@ -86,22 +86,22 @@ nuevos, que reemplazan al par anterior antes de reintentar una única vez la con
 Si el refresh falla, se descarta toda la sesión.
 
 La ruta `/login` muestra el acceso propio del portal de Analítica Urbana. La
-pantalla **no autentica usuarios por sí misma**: envía usuario, contraseña y
-`client_id` a `VITE_AUTH_LOGIN_ENDPOINT`, que debe completar el grupo Login. La
-respuesta esperada es el par `access_token` y `refresh_token`. No existe selector
-de tipo de usuario; los grupos firmados dentro del access token determinan los
-dashboards que puede ver la persona.
+pantalla **no autentica usuarios por sí misma**: manda usuario, contraseña y
+`clientId` a `POST https://api.citypass-login.pp.ua/auth/login`. La respuesta
+esperada es el par `access_token` y `refresh_token`. No existe selector de tipo
+de usuario; los grupos firmados dentro del access token determinan los dashboards
+que puede ver la persona.
 
-Si Backend publica `VITE_AUTH_VERIFY_ENDPOINT`, después de recibir el token el
-frontend manda el Bearer token a ese endpoint y sólo continúa si Backend responde
-con éxito. Esto es un chequeo inicial; cada endpoint de datos debe validar el JWT
-y aplicar permisos por grupo de forma independiente.
+Después de recibir el token el frontend llama `GET /me` con `Authorization:
+Bearer <access_token>` y sólo continúa si el IdP responde con éxito. Es una
+confirmación inicial de Login; el backend de Analítica debe validar el JWT y
+aplicar permisos por grupo en cada endpoint de datos de forma independiente.
 
 El IdP debe permitir por CORS el origen donde se publique este frontend para
 `POST /auth/login`, `POST /auth/refresh` y `POST /auth/logout`.
 
-El cliente controla la forma de los claims del contrato (`iss`, `sub`, `aud`,
-`token_use`, `ver`, `preferred_username`, `module`, `groups`, `iat`, `exp`, `jti`)
-para proteger la interfaz. Los permisos de pantalla se asignan explícitamente por
-grupo en `src/auth/authorization.ts`; un grupo desconocido no da ningún acceso.
-La API debe validar la firma y todas las restricciones criptográficas del contrato.
+El cliente controla la forma de los claims del contrato y confirma `iss`, `aud`
+y `module` esperados para Analítica. Los permisos de pantalla se asignan
+explícitamente por grupo en `src/auth/authorization.ts`; un grupo desconocido no
+da ningún acceso. La API debe validar la firma RS256 con el JWKS y todas las
+restricciones criptográficas del contrato.

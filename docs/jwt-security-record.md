@@ -2,23 +2,24 @@
 
 ## Flujo que usa el frontend
 
-1. La pantalla `/login` envía usuario, contraseña y `client_id` al endpoint que
-   publique el grupo Login (`VITE_AUTH_LOGIN_ENDPOINT`). La respuesta esperada es
+1. La pantalla `/login` envía usuario, contraseña y `clientId` a `POST
+   https://api.citypass-login.pp.ua/auth/login`. La respuesta esperada es
    `access_token` y `refresh_token`.
 2. El frontend acepta ese par solamente desde `VITE_AUTH_LOGIN_ORIGIN` y lo deja
    en memoria de la pestaña. No va a URL, logs ni almacenamiento del navegador.
 3. Para consultar analítica, envía `Authorization: Bearer <access_token>`.
-4. Si la API responde `401`, llama `POST {VITE_IDP_BASE_URL}/auth/refresh` con el
-   refresh token. Reemplaza los dos tokens por la respuesta y reintenta una vez.
+4. Renueva el par automáticamente alrededor de los 13 minutos, o si la API
+   responde `401`, mediante `POST /auth/refresh` con `{ "refreshToken": "…" }`.
+   Reemplaza los dos tokens por la respuesta y reintenta una vez.
 5. Si refresh falla, elimina ambos tokens y Login debe iniciar una sesión nueva.
 
 El refresh token no se manda a los endpoints `/analytics/**`. El access token no
 se reenvía a otros sistemas ni al bus de eventos.
 
 La pantalla `/login` pertenece sólo al portal de Analítica Urbana; es una puerta
-de entrada visual, no un servicio de identidad. La URL de Login y el endpoint
-opcional de verificación con Backend se dejan configurables para su integración.
-No guarda contraseñas, usuarios ni claves de firma.
+de entrada visual, no un servicio de identidad. Después del login llama al perfil
+del IdP, `GET https://api.citypass-login.pp.ua/me`, con el Bearer token para
+confirmar la sesión. No guarda contraseñas, usuarios ni claves de firma.
 
 ## Pantallas que el frontend habilita
 
@@ -44,6 +45,10 @@ existir en Backend: ocultar una ruta en el navegador no protege un endpoint.
 - Tipos de `sub` y `groups`; `sub` es el ID estable que se guarda y audita.
 - Autorización por la misma tabla de grupos. Sin token o token inválido: `401`;
   token válido sin permiso: `403`.
+
+El Backend compartido todavía no tiene este middleware ni permite el header
+`Authorization` en CORS. Esa implementación sigue siendo necesaria antes de que
+los dashboards consuman datos sensibles.
 
 El token humano dura 15 minutos. Si se deshabilita una persona, puede conservar
 acceso hasta ese vencimiento; su próximo refresh falla, según el contrato.
