@@ -11,6 +11,8 @@ El proyecto requiere estas dos:
 | `VITE_AUTH_LOGIN_ORIGIN` | origen HTTPS exacto | Origen de Login autorizado a entregar el JWT. |
 | `VITE_IDP_BASE_URL` | URL HTTPS | Base del IdP para `auth/refresh` y `auth/logout`. |
 | `VITE_AUTH_CLIENT_ID` | texto asignado por IdP | Identifica a Analítica Urbana al pedir tokens. |
+| `VITE_AUTH_LOGIN_ENDPOINT` | URL HTTPS o vacío | Endpoint del grupo Login que recibe usuario, contraseña y `client_id`. |
+| `VITE_AUTH_VERIFY_ENDPOINT` | URL HTTPS o vacío | Endpoint opcional del backend para el chequeo inicial de sesión. |
 
 ## Configuración local
 
@@ -83,11 +85,17 @@ token exclusivamente contra el IdP; el IdP devuelve un access token y refresh to
 nuevos, que reemplazan al par anterior antes de reintentar una única vez la consulta.
 Si el refresh falla, se descarta toda la sesión.
 
-Como alternativa de integración, la ruta `/login` muestra el acceso propio del
-portal de Analítica Urbana. La pantalla **no autentica usuarios por sí misma**:
-envía usuario, contraseña y `client_id` a `POST /auth/login` del IdP y recibe el
-par de tokens. No existe selector de tipo de usuario; los grupos firmados dentro
-del access token determinan los dashboards que puede ver la persona.
+La ruta `/login` muestra el acceso propio del portal de Analítica Urbana. La
+pantalla **no autentica usuarios por sí misma**: envía usuario, contraseña y
+`client_id` a `VITE_AUTH_LOGIN_ENDPOINT`, que debe completar el grupo Login. La
+respuesta esperada es el par `access_token` y `refresh_token`. No existe selector
+de tipo de usuario; los grupos firmados dentro del access token determinan los
+dashboards que puede ver la persona.
+
+Si Backend publica `VITE_AUTH_VERIFY_ENDPOINT`, después de recibir el token el
+frontend manda el Bearer token a ese endpoint y sólo continúa si Backend responde
+con éxito. Esto es un chequeo inicial; cada endpoint de datos debe validar el JWT
+y aplicar permisos por grupo de forma independiente.
 
 El IdP debe permitir por CORS el origen donde se publique este frontend para
 `POST /auth/login`, `POST /auth/refresh` y `POST /auth/logout`.

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { canAccessArea, getDefaultAuthorizedPath } from '../auth/authorization';
-import { authenticateWithIdp, clearTokenPair, getAuthSnapshot, parseCityPassClaims, setTokenPair } from '../auth/session';
+import { authenticateWithIdp, clearTokenPair, getAuthSnapshot, parseCityPassClaims, setTokenPair, verifySessionWithBackend } from '../auth/session';
 
 function token(overrides: object = {}) {
   const payload = {
@@ -42,8 +42,8 @@ describe('CityPass JWT boundary', () => {
 
   it('delegates credentials to the IdP and keeps only the returned token pair', async () => {
     vi.stubEnv('VITE_AUTH_ENABLED', 'true');
-    vi.stubEnv('VITE_IDP_BASE_URL', 'https://idp.citypass.local');
     vi.stubEnv('VITE_AUTH_CLIENT_ID', 'citypass-analytics-web');
+    vi.stubEnv('VITE_AUTH_LOGIN_ENDPOINT', 'https://login.citypass.local/auth/login');
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: vi.fn().mockResolvedValue({ access_token: token(), refresh_token: 'opaque-refresh-token' }),
@@ -51,11 +51,25 @@ describe('CityPass JWT boundary', () => {
     vi.stubGlobal('fetch', fetchMock);
 
     await expect(authenticateWithIdp('jperez', 'correcta')).resolves.toBe('success');
-    expect(fetchMock).toHaveBeenCalledWith('https://idp.citypass.local/auth/login', {
+    expect(fetchMock).toHaveBeenCalledWith('https://login.citypass.local/auth/login', {
       method: 'POST',
       headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: 'jperez', password: 'correcta', client_id: 'citypass-analytics-web' }),
     });
     expect(getAuthSnapshot().status).toBe('authenticated');
+  });
+
+  it('uses the optional backend endpoint to confirm an authenticated session', async () => {
+    vi.stubEnv('VITE_AUTH_ENABLED', 'true');
+    vi.stubEnv('VITE_AUTH_VERIFY_ENDPOINT', 'https://analytics.citypass.local/auth/verify');
+    setTokenPair({ accessToken: token(), refreshToken: 'opaque-refresh-token' });
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true });
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(verifySessionWithBackend()).resolves.toBe(true);
+    expect(fetchMock).toHaveBeenCalledWith('https://analytics.citypass.local/auth/verify', {
+      method: 'GET',
+      headers: { Accept: 'application/json', Authorization: expect.stringMatching(/^Bearer /) },
+    });
   });
 });

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { BarChart3, Eye, EyeOff, LockKeyhole } from 'lucide-react';
+import { BarChart3, Eye, EyeOff, LogIn } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { authenticateWithIdp, getAuthSnapshot } from '../auth/session';
+import { authenticateWithIdp, getAuthSnapshot, verifySessionWithBackend } from '../auth/session';
 import { getDefaultAuthorizedPath } from '../auth/authorization';
 import styles from './LoginPage.module.css';
 
@@ -30,6 +30,12 @@ export function LoginPage() {
       return;
     }
 
+    const verified = await verifySessionWithBackend();
+    if (!verified) {
+      setError('No pudimos validar tu acceso para este portal. Intentá nuevamente.');
+      return;
+    }
+
     const session = getAuthSnapshot();
     const path = session.status === 'authenticated' ? getDefaultAuthorizedPath(session.claims) : undefined;
     navigate(path ?? '/');
@@ -44,10 +50,9 @@ export function LoginPage() {
         </header>
 
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
-          <h1 id="login-title">Ingresar</h1>
-          <p className={styles.description}>Accedé con tus credenciales de CityPass+.</p>
+          <h1 id="login-title" className={styles.srOnly}>Ingresar a Analítica Urbana</h1>
 
-          <label htmlFor="username">Usuario</label>
+          <label htmlFor="username">Usuario <span aria-hidden="true">*</span></label>
           <input
             id="username"
             name="username"
@@ -58,7 +63,7 @@ export function LoginPage() {
             required
           />
 
-          <label htmlFor="password">Contraseña</label>
+          <label htmlFor="password">Contraseña <span aria-hidden="true">*</span></label>
           <div className={styles.passwordField}>
             <input
               id="password"
@@ -83,12 +88,12 @@ export function LoginPage() {
           {error && <p className={styles.error} role="alert">{error}</p>}
 
           <button className={styles.submit} type="submit" disabled={isSubmitting || !username.trim() || !password}>
-            <LockKeyhole size={16} />
+            <LogIn size={16} />
             {isSubmitting ? 'Verificando acceso…' : 'Ingresar'}
           </button>
         </form>
+        <p className={styles.notice}>Tu acceso se determina por los grupos asignados en CityPass+.</p>
       </section>
-      <p className={styles.footer}>El acceso es administrado por CityPass+. Los permisos se asignan según tu grupo.</p>
     </main>
   );
 }

@@ -102,13 +102,19 @@ function getClientId(): string {
   return clientId;
 }
 
+function getLoginEndpoint(): string {
+  const endpoint = import.meta.env.VITE_AUTH_LOGIN_ENDPOINT?.trim();
+  if (!endpoint) throw new Error('Falta configurar VITE_AUTH_LOGIN_ENDPOINT.');
+  return endpoint;
+}
+
 /**
  * Delegates credential verification to the CityPass+ IdP. This module never
  * validates, stores or interprets a password beyond this one request.
  */
 export async function authenticateWithIdp(username: string, password: string): Promise<LoginResult> {
   try {
-    const response = await fetch(`${getIdpBaseUrl()}/auth/login`, {
+    const response = await fetch(getLoginEndpoint(), {
       method: 'POST',
       headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password, client_id: getClientId() }),
@@ -123,6 +129,26 @@ export async function authenticateWithIdp(username: string, password: string): P
   } catch {
     return 'unavailable';
   }
+}
+
+/**
+ * Optional handshake with the Analytics backend. The endpoint is configurable
+ * until Backend publishes its contract; data endpoints must still verify JWTs.
+ */
+export async function verifySessionWithBackend(): Promise<boolean> {
+  const endpoint = import.meta.env.VITE_AUTH_VERIFY_ENDPOINT?.trim();
+  if (!endpoint) return true;
+  const session = getAuthSnapshot();
+  if (session.status !== 'authenticated') return false;
+  try {
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: { Accept: 'application/json', Authorization: `Bearer ${session.token}` },
+    });
+    if (response.ok) return true;
+  } catch { /* A failed handshake is treated as a denied session. */ }
+  clearTokenPair();
+  return false;
 }
 
 async function doRefresh(): Promise<boolean> {
