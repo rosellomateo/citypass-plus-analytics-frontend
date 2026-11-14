@@ -53,19 +53,11 @@ export const DOMAIN_NAV_ITEMS: DomainNavMeta[] = [
   },
   {
     domain: 'login',
-    label: 'Login',
+    label: 'Login Federado',
     shortDescription: 'Inicios de sesión, renovaciones y cierres por departamento.',
     path: '/analytics/login',
     color: '#285DA5',
     bgColor: '#EBF3FC',
-  },
-  {
-    domain: 'dap',
-    label: 'DAP',
-    shortDescription: 'Indicadores de comunicaciones del equipo DAP.',
-    path: '/analytics/dap',
-    color: '#754CA0',
-    bgColor: '#F4EEFA',
   },
   {
     domain: 'eda',

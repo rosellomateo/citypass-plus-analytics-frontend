@@ -1,6 +1,8 @@
 // src/components/layout/AppShell/AppShell.tsx
 import { Outlet } from 'react-router-dom';
-import { Badge } from '@mantine/core';
+import { Badge, Group } from '@mantine/core';
+import { isLocalPreview } from '../../../config/localPreview';
+import { DemoScenarioSelect } from '../../common/DemoScenarioSelect';
 import { Sidebar } from '../Sidebar/Sidebar';
 import { Header } from '../Header/Header';
 import styles from './AppShell.module.css';
@@ -12,8 +14,13 @@ export function AppShell() {
       <Header />
       <main className={styles.main} id="main-content">
         <div className={styles.content}>
-          {import.meta.env.VITE_DATA_SOURCE === 'mock' && (
-            <Badge className={styles.demo} variant="light" color="blue">Vista previa · Datos de ejemplo</Badge>
+          {isLocalPreview() && (
+            <Group className={styles.demo} justify="space-between">
+              <Badge variant="light" color="blue">
+                {import.meta.env.MODE === 'presentation' ? 'Presentación · Datos de ejemplo' : 'Vista previa · Datos de ejemplo'}
+              </Badge>
+              <DemoScenarioSelect />
+            </Group>
           )}
           <Outlet />
         </div>

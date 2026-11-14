@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "dev:mock": "vite --mode mock --host 127.0.0.1 --port 5174 --strictPort",
+    "dev:presentation": "vite --mode presentation --host 127.0.0.1 --port 5175 --strictPort",
     "build": "tsc -b && vite build",
     "build:mock": "tsc -b && vite build --mode mock",
     "lint": "oxlint",

@@ -8,10 +8,9 @@ export const OVERVIEW = { area: 'overview', label: 'Analítica Urbana', path: '/
 const AREAS = [OVERVIEW, ...DOMAIN_NAV_ITEMS.map(({ domain, path }) => ({ area: domain, path }))];
 
 export const LOGIN_TEAMS = [
-  { area: 'overview', label: OVERVIEW.label, clientId: import.meta.env.VITE_AUTH_CLIENT_ID?.trim() || 'citypass-admin-web' },
+  { area: 'overview', label: OVERVIEW.label, clientId: import.meta.env.VITE_AUTH_CLIENT_ID?.trim() || 'citypass-analitica-web' },
   { area: 'eda', label: 'EDA', clientId: 'citypass-eda-web' },
-  { area: 'dap', label: 'DAP', clientId: import.meta.env.VITE_AUTH_DAP_CLIENT_ID?.trim() || 'citypass-dap-web' },
-  { area: 'login', label: 'Login', clientId: import.meta.env.VITE_AUTH_LOGIN_CLIENT_ID?.trim() || 'citypass-admin-web' },
+  { area: 'login', label: 'Login Federado', clientId: import.meta.env.VITE_AUTH_LOGIN_CLIENT_ID?.trim() || 'citypass-admin-web' },
   { area: 'emergencies', label: 'Emergencias', clientId: 'citypass-emergencias-web' },
   { area: 'culture', label: 'Espacios Públicos y Cultura', clientId: 'citypass-espacios-web' },
   { area: 'mobility', label: 'Movilidad', clientId: 'citypass-movilidad-web' },

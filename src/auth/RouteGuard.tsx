@@ -15,14 +15,12 @@ function NoAccess() {
 
 export function DefaultDashboardRedirect() {
   const snapshot = useSyncExternalStore(subscribeToAuth, getAuthSnapshot, getAuthSnapshot);
-  if (snapshot.status === 'disabled') return <Navigate to="/analytics" replace />;
   const path = snapshot.status === 'authenticated' ? getDefaultAuthorizedPath(snapshot.dashboards) : undefined;
   return path ? <Navigate to={path} replace /> : <NoAccess />;
 }
 
 export function RouteGuard({ area, children }: { area: ProtectedArea; children: ReactNode }) {
   const snapshot = useSyncExternalStore(subscribeToAuth, getAuthSnapshot, getAuthSnapshot);
-  if (snapshot.status === 'disabled') return <>{children}</>;
   if (snapshot.status !== 'authenticated') return <Navigate to="/login" replace />;
   if (canAccessArea(snapshot.dashboards, area)) return <>{children}</>;
   const path = getDefaultAuthorizedPath(snapshot.dashboards);

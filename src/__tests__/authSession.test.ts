@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { canAccessArea, getDefaultAuthorizedPath } from '../auth/authorization';
-import { authenticateWithIdp, clearTokenPair, getAuthSnapshot } from '../auth/session';
+import { authenticatePresentationTeam, authenticateWithIdp, clearTokenPair, getAuthSnapshot } from '../auth/session';
 
 const idp = 'https://api.citypass-login.pp.ua/auth/login';
 const api = 'https://analytics.citypass.local';
@@ -23,6 +23,21 @@ afterEach(() => {
 });
 
 describe('CityPass session', () => {
+  it('uses the selected fixture only in the local presentation mode', async () => {
+    vi.stubEnv('MODE', 'presentation');
+    vi.stubEnv('VITE_DATA_SOURCE', 'mock');
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({
+      claims: { token: 'local-demo:claims', preferred_username: 'prueba-reclamos', module: 'reclamos', groups: ['operadores'], dashboards: ['claims'] },
+    }) });
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(authenticatePresentationTeam('claims')).resolves.toBe('success');
+    expect(fetchMock).toHaveBeenCalledExactlyOnceWith('/__presentation/sessions.json', { cache: 'no-store' });
+    expect(getAuthSnapshot()).toMatchObject({ status: 'authenticated', dashboards: ['claims'] });
+    vi.stubEnv('DEV', false);
+    await expect(authenticatePresentationTeam('claims')).resolves.toBe('unconfigured');
+  });
+
   it('sends the selected client to Login and trusts only dashboards returned by Analytics', async () => {
     vi.stubEnv('VITE_DATA_SOURCE', 'api');
     vi.stubEnv('VITE_API_BASE_URL', api);

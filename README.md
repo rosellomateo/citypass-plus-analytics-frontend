@@ -26,9 +26,20 @@ Para ver y probar los gráficos sin levantar la API, ejecutar:
 npm run dev:mock
 ```
 
-Abrir <http://127.0.0.1:5174>. La vista previa local usa datos de ejemplo y
-habilita los nueve tableros. Vite refleja los cambios al guardar. Para cerrar
+Abrir <http://127.0.0.1:5174>. La vista previa local empieza en el login.
+Los accesos rápidos usan datos de ejemplo y muestran los tableros del equipo
+elegido. Vite refleja los cambios al guardar. Para cerrar
 la vista previa, usar `Ctrl+C` en la terminal donde se inició.
+
+Los seis casos de la Parte 2 se pueden ensayar con **Simular escenario** en
+los tableros. La vista previa lee sus archivos locales en `testingDatos/`
+cuando están disponibles.
+
+### Presentación local por equipo
+
+`npm run dev:presentation` abre <http://127.0.0.1:5175/login> con ocho accesos
+rápidos para ensayar los permisos y ver datos de ejemplo. Consultá la
+[configuración de las sesiones locales](docs/configuration.md#modo-presentación).
 
 Para generar una versión estática de demostración, sin dependencia del backend:
 

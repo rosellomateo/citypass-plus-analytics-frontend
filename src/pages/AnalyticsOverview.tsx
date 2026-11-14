@@ -35,7 +35,6 @@ const DOMAIN_OPTIONS = [
   { value: 'Cultura', label: 'Cultura' },
   { value: 'Residuos', label: 'Residuos' },
   { value: 'login', label: 'Login' },
-  { value: 'dap', label: 'DAP' },
   { value: 'eda', label: 'EDA' },
 ];
 

@@ -1,4 +1,4 @@
-import { CrossModuleMetrics } from '../components/common/CrossModuleMetrics';
+import { DashboardImpactCards } from '../components/common/DashboardImpactCards';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Anchor } from '@mantine/core';
@@ -84,6 +84,7 @@ export function CultureDashboard() {
                   status: 'info',
                 }}
               />
+              <DashboardImpactCards area="culture" />
             </div>
           </div>
 
@@ -175,7 +176,7 @@ export function CultureDashboard() {
           </div>
         </>
       ) : null}
-      <CrossModuleMetrics area="culture" />
+      {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="culture" standalone />}
     </div>
   );
 }

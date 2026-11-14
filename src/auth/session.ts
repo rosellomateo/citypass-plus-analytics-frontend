@@ -1,3 +1,5 @@
+import { isLocalPreview } from '../config/localPreview';
+
 export interface CityPassClaims {
   preferred_username: string;
   module: string;
@@ -5,18 +7,16 @@ export interface CityPassClaims {
 }
 
 export interface TokenPair { accessToken: string; refreshToken: string; }
-export type LoginResult = 'success' | 'rejected' | 'invalid-token' | 'unavailable';
+export type LoginResult = 'success' | 'rejected' | 'invalid-token' | 'unavailable' | 'unconfigured';
 
 type Authenticated = { status: 'authenticated'; token: string; claims: CityPassClaims; dashboards: string[]; version: number };
 export type AuthSnapshot =
-  | { status: 'disabled' }
   | { status: 'anonymous' }
   | { status: 'verifying' }
   | Authenticated;
 
 const IDP_URL = 'https://api.citypass-login.pp.ua';
 const anonymous = { status: 'anonymous' } as const;
-const disabled = { status: 'disabled' } as const;
 let snapshot: AuthSnapshot = anonymous;
 let tokenPair: TokenPair | undefined;
 let refreshInFlight: Promise<boolean> | undefined;
@@ -29,12 +29,12 @@ function publish(next: AuthSnapshot) {
   subscribers.forEach((subscriber) => subscriber());
 }
 
-export function isAuthenticationEnabled(): boolean {
-  return import.meta.env.VITE_DATA_SOURCE !== 'mock';
+export function requiresApiToken(): boolean {
+  return import.meta.env.PROD || isLocalPreview() || import.meta.env.VITE_DATA_SOURCE !== 'mock';
 }
 
 export function getAuthSnapshot(): AuthSnapshot {
-  return isAuthenticationEnabled() ? snapshot : disabled;
+  return snapshot;
 }
 
 export function subscribeToAuth(callback: () => void): () => void {
@@ -105,17 +105,51 @@ async function confirmToken(pair: TokenPair, version: number): Promise<LoginResu
   return 'success';
 }
 
-export async function authenticateWithIdp(username: string, password: string, clientId: string): Promise<LoginResult> {
+function postJson(url: string, payload: object): Promise<Response> {
+  return fetch(url, {
+    method: 'POST',
+    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(10_000),
+  });
+}
+
+export function authenticateWithIdp(username: string, password: string, clientId: string): Promise<LoginResult> {
+  const endpoint = import.meta.env.VITE_AUTH_LOGIN_ENDPOINT?.trim() || `${getIdpBaseUrl()}/auth/login`;
+  return openSession(() => postJson(endpoint, { username, password, clientId }));
+}
+
+export async function authenticatePresentationTeam(area: string): Promise<LoginResult> {
+  if (!isLocalPreview()) return 'unconfigured';
   clearTokenPair();
   const version = sessionVersion;
   publish({ status: 'verifying' });
   try {
-    const response = await fetch(import.meta.env.VITE_AUTH_LOGIN_ENDPOINT?.trim() || `${getIdpBaseUrl()}/auth/login`, {
-      method: 'POST',
-      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password, clientId }),
-      signal: AbortSignal.timeout(10_000),
-    });
+    const response = await fetch('/__presentation/sessions.json', { cache: 'no-store' });
+    if (!response.ok) return 'unconfigured';
+    const records: unknown = await response.json();
+    if (!records || typeof records !== 'object') return 'unconfigured';
+    const profile = (records as Record<string, unknown>)[area];
+    if (!profile || typeof profile !== 'object') return 'unconfigured';
+    const { token, preferred_username, module, groups, dashboards } = profile as Record<string, unknown>;
+    if (typeof token !== 'string' || !token.startsWith('local-demo:') ||
+        typeof preferred_username !== 'string' || typeof module !== 'string' ||
+        !isStringArray(groups) || !isStringArray(dashboards) || version !== sessionVersion) return 'invalid-token';
+    publish({ status: 'authenticated', token, claims: { preferred_username, module, groups }, dashboards, version });
+    return 'success';
+  } catch {
+    return 'unavailable';
+  } finally {
+    if (version === sessionVersion && snapshot.status === 'verifying') clearTokenPair();
+  }
+}
+
+async function openSession(requestTokens: () => Promise<Response>): Promise<LoginResult> {
+  clearTokenPair();
+  const version = sessionVersion;
+  publish({ status: 'verifying' });
+  try {
+    const response = await requestTokens();
     if (!response.ok) return response.status >= 500 ? 'unavailable' : 'rejected';
     const pair = await readTokenPair(response);
     return pair ? await confirmToken(pair, version) : 'invalid-token';

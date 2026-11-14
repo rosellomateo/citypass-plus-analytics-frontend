@@ -2,10 +2,10 @@ export const PART2_METRICS = {
   culture: [
     ['Eventos culturales cancelados por clima'],
     ['Espacios públicos afectados por reclamos'],
-    ['Eventos masivos creados'],
+    ['Actividades masivas creadas (capacidad de 500 o más)'],
     ['Espacios públicos afectados por incidentes'],
-    ['Reservas afectadas por accidentes en bicicleta'],
-    ['Reservas ciudadanas frente al total de eventos'],
+    ['Actividades modificadas por accidentes viales'],
+    ['Actividades organizadas por ciudadanos frente al total'],
   ],
   waste: [
     ['Cuadrillas afectadas por clima'],
@@ -42,6 +42,10 @@ export const PART2_METRICS = {
 } as const;
 
 export const PART2_CASES = [
-  'Eventos climáticos', 'Reclamos ciudadanos', 'Eventos masivos',
-  'Incidentes viales', 'Accidentes en bicicleta', 'Eventos ciudadanos',
+  'Evento climático que afecta múltiples servicios',
+  'Reclamo ciudadano que desencadena una intervención urbana',
+  'Recolección inteligente después de un evento masivo',
+  'Ruta urbana inteligente con incidentes en tiempo real',
+  'Emergencia durante un viaje en bicicleta',
+  'Reserva de espacio público, movilidad y residuos',
 ];

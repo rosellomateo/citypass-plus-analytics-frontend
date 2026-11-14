@@ -1,5 +1,5 @@
 // src/router/routes.tsx
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { AppShell } from '../components/layout/AppShell/AppShell';
 import { NotFound } from '../pages/NotFound';
@@ -15,7 +15,7 @@ const MobilityDashboard = lazy(() => import('../pages/MobilityDashboard').then((
 const CultureDashboard = lazy(() => import('../pages/CultureDashboard').then((m) => ({ default: m.CultureDashboard })));
 const WasteDashboard = lazy(() => import('../pages/WasteDashboard').then((m) => ({ default: m.WasteDashboard })));
 const LoginDashboard = lazy(() => import('../pages/LoginDashboard').then((m) => ({ default: m.LoginDashboard })));
-const CoordinationDashboard = lazy(() => import('../pages/CoordinationDashboard').then((m) => ({ default: m.CoordinationDashboard })));
+const EdaDashboard = lazy(() => import('../pages/EdaDashboard').then((m) => ({ default: m.EdaDashboard })));
 
 function SuspenseWrapper({ children }: { children: React.ReactNode }) {
   return <Suspense fallback={<LoadingFullPage />}>{children}</Suspense>;
@@ -64,11 +64,11 @@ export const router = createBrowserRouter([
       },
       {
         path: 'analytics/dap',
-        element: <RouteGuard area="dap"><SuspenseWrapper><CoordinationDashboard area="dap" /></SuspenseWrapper></RouteGuard>,
+        element: <Navigate to="/analytics/login" replace />,
       },
       {
         path: 'analytics/eda',
-        element: <RouteGuard area="eda"><SuspenseWrapper><CoordinationDashboard area="eda" /></SuspenseWrapper></RouteGuard>,
+        element: <RouteGuard area="eda"><SuspenseWrapper><EdaDashboard /></SuspenseWrapper></RouteGuard>,
       },
     ],
   },

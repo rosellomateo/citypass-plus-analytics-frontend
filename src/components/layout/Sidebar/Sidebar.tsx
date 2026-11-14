@@ -5,7 +5,6 @@ import {
   Bike,
   Trash2,
   KeyRound,
-  Megaphone,
   User,
   Bell,
   Settings,
@@ -72,7 +71,6 @@ const ICONS: Record<ProtectedArea, React.ReactNode> = {
   emergencies: <EmergenciasIcon size={18} />,
   culture: <EspaciosPublicosIcon size={18} />,
   login: <KeyRound size={18} />,
-  dap: <Megaphone size={18} />,
   eda: <Network size={18} />,
 };
 

@@ -8,7 +8,6 @@ import {
   Lightbulb,
   AlertTriangle,
   Cpu,
-  Calendar,
   Layers,
 } from 'lucide-react';
 import type { AIAnalysisReport, AIAnalysisItem } from '../../../types';
@@ -51,9 +50,9 @@ export function AIAnalysisCard({ report, item: directItem, defaultExpanded = tru
     return null;
   }
 
-  const { resumen, metadata, semana } = activeItem;
-  const llmInfo = metadata?.llm;
-  const semanaDisplay = semana || metadata?.semana_actual || report?.ultima_semana;
+  const { resumen, metadata } = activeItem;
+  const model = metadata?.llm?.modelo_respuesta || metadata?.llm?.deployment;
+  const modelLabel = model?.toLowerCase() === 'gpt-5-mini' ? 'GPT-5 mini' : model;
   const casoDeUsoDisplay = metadata?.caso_de_uso || report?.caso_de_uso;
 
   return (
@@ -71,17 +70,10 @@ export function AIAnalysisCard({ report, item: directItem, defaultExpanded = tru
         </div>
 
         <div className={styles.headerRight}>
-          {semanaDisplay && (
-            <span className={styles.metaPill}>
-              <Calendar size={12} />
-              {semanaDisplay}
-            </span>
-          )}
-
-          {llmInfo?.deployment && (
+          {modelLabel && (
             <span className={styles.metaPill}>
               <Cpu size={12} />
-              {llmInfo.deployment}
+              {modelLabel}
             </span>
           )}
 

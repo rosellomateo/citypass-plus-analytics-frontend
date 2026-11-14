@@ -1,12 +1,15 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { BarChart3, Eye, EyeOff, LogIn } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { authenticateWithIdp, getAuthSnapshot } from '../auth/session';
+import { authenticatePresentationTeam, authenticateWithIdp, getAuthSnapshot } from '../auth/session';
+import type { LoginResult } from '../auth/session';
 import { getDefaultAuthorizedPath, LOGIN_TEAMS } from '../auth/authorization';
+import { isLocalPreview } from '../config/localPreview';
 import styles from './LoginPage.module.css';
 
 const GENERIC_LOGIN_ERROR = 'No pudimos iniciar sesión. Revisá tus datos e intentá nuevamente.';
+const isPresentation = isLocalPreview();
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -15,21 +18,24 @@ export function LoginPage() {
   const [team, setTeam] = useState<string>('overview');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string>();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pending, setPending] = useState<string>();
+  const submitting = useRef(false);
+  const isSubmitting = pending !== undefined;
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const selectedTeam = LOGIN_TEAMS.find(({ area }) => area === team);
-    if (isSubmitting || !username.trim() || !password || !selectedTeam) return;
+  async function signIn(source: string, request: () => Promise<LoginResult>) {
+    if (submitting.current) return;
+    submitting.current = true;
     setError(undefined);
-    setIsSubmitting(true);
-    const result = await authenticateWithIdp(username.trim(), password, selectedTeam.clientId);
+    setPending(source);
+    const result = await request();
     setPassword('');
-    setIsSubmitting(false);
+    submitting.current = false;
+    setPending(undefined);
 
     if (result !== 'success') {
       if (result === 'unavailable') setError('El servicio de acceso no está disponible. Intentá nuevamente.');
       else if (result === 'invalid-token') setError('No pudimos validar tu acceso para este portal.');
+      else if (result === 'unconfigured') setError('La sesión local de este equipo no está disponible.');
       else setError(GENERIC_LOGIN_ERROR);
       return;
     }
@@ -39,9 +45,16 @@ export function LoginPage() {
     navigate(path ?? '/', { replace: true });
   }
 
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const selectedTeam = LOGIN_TEAMS.find(({ area }) => area === team);
+    if (!username.trim() || !password || !selectedTeam) return;
+    void signIn('manual', () => authenticateWithIdp(username.trim(), password, selectedTeam.clientId));
+  }
+
   return (
     <main className={styles.page}>
-      <section className={styles.card} aria-labelledby="login-title">
+      <section className={`${styles.card} ${isPresentation ? styles.presentationCard : ''}`} aria-labelledby="login-title">
         <header className={styles.brandHeader}>
           <div className={styles.brandLine}><BarChart3 aria-hidden="true" size={28} /><span>CityPass<span>+</span></span></div>
           <p>Analítica Urbana</p>
@@ -92,9 +105,27 @@ export function LoginPage() {
 
           <button className={styles.submit} type="submit" disabled={isSubmitting || !username.trim() || !password}>
             <LogIn size={16} />
-            {isSubmitting ? 'Verificando acceso…' : 'Ingresar'}
+            {pending === 'manual' ? 'Verificando acceso…' : 'Ingresar'}
           </button>
         </form>
+        {isPresentation && <section className={styles.teamSection} aria-labelledby="quick-sign-in">
+          <h2 id="quick-sign-in">Accesos de presentación</h2>
+          <div className={styles.teamGrid}>
+            {LOGIN_TEAMS.map(({ area, label }) => (
+              <button
+                key={area}
+                type="button"
+                disabled={isSubmitting}
+                onClick={() => {
+                  setTeam(area);
+                  void signIn(area, () => authenticatePresentationTeam(area));
+                }}
+              >
+                {pending === area ? 'Verificando…' : label}
+              </button>
+            ))}
+          </div>
+        </section>}
         <p className={styles.notice}>Tu acceso se determina por los grupos asignados en CityPass+.</p>
       </section>
     </main>

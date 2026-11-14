@@ -1,4 +1,4 @@
-import { CrossModuleMetrics } from '../components/common/CrossModuleMetrics';
+import { DashboardImpactCards } from '../components/common/DashboardImpactCards';
 // src/pages/EmergenciesDashboard.tsx
 import { useState, useMemo } from 'react';
 import { DashboardHeader } from '../components/common/DashboardHeader/DashboardHeader';
@@ -177,6 +177,7 @@ export function EmergenciesDashboard() {
                 unit: ' min',
                 sublabel: 'Promedio ponderado por cantidad de emergencias con datos',
               }} />}
+              <DashboardImpactCards area="emergencies" />
             </div>
           </div>
 
@@ -253,7 +254,7 @@ export function EmergenciesDashboard() {
           </div>
         </>
       ) : null}
-      <CrossModuleMetrics area="emergencies" />
+      {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="emergencies" standalone />}
     </div>
   );
 }

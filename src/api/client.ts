@@ -1,4 +1,4 @@
-import { clearTokenPair, getAuthSnapshot, isAuthenticationEnabled, refreshTokenPair } from '../auth/session';
+import { clearTokenPair, getAuthSnapshot, requiresApiToken, refreshTokenPair } from '../auth/session';
 
 export class ApiError extends Error {
   readonly status: number;
@@ -28,7 +28,7 @@ export function getApiBaseUrl(): string {
 export async function apiGet<T>(path: string): Promise<T> {
   const initialSession = getAuthSnapshot();
   const response = await apiGetResponse(path);
-  if (response.status === 401 && isAuthenticationEnabled()) {
+  if (response.status === 401 && requiresApiToken()) {
     const currentSession = getAuthSnapshot();
     const refreshed = currentSession.status === 'authenticated' && initialSession.status === 'authenticated' &&
       currentSession.version === initialSession.version &&
@@ -48,12 +48,13 @@ export async function apiGet<T>(path: string): Promise<T> {
 
 async function apiGetResponse(path: string): Promise<Response> {
   const headers: Record<string, string> = { Accept: 'application/json' };
-  if (isAuthenticationEnabled()) {
+  if (requiresApiToken()) {
     const session = getAuthSnapshot();
     if (session.status !== 'authenticated') {
       clearTokenPair();
       throw new AuthenticationError();
     }
+    if (session.token.startsWith('local-demo:')) throw new AuthenticationError();
     headers.Authorization = `Bearer ${session.token}`;
   }
 

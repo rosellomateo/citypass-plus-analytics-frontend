@@ -23,6 +23,11 @@ export interface CrossModuleMetric {
 export interface CrossModuleResponse {
   fecha_snapshot: string | null;
   datos: CrossModuleMetric[];
+  actualizado_en?: string | null;
+  impactos?: Array<{ caso: number | null; origen: string; emergencias: number; ultimo_vinculo: string }>;
+  eventos_publicos?: Array<{ evento_id: string; emergencias: number; ultimo_vinculo: string }> | null;
+  informe?: AIAnalysisReport | null;
+  version_cultura?: number | null;
 }
 
 export interface ClaimApiRecord {
