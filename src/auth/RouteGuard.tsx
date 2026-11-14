@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import type { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
-import { canAccessArea, getDefaultAuthorizedPath, hasAnyAnalyticsAccess } from './authorization';
+import { canAccessArea, getDefaultAuthorizedPath } from './authorization';
 import type { ProtectedArea } from './authorization';
 import { getAuthSnapshot, subscribeToAuth } from './session';
 
@@ -16,14 +16,15 @@ function NoAccess() {
 export function DefaultDashboardRedirect() {
   const snapshot = useSyncExternalStore(subscribeToAuth, getAuthSnapshot, getAuthSnapshot);
   if (snapshot.status === 'disabled') return <Navigate to="/analytics" replace />;
-  const path = snapshot.status === 'authenticated' ? getDefaultAuthorizedPath(snapshot.claims) : undefined;
+  const path = snapshot.status === 'authenticated' ? getDefaultAuthorizedPath(snapshot.dashboards) : undefined;
   return path ? <Navigate to={path} replace /> : <NoAccess />;
 }
 
 export function RouteGuard({ area, children }: { area: ProtectedArea; children: ReactNode }) {
   const snapshot = useSyncExternalStore(subscribeToAuth, getAuthSnapshot, getAuthSnapshot);
   if (snapshot.status === 'disabled') return <>{children}</>;
-  if (snapshot.status !== 'authenticated' || !hasAnyAnalyticsAccess(snapshot.claims)) return <NoAccess />;
-  if (canAccessArea(snapshot.claims, area)) return <>{children}</>;
-  return <Navigate to={getDefaultAuthorizedPath(snapshot.claims) ?? '/'} replace />;
+  if (snapshot.status !== 'authenticated') return <Navigate to="/login" replace />;
+  if (canAccessArea(snapshot.dashboards, area)) return <>{children}</>;
+  const path = getDefaultAuthorizedPath(snapshot.dashboards);
+  return path ? <Navigate to={path} replace /> : <NoAccess />;
 }

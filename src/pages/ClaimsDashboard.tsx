@@ -1,3 +1,4 @@
+import { CrossModuleMetrics } from '../components/common/CrossModuleMetrics';
 // src/pages/ClaimsDashboard.tsx
 import { useState, useMemo } from 'react';
 import { DashboardHeader } from '../components/common/DashboardHeader/DashboardHeader';
@@ -162,6 +163,7 @@ export function ClaimsDashboard() {
           </div>
         </>
       ) : null}
+      <CrossModuleMetrics area="claims" />
     </div>
   );
 }

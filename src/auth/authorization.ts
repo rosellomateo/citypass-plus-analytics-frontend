@@ -1,35 +1,28 @@
-import type { CityPassClaims } from './session';
+import { DOMAIN_NAV_ITEMS } from '../config/domains';
 import type { Domain } from '../types';
 
 export type ProtectedArea = Domain | 'overview';
 
-/** Explicit local interpretation of IdP groups. Unknown groups grant nothing. */
-const GROUPS_BY_AREA: Record<ProtectedArea, readonly string[]> = {
-  overview: ['analitica-urbana'],
-  emergencies: ['analitica-urbana', 'seguridad-urbana'],
-  culture: ['analitica-urbana', 'cultura'],
-  mobility: ['analitica-urbana', 'movilidad-urbana'],
-  claims: ['analitica-urbana', 'reclamos'],
-  waste: ['analitica-urbana', 'residuos'],
-};
+export const OVERVIEW = { area: 'overview', label: 'Analítica Urbana', path: '/analytics' } as const;
 
-const AREA_PATHS: Array<[ProtectedArea, string]> = [
-  ['overview', '/analytics'],
-  ['emergencies', '/analytics/emergencies'],
-  ['culture', '/analytics/culture'],
-  ['mobility', '/analytics/mobility'],
-  ['claims', '/analytics/claims'],
-  ['waste', '/analytics/waste'],
-];
+const AREAS = [OVERVIEW, ...DOMAIN_NAV_ITEMS.map(({ domain, path }) => ({ area: domain, path }))];
 
-export function canAccessArea(claims: CityPassClaims | undefined, area: ProtectedArea): boolean {
-  return Boolean(claims && GROUPS_BY_AREA[area].some((group) => claims.groups.includes(group)));
+export const LOGIN_TEAMS = [
+  { area: 'overview', label: OVERVIEW.label, clientId: import.meta.env.VITE_AUTH_CLIENT_ID?.trim() || 'citypass-admin-web' },
+  { area: 'eda', label: 'EDA', clientId: 'citypass-eda-web' },
+  { area: 'dap', label: 'DAP', clientId: import.meta.env.VITE_AUTH_DAP_CLIENT_ID?.trim() || 'citypass-dap-web' },
+  { area: 'login', label: 'Login', clientId: import.meta.env.VITE_AUTH_LOGIN_CLIENT_ID?.trim() || 'citypass-admin-web' },
+  { area: 'emergencies', label: 'Emergencias', clientId: 'citypass-emergencias-web' },
+  { area: 'culture', label: 'Espacios Públicos y Cultura', clientId: 'citypass-espacios-web' },
+  { area: 'mobility', label: 'Movilidad', clientId: 'citypass-movilidad-web' },
+  { area: 'claims', label: 'Reclamos', clientId: 'citypass-reclamos-web' },
+  { area: 'waste', label: 'Residuos', clientId: 'citypass-residuos-web' },
+] as const;
+
+export function canAccessArea(dashboards: readonly string[], area: ProtectedArea): boolean {
+  return dashboards.includes(area);
 }
 
-export function getDefaultAuthorizedPath(claims: CityPassClaims | undefined): string | undefined {
-  return AREA_PATHS.find(([area]) => canAccessArea(claims, area))?.[1];
-}
-
-export function hasAnyAnalyticsAccess(claims: CityPassClaims | undefined): boolean {
-  return AREA_PATHS.some(([area]) => canAccessArea(claims, area));
+export function getDefaultAuthorizedPath(dashboards: readonly string[]): string | undefined {
+  return AREAS.find(({ area }) => canAccessArea(dashboards, area))?.path;
 }

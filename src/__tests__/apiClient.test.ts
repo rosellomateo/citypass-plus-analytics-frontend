@@ -1,7 +1,7 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { analyticsApi } from '../api/analyticsApi';
 import { apiGet, getApiBaseUrl } from '../api/client';
-import { clearAccessToken, setAccessToken, setTokenPair } from '../auth/session';
+import { authenticateWithIdp, clearTokenPair } from '../auth/session';
 
 const informeMock = {
   actualizado_en: '2026-09-24T12:00:00Z',
@@ -22,21 +22,25 @@ const informeMock = {
   }],
 };
 afterEach(() => {
-  clearAccessToken();
+  clearTokenPair();
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
 });
 
-function token(overrides: object = {}) {
-  const payload = {
-    iss: 'https://idp.citypass.local', sub: 'U000042', aud: ['citypass-analitica-api'], token_use: 'human', ver: 1,
-    preferred_username: 'jperez', module: 'analitica', groups: [], iat: Date.now() / 1000 - 10,
-    exp: Date.now() / 1000 + 60, jti: 'test-token', ...overrides,
-  };
-  return `header.${btoa(JSON.stringify(payload)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')}.signature`;
+function tokenResponse(access: string, refresh: string) {
+  return { ok: true, json: async () => ({ access_token: access, refresh_token: refresh }) };
+}
+
+function verificationResponse() {
+  return { ok: true, json: async () => ({
+    preferred_username: 'jperez', module: 'reclamos', groups: ['operadores'],
+    dashboards: ['claims'], expires_at: Date.now() / 1000 + 900,
+  }) };
 }
 
 describe('API client', () => {
+  beforeEach(() => vi.stubEnv('VITE_DATA_SOURCE', 'mock'));
+
   it('uses VITE_API_BASE_URL and removes its trailing slash', () => {
     vi.stubEnv('VITE_API_BASE_URL', 'http://localhost:8000/');
 
@@ -78,11 +82,14 @@ describe('API client', () => {
 
   it('sends a memory-only access token when authentication is enabled', async () => {
     vi.stubEnv('VITE_API_BASE_URL', 'http://localhost:8000');
-    vi.stubEnv('VITE_AUTH_ENABLED', 'true');
-    setAccessToken(token());
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true, status: 200, json: vi.fn().mockResolvedValue({}) });
+    vi.stubEnv('VITE_DATA_SOURCE', 'api');
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(tokenResponse('access-token', 'refresh-token'))
+      .mockResolvedValueOnce(verificationResponse())
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({}) });
     vi.stubGlobal('fetch', fetchMock);
 
+    await authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web');
     await apiGet('/analytics/reclamos');
 
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:8000/analytics/reclamos', {
@@ -93,24 +100,27 @@ describe('API client', () => {
   it('rotates the token pair and retries once after a 401', async () => {
     vi.stubEnv('VITE_API_BASE_URL', 'http://localhost:8000');
     vi.stubEnv('VITE_IDP_BASE_URL', 'https://api.citypass-login.pp.ua');
-    vi.stubEnv('VITE_AUTH_ENABLED', 'true');
-    const first = token({ jti: 'first' });
-    const refreshed = token({ jti: 'refreshed' });
-    setTokenPair({ accessToken: first, refreshToken: 'old-refresh' });
+    vi.stubEnv('VITE_DATA_SOURCE', 'api');
     const fetchMock = vi.fn()
+      .mockResolvedValueOnce(tokenResponse('access-token', 'old-refresh'))
+      .mockResolvedValueOnce(verificationResponse())
       .mockResolvedValueOnce({ ok: false, status: 401 })
-      .mockResolvedValueOnce({ ok: true, status: 200, json: vi.fn().mockResolvedValue({ access_token: refreshed, refresh_token: 'new-refresh' }) })
-      .mockResolvedValueOnce({ ok: true, status: 200, json: vi.fn().mockResolvedValue({ datos: [] }) });
+      .mockResolvedValueOnce(tokenResponse('new-access', 'new-refresh'))
+      .mockResolvedValueOnce(verificationResponse())
+      .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ datos: [] }) });
     vi.stubGlobal('fetch', fetchMock);
+    await authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web');
 
     await expect(apiGet('/analytics/reclamos')).resolves.toEqual({ datos: [] });
 
-    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+    expect(fetchMock.mock.calls.slice(2).map(([url]) => url)).toEqual([
       'http://localhost:8000/analytics/reclamos',
       'https://api.citypass-login.pp.ua/auth/refresh',
+      'http://localhost:8000/auth/session',
       'http://localhost:8000/analytics/reclamos',
     ]);
-    expect(fetchMock.mock.calls[1][1]).toMatchObject({ body: JSON.stringify({ refreshToken: 'old-refresh' }) });
+    expect(fetchMock.mock.calls[3][1]).toMatchObject({ body: JSON.stringify({ refreshToken: 'old-refresh' }) });
+    expect(fetchMock.mock.calls[5][1]).toMatchObject({ headers: { Authorization: 'Bearer new-access' } });
   });
 
   it('defines the current backend endpoint paths', async () => {

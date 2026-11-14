@@ -1,3 +1,4 @@
+import { CrossModuleMetrics } from '../components/common/CrossModuleMetrics';
 // src/pages/WasteDashboard.tsx
 import { DashboardHeader } from '../components/common/DashboardHeader/DashboardHeader';
 import { MetricCard } from '../components/common/MetricCard/MetricCard';
@@ -38,6 +39,15 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export function WasteDashboard() {
+  return (
+    <>
+      <WasteDashboardContent />
+      <CrossModuleMetrics area="waste" />
+    </>
+  );
+}
+
+function WasteDashboardContent() {
   const { filters, updateFilter, updateDateRange } = useFilters();
   const wasteAsync = useWasteData(filters);
   const resolved = useResolvedUiState(wasteAsync);

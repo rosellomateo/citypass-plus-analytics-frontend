@@ -1,201 +1,153 @@
-/**
- * Boundary with CityPass+ Login. JWT signatures are verified by the API with
- * the IdP JWKS; client-side parsing only controls the user interface.
- */
 export interface CityPassClaims {
-  iss: string;
-  sub: string;
-  aud: string[];
-  token_use: 'human';
-  ver: 1;
   preferred_username: string;
   module: string;
   groups: string[];
-  iat: number;
-  exp: number;
-  jti: string;
 }
 
 export interface TokenPair { accessToken: string; refreshToken: string; }
-
 export type LoginResult = 'success' | 'rejected' | 'invalid-token' | 'unavailable';
 
+type Authenticated = { status: 'authenticated'; token: string; claims: CityPassClaims; dashboards: string[]; version: number };
 export type AuthSnapshot =
   | { status: 'disabled' }
   | { status: 'anonymous' }
-  | { status: 'authenticated'; token: string; claims: CityPassClaims }
-  | { status: 'invalid' };
+  | { status: 'verifying' }
+  | Authenticated;
 
+const IDP_URL = 'https://api.citypass-login.pp.ua';
+const anonymous = { status: 'anonymous' } as const;
+const disabled = { status: 'disabled' } as const;
+let snapshot: AuthSnapshot = anonymous;
 let tokenPair: TokenPair | undefined;
-let listenerInstalled = false;
 let refreshInFlight: Promise<boolean> | undefined;
 let refreshTimer: ReturnType<typeof setTimeout> | undefined;
+let sessionVersion = 0;
 const subscribers = new Set<() => void>();
 
-function notify() { subscribers.forEach((subscriber) => subscriber()); }
-
-function clearRefreshTimer() {
-  if (refreshTimer) clearTimeout(refreshTimer);
-  refreshTimer = undefined;
+function publish(next: AuthSnapshot) {
+  snapshot = next;
+  subscribers.forEach((subscriber) => subscriber());
 }
 
-function decodeBase64Url(value: string): string | undefined {
-  try {
-    const padded = value.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(value.length / 4) * 4, '=');
-    return atob(padded);
-  } catch { return undefined; }
+export function isAuthenticationEnabled(): boolean {
+  return import.meta.env.VITE_DATA_SOURCE !== 'mock';
 }
-
-function isNonEmptyString(value: unknown): value is string {
-  return typeof value === 'string' && value.length > 0;
-}
-
-export function parseCityPassClaims(token: string): CityPassClaims | undefined {
-  const encodedPayload = token.split('.')[1];
-  if (!encodedPayload) return undefined;
-  const payload = decodeBase64Url(encodedPayload);
-  if (!payload) return undefined;
-  try {
-    const claims: unknown = JSON.parse(payload);
-    if (!claims || typeof claims !== 'object') return undefined;
-    const { iss, sub, aud, token_use, ver, preferred_username, module, groups, iat, exp, jti } = claims as Record<string, unknown>;
-    if (
-      !isNonEmptyString(iss) || !isNonEmptyString(sub) || !/^U\d+$/.test(sub) || !Array.isArray(aud) || !aud.every(isNonEmptyString) ||
-      token_use !== 'human' || ver !== 1 || !isNonEmptyString(preferred_username) || !isNonEmptyString(module) ||
-      !Array.isArray(groups) || !groups.every(isNonEmptyString) || typeof iat !== 'number' || !Number.isFinite(iat) ||
-      typeof exp !== 'number' || !Number.isFinite(exp) || exp <= Date.now() / 1000 || !isNonEmptyString(jti)
-    ) return undefined;
-    return { iss, sub, aud, token_use, ver, preferred_username, module, groups, iat, exp, jti };
-  } catch { return undefined; }
-}
-
-export function isAuthenticationEnabled(): boolean { return import.meta.env.VITE_AUTH_ENABLED === 'true'; }
 
 export function getAuthSnapshot(): AuthSnapshot {
-  if (!isAuthenticationEnabled()) return { status: 'disabled' };
-  if (!tokenPair) return { status: 'anonymous' };
-  const claims = parseCityPassClaims(tokenPair.accessToken);
-  if (!claims || !matchesAnalyticsToken(claims)) return { status: 'invalid' };
-  return { status: 'authenticated', token: tokenPair.accessToken, claims };
+  return isAuthenticationEnabled() ? snapshot : disabled;
 }
-
-function matchesAnalyticsToken(claims: CityPassClaims): boolean {
-  return claims.iss === 'https://idp.citypass.local'
-    && claims.aud.includes('citypass-analitica-api')
-    && claims.module === 'analitica';
-}
-
-function scheduleRefresh(accessToken: string) {
-  clearRefreshTimer();
-  const claims = parseCityPassClaims(accessToken);
-  if (!claims) return;
-  // The IdP issues a 15-minute token; renew two minutes before expiry.
-  const delay = Math.max(30_000, (claims.exp - Date.now() / 1000 - 120) * 1000);
-  refreshTimer = setTimeout(() => { void refreshTokenPair(); }, delay);
-}
-
-/** Login must provide the newest pair together; neither token is persisted. */
-export function setTokenPair(pair: TokenPair): boolean {
-  if (!parseCityPassClaims(pair.accessToken) || !isNonEmptyString(pair.refreshToken)) return false;
-  tokenPair = pair;
-  scheduleRefresh(pair.accessToken);
-  notify();
-  return true;
-}
-
-/** Test/support entrypoint. Requests that need refresh still require a real pair. */
-export function setAccessToken(token: string): void { setTokenPair({ accessToken: token, refreshToken: 'not-refreshable' }); }
-export function clearTokenPair(): void { clearRefreshTimer(); tokenPair = undefined; notify(); }
-export const clearAccessToken = clearTokenPair;
 
 export function subscribeToAuth(callback: () => void): () => void {
   subscribers.add(callback);
   return () => subscribers.delete(callback);
 }
 
+export function clearTokenPair(): void {
+  sessionVersion += 1;
+  clearTimeout(refreshTimer);
+  refreshInFlight = undefined;
+  tokenPair = undefined;
+  publish(anonymous);
+}
+
 function getIdpBaseUrl(): string {
-  const baseUrl = import.meta.env.VITE_IDP_BASE_URL?.trim();
-  if (!baseUrl) throw new Error('Falta configurar VITE_IDP_BASE_URL.');
-  return baseUrl.replace(/\/$/, '');
+  return (import.meta.env.VITE_IDP_BASE_URL?.trim() || IDP_URL).replace(/\/$/, '');
 }
 
-function getClientId(): string {
-  const clientId = import.meta.env.VITE_AUTH_CLIENT_ID?.trim();
-  if (!clientId) throw new Error('Falta configurar VITE_AUTH_CLIENT_ID.');
-  return clientId;
+function getVerificationUrl(): string {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL?.trim() || (import.meta.env.DEV ? 'http://localhost:8000' : '');
+  if (!baseUrl) throw new Error('Falta configurar VITE_API_BASE_URL.');
+  return `${baseUrl.replace(/\/$/, '')}/auth/session`;
 }
 
-function getLoginEndpoint(): string {
-  const endpoint = import.meta.env.VITE_AUTH_LOGIN_ENDPOINT?.trim();
-  if (!endpoint) throw new Error('Falta configurar VITE_AUTH_LOGIN_ENDPOINT.');
-  return endpoint;
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === 'string' && item.length > 0);
 }
 
-/**
- * Delegates credential verification to the CityPass+ IdP. This module never
- * validates, stores or interprets a password beyond this one request.
- */
-export async function authenticateWithIdp(username: string, password: string): Promise<LoginResult> {
+async function readTokenPair(response: Response): Promise<TokenPair | undefined> {
+  const body: unknown = await response.json();
+  if (!body || typeof body !== 'object') return undefined;
+  const { access_token, refresh_token } = body as Record<string, unknown>;
+  if (typeof access_token !== 'string' || !access_token || typeof refresh_token !== 'string' || !refresh_token) {
+    return undefined;
+  }
+  return { accessToken: access_token, refreshToken: refresh_token };
+}
+
+async function confirmToken(pair: TokenPair, version: number): Promise<LoginResult> {
+  const response = await fetch(getVerificationUrl(), {
+    headers: { Accept: 'application/json', Authorization: `Bearer ${pair.accessToken}` },
+    signal: AbortSignal.timeout(10_000),
+  });
+  if (!response.ok) return response.status >= 500 ? 'unavailable' : 'invalid-token';
+  const body: unknown = await response.json();
+  if (!body || typeof body !== 'object') return 'invalid-token';
+  const { preferred_username, module, groups, dashboards, expires_at } = body as Record<string, unknown>;
+  if (typeof preferred_username !== 'string' || typeof module !== 'string' ||
+      !isStringArray(groups) || !isStringArray(dashboards) ||
+      typeof expires_at !== 'number' || !Number.isFinite(expires_at) || expires_at <= Date.now() / 1000 ||
+      version !== sessionVersion) {
+    return 'invalid-token';
+  }
+
+  tokenPair = pair;
+  clearTimeout(refreshTimer);
+  const remainingMs = expires_at * 1000 - Date.now();
+  const delay = Math.max(remainingMs - 120_000, remainingMs / 2);
+  refreshTimer = setTimeout(() => { void refreshTokenPair(); }, Math.max(1_000, delay));
+  publish({
+    status: 'authenticated',
+    token: pair.accessToken,
+    claims: { preferred_username, module, groups },
+    dashboards,
+    version,
+  });
+  return 'success';
+}
+
+export async function authenticateWithIdp(username: string, password: string, clientId: string): Promise<LoginResult> {
+  clearTokenPair();
+  const version = sessionVersion;
+  publish({ status: 'verifying' });
   try {
-    const response = await fetch(getLoginEndpoint(), {
+    const response = await fetch(import.meta.env.VITE_AUTH_LOGIN_ENDPOINT?.trim() || `${getIdpBaseUrl()}/auth/login`, {
       method: 'POST',
       headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password, clientId: getClientId() }),
+      body: JSON.stringify({ username, password, clientId }),
+      signal: AbortSignal.timeout(10_000),
     });
-    if (!response.ok) return 'rejected';
-    const body: unknown = await response.json();
-    if (!body || typeof body !== 'object') return 'invalid-token';
-    const { access_token, refresh_token } = body as Record<string, unknown>;
-    return setTokenPair({ accessToken: String(access_token ?? ''), refreshToken: String(refresh_token ?? '') })
-      ? 'success'
-      : 'invalid-token';
+    if (!response.ok) return response.status >= 500 ? 'unavailable' : 'rejected';
+    const pair = await readTokenPair(response);
+    return pair ? await confirmToken(pair, version) : 'invalid-token';
   } catch {
     return 'unavailable';
+  } finally {
+    if (version === sessionVersion && snapshot.status === 'verifying') clearTokenPair();
   }
 }
 
-/**
- * Confirms the freshly issued token with the IdP profile endpoint (/me). Data
- * endpoints must still verify JWTs independently in the Analytics backend.
- */
-export async function verifySessionWithBackend(): Promise<boolean> {
-  const endpoint = import.meta.env.VITE_AUTH_VERIFY_ENDPOINT?.trim();
-  if (!endpoint) return true;
-  const session = getAuthSnapshot();
-  if (session.status !== 'authenticated') return false;
+async function doRefresh(pair: TokenPair, version: number): Promise<boolean> {
   try {
-    const response = await fetch(endpoint, {
-      method: 'GET',
-      headers: { Accept: 'application/json', Authorization: `Bearer ${session.token}` },
+    const response = await fetch(`${getIdpBaseUrl()}/auth/refresh`, {
+      method: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken: pair.refreshToken }),
+      signal: AbortSignal.timeout(10_000),
     });
-    if (response.ok) return true;
-  } catch { /* A failed handshake is treated as a denied session. */ }
-  clearTokenPair();
+    const nextPair = response.ok ? await readTokenPair(response) : undefined;
+    if (nextPair && await confirmToken(nextPair, version) === 'success') return true;
+  } catch { /* A failed refresh ends the session. */ }
+  if (version === sessionVersion) clearTokenPair();
   return false;
 }
 
-async function doRefresh(): Promise<boolean> {
-  if (!tokenPair) return false;
-  try {
-    const response = await fetch(`${getIdpBaseUrl()}/auth/refresh`, {
-      method: 'POST', headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken: tokenPair.refreshToken }),
-    });
-    if (!response.ok) { clearTokenPair(); return false; }
-    const body: unknown = await response.json();
-    if (!body || typeof body !== 'object') { clearTokenPair(); return false; }
-    const { access_token, refresh_token } = body as Record<string, unknown>;
-    if (!setTokenPair({ accessToken: String(access_token ?? ''), refreshToken: String(refresh_token ?? '') })) {
-      clearTokenPair();
-      return false;
-    }
-    return true;
-  } catch { clearTokenPair(); return false; }
-}
-
-/** Rotates the pair once, preventing concurrent requests from reusing a refresh token. */
 export function refreshTokenPair(): Promise<boolean> {
-  if (!refreshInFlight) refreshInFlight = doRefresh().finally(() => { refreshInFlight = undefined; });
+  if (refreshInFlight) return refreshInFlight;
+  if (!tokenPair) return Promise.resolve(false);
+  const version = sessionVersion;
+  refreshInFlight = doRefresh(tokenPair, version).finally(() => {
+    if (version === sessionVersion) refreshInFlight = undefined;
+  });
   return refreshInFlight;
 }
 
@@ -205,23 +157,10 @@ export async function logout(): Promise<void> {
   if (!refreshToken) return;
   try {
     await fetch(`${getIdpBaseUrl()}/auth/logout`, {
-      method: 'POST', headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      method: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),
+      signal: AbortSignal.timeout(10_000),
     });
-  } catch { /* Local logout still succeeds when the IdP is unavailable. */ }
-}
-
-/** Tokens are deliberately never read from URL or browser storage. */
-export function installLoginMessageListener(): void {
-  if (listenerInstalled || !isAuthenticationEnabled()) return;
-  listenerInstalled = true;
-  const trustedOrigin = import.meta.env.VITE_AUTH_LOGIN_ORIGIN?.trim();
-  if (!trustedOrigin) return;
-  window.addEventListener('message', (event: MessageEvent<unknown>) => {
-    if (event.origin !== trustedOrigin || !event.data || typeof event.data !== 'object') return;
-    const message = event.data as { type?: unknown; access_token?: unknown; refresh_token?: unknown };
-    if (message.type === 'citypass.auth.tokens' && typeof message.access_token === 'string' && typeof message.refresh_token === 'string') {
-      setTokenPair({ accessToken: message.access_token, refreshToken: message.refresh_token });
-    }
-  });
+  } catch { /* Local logout is already complete. */ }
 }

@@ -8,7 +8,6 @@ export interface DomainNavMeta {
   path: string;
   color: string;
   bgColor: string;
-  isPending?: boolean;
 }
 
 export const DOMAIN_NAV_ITEMS: DomainNavMeta[] = [
@@ -51,6 +50,30 @@ export const DOMAIN_NAV_ITEMS: DomainNavMeta[] = [
     path: '/analytics/waste',
     color: '#4F8A72',
     bgColor: '#EAF4EF',
+  },
+  {
+    domain: 'login',
+    label: 'Login',
+    shortDescription: 'Inicios de sesión, renovaciones y cierres por departamento.',
+    path: '/analytics/login',
+    color: '#285DA5',
+    bgColor: '#EBF3FC',
+  },
+  {
+    domain: 'dap',
+    label: 'DAP',
+    shortDescription: 'Indicadores de comunicaciones del equipo DAP.',
+    path: '/analytics/dap',
+    color: '#754CA0',
+    bgColor: '#F4EEFA',
+  },
+  {
+    domain: 'eda',
+    label: 'EDA',
+    shortDescription: 'Recepción y distribución de eventos entre equipos.',
+    path: '/analytics/eda',
+    color: '#377A70',
+    bgColor: '#E8F4F2',
   },
 ];
 

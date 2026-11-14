@@ -10,9 +10,8 @@
 El frontend invoca al backend directamente desde el navegador. La URL base no
 debe terminar con una ruta de analítica y puede llevar o no una barra final.
 
-Con `VITE_AUTH_ENABLED=true`, cada solicitud incluye `Authorization: Bearer
-<access-token>`. Configurar CORS para permitir ese encabezado y no habilitar
-orígenes con comodines en producción.
+En modo API, cada solicitud incluye `Authorization: Bearer <access-token>`.
+Configurar CORS para permitir ese encabezado desde el origen del portal.
 
 Un `401` hace que el navegador use el refresh token contra el IdP, nunca contra
 esta API, y reintente una sola vez. El backend debe devolver `403` cuando el
@@ -22,14 +21,42 @@ token sea válido pero sus grupos no alcancen para el dominio solicitado.
 
 | Pantalla | Endpoint del backend |
 | --- | --- |
+| Sesión del portal | `GET /auth/session` |
 | Reclamos | `GET /analytics/reclamos` |
 | Emergencias | `GET /analytics/seguridad-emergencias` |
 | Movilidad | `GET /analytics/movilidad-urbana` |
 | Espacios y cultura | `GET /analytics/espacios-cultura` |
 | Residuos | `GET /analytics/residuos` |
+| Login | `GET /analytics/identidad` |
+| Indicadores de la Parte 2, EDA y DAP | `GET /analytics/{area}/parte2` |
 
-`GET /analytics/eventos` está definido en el cliente, pero no alimenta un
-tablero actual.
+El tablero de Login muestra el último corte del resumen de autenticación.
+Los totales y el gráfico usan eventos agregados por departamento.
+
+### Indicadores de la Parte 2
+
+El backend busca `parte2/{area}.json` en Gold, donde `area` es `claims`,
+`emergencies`, `mobility`, `culture`, `waste`, `eda` o `dap`. Ejemplo:
+
+```json
+{
+  "fecha_snapshot": "2026-11-12",
+  "datos": [
+    { "id": "c1", "valor": 6, "unidad": "reclamos" }
+  ]
+}
+```
+
+En los cinco módulos del modelado, `c1` a `c6` identifican los seis casos en
+el orden del documento. Emergencias admite `c4b` para recursos despachados
+y `c5b` para tiempo hasta resolución. `detalle` admite una lista de objetos
+con `etiqueta` y `valor` para comparaciones y desgloses. DAP y EDA usan sus
+propios identificadores y requieren `etiqueta` para cada indicador.
+
+Si el JSON aún no existe, el backend puede derivar algunos indicadores de
+Reclamos y Emergencias cuando sus resúmenes Gold incluyen `causaTipo`.
+El tablero muestra «Pendiente de datos» cuando falta un valor. El cero se
+muestra cuando está presente en un resultado calculado o publicado.
 
 Los nombres y contratos del backend se mantienen en `src/api/types.ts`. La capa
 `src/dataSources/apiAnalyticsDataSource.ts` convierte esos registros al modelo
@@ -72,7 +99,7 @@ Primero comprobar el backend:
 
 ```bash
 curl --fail http://localhost:8000/health
-curl --fail http://localhost:8000/analytics/residuos
+curl --fail -H "Authorization: Bearer <access-token>" http://localhost:8000/auth/session
 ```
 
 Luego iniciar el frontend:

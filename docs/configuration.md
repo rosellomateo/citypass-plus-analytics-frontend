@@ -1,18 +1,15 @@
 # Configuración y modos de datos
 
 Vite expone al código del navegador únicamente variables con prefijo `VITE_`.
-El proyecto requiere estas dos:
+Estas variables configuran el portal:
 
 | Variable | Valores | Descripción |
 | --- | --- | --- |
 | `VITE_DATA_SOURCE` | `mock` o `api` | Selecciona la fuente utilizada por todos los tableros. |
 | `VITE_API_BASE_URL` | URL HTTP(S) | URL base del backend, sin ruta de endpoint. |
-| `VITE_AUTH_ENABLED` | `true` o vacío | Activa la protección JWT del panel. |
-| `VITE_AUTH_LOGIN_ORIGIN` | origen HTTPS exacto | Origen autorizado para una entrega alternativa por `postMessage`. |
 | `VITE_IDP_BASE_URL` | URL HTTPS | Base del IdP para `auth/refresh` y `auth/logout`. |
-| `VITE_AUTH_CLIENT_ID` | texto asignado por IdP | Identifica a Analítica Urbana al pedir tokens. |
+| `VITE_AUTH_CLIENT_ID` | texto asignado por IdP | Cliente de Analítica Urbana (por defecto, citypass-admin-web). |
 | `VITE_AUTH_LOGIN_ENDPOINT` | URL HTTPS | Endpoint del IdP que recibe usuario, contraseña y `clientId`. |
-| `VITE_AUTH_VERIFY_ENDPOINT` | URL HTTPS | Perfil del IdP (`GET /me`) para confirmar el access token recién emitido. |
 
 ## Configuración local
 
@@ -68,40 +65,22 @@ tokens, contraseñas, SAS de Azure ni secretos en estas variables.
 
 ## Autenticación delegada a Login
 
-El panel no implementa login, no cifra ni firma JWT y no conserva tokens en
-`localStorage`, `sessionStorage`, URL ni variables `VITE_*`. Login entrega el
-último par de tokens con `window.postMessage` desde el origen exacto configurado:
+En modo API, la pantalla de ingreso envía los campos `username`, `password`
+y `clientId` a `POST /auth/login` de Login Federado. El equipo seleccionado
+determina el cliente de Login. Analítica lee el módulo y los roles del token
+verificado para determinar el acceso.
 
-```ts
-window.postMessage(
-  { type: 'citypass.auth.tokens', access_token, refresh_token },
-  'https://analytics.citypass.example',
-);
-```
+El frontend confirma la sesión en `GET /auth/session` del backend de Analítica.
+Las consultas usan el access token en la cabecera `Authorization: Bearer`.
+El refresh token se usa en Login para renovar y cerrar la sesión. Ambos tokens
+viven en memoria.
 
-Los dos tokens quedan solamente en memoria. El access token se adjunta como
-`Authorization: Bearer <token>` a la API. Ante un `401`, el cliente usa el refresh
-token exclusivamente contra el IdP; el IdP devuelve un access token y refresh token
-nuevos, que reemplazan al par anterior antes de reintentar una única vez la consulta.
-Si el refresh falla, se descarta toda la sesión.
+Los clientes de DAP y de Login se pueden ajustar mediante `VITE_AUTH_DAP_CLIENT_ID`
+y `VITE_AUTH_LOGIN_CLIENT_ID`. El backend configura la audiencia y el módulo
+asociados a cada uno.
 
-La ruta `/login` muestra el acceso propio del portal de Analítica Urbana. La
-pantalla **no autentica usuarios por sí misma**: manda usuario, contraseña y
-`clientId` a `POST https://api.citypass-login.pp.ua/auth/login`. La respuesta
-esperada es el par `access_token` y `refresh_token`. No existe selector de tipo
-de usuario; los grupos firmados dentro del access token determinan los dashboards
-que puede ver la persona.
+Login Federado debe permitir por CORS el origen del portal para `POST /auth/login`,
+`POST /auth/refresh` y `POST /auth/logout`. El backend de Analítica también
+debe permitir ese origen y la cabecera `Authorization`.
 
-Después de recibir el token el frontend llama `GET /me` con `Authorization:
-Bearer <access_token>` y sólo continúa si el IdP responde con éxito. Es una
-confirmación inicial de Login; el backend de Analítica debe validar el JWT y
-aplicar permisos por grupo en cada endpoint de datos de forma independiente.
-
-El IdP debe permitir por CORS el origen donde se publique este frontend para
-`POST /auth/login`, `POST /auth/refresh` y `POST /auth/logout`.
-
-El cliente controla la forma de los claims del contrato y confirma `iss`, `aud`
-y `module` esperados para Analítica. Los permisos de pantalla se asignan
-explícitamente por grupo en `src/auth/authorization.ts`; un grupo desconocido no
-da ningún acceso. La API debe validar la firma RS256 con el JWKS y todas las
-restricciones criptográficas del contrato.
+El modo `mock` muestra los tableros con datos de demostración y no pide una sesión.

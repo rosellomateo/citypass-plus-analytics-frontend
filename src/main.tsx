@@ -7,9 +7,6 @@ import '@mantine/core/styles.css';
 import './index.css';
 import { router } from './router/routes';
 import { theme } from './theme/mantineTheme';
-import { installLoginMessageListener } from './auth/session';
-
-installLoginMessageListener();
 
 const root = document.getElementById('root');
 if (!root) throw new Error('Root element not found');

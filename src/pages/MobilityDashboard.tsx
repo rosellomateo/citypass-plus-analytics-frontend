@@ -1,3 +1,4 @@
+import { CrossModuleMetrics } from '../components/common/CrossModuleMetrics';
 // src/pages/MobilityDashboard.tsx
 import { useState, useMemo } from 'react';
 import { DashboardHeader } from '../components/common/DashboardHeader/DashboardHeader';
@@ -240,6 +241,7 @@ export function MobilityDashboard() {
           </div>
         </>
       ) : null}
+      <CrossModuleMetrics area="mobility" />
     </div>
   );
 }

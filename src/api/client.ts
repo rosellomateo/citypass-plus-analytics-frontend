@@ -26,11 +26,18 @@ export function getApiBaseUrl(): string {
 }
 
 export async function apiGet<T>(path: string): Promise<T> {
+  const initialSession = getAuthSnapshot();
   const response = await apiGetResponse(path);
   if (response.status === 401 && isAuthenticationEnabled()) {
-    const refreshed = await refreshTokenPair();
+    const currentSession = getAuthSnapshot();
+    const refreshed = currentSession.status === 'authenticated' && initialSession.status === 'authenticated' &&
+      currentSession.version === initialSession.version &&
+      (initialSession !== currentSession || await refreshTokenPair());
     if (!refreshed) throw new AuthenticationError();
+    const verifiedSession = getAuthSnapshot();
+    if (verifiedSession.status !== 'authenticated' || verifiedSession.version !== initialSession.version) throw new AuthenticationError();
     const retry = await apiGetResponse(path);
+    if (retry.status === 401 && getAuthSnapshot() === verifiedSession) clearTokenPair();
     if (!retry.ok) throw new ApiError(retry.status);
     return (await retry.json()) as T;
   }

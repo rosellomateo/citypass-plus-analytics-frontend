@@ -2,8 +2,8 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { BarChart3, Eye, EyeOff, LogIn } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { authenticateWithIdp, getAuthSnapshot, verifySessionWithBackend } from '../auth/session';
-import { getDefaultAuthorizedPath } from '../auth/authorization';
+import { authenticateWithIdp, getAuthSnapshot } from '../auth/session';
+import { getDefaultAuthorizedPath, LOGIN_TEAMS } from '../auth/authorization';
 import styles from './LoginPage.module.css';
 
 const GENERIC_LOGIN_ERROR = 'No pudimos iniciar sesión. Revisá tus datos e intentá nuevamente.';
@@ -12,33 +12,31 @@ export function LoginPage() {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [team, setTeam] = useState<string>('overview');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!username.trim() || !password) return;
+    const selectedTeam = LOGIN_TEAMS.find(({ area }) => area === team);
+    if (isSubmitting || !username.trim() || !password || !selectedTeam) return;
     setError(undefined);
     setIsSubmitting(true);
-    const result = await authenticateWithIdp(username.trim(), password);
+    const result = await authenticateWithIdp(username.trim(), password, selectedTeam.clientId);
     setPassword('');
     setIsSubmitting(false);
 
     if (result !== 'success') {
-      setError(result === 'unavailable' ? 'El servicio de acceso no está disponible. Intentá nuevamente.' : GENERIC_LOGIN_ERROR);
-      return;
-    }
-
-    const verified = await verifySessionWithBackend();
-    if (!verified) {
-      setError('No pudimos validar tu acceso para este portal. Intentá nuevamente.');
+      if (result === 'unavailable') setError('El servicio de acceso no está disponible. Intentá nuevamente.');
+      else if (result === 'invalid-token') setError('No pudimos validar tu acceso para este portal.');
+      else setError(GENERIC_LOGIN_ERROR);
       return;
     }
 
     const session = getAuthSnapshot();
-    const path = session.status === 'authenticated' ? getDefaultAuthorizedPath(session.claims) : undefined;
-    navigate(path ?? '/');
+    const path = session.status === 'authenticated' ? getDefaultAuthorizedPath(session.dashboards) : undefined;
+    navigate(path ?? '/', { replace: true });
   }
 
   return (
@@ -51,6 +49,11 @@ export function LoginPage() {
 
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
           <h1 id="login-title" className={styles.srOnly}>Ingresar a Analítica Urbana</h1>
+
+          <label htmlFor="team">Equipo</label>
+          <select id="team" value={team} disabled={isSubmitting} onChange={(event) => setTeam(event.target.value)}>
+            {LOGIN_TEAMS.map(({ area, label }) => <option key={area} value={area}>{label}</option>)}
+          </select>
 
           <label htmlFor="username">Usuario <span aria-hidden="true">*</span></label>
           <input

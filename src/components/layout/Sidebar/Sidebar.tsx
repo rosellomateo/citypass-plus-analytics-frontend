@@ -1,10 +1,11 @@
 // src/components/layout/Sidebar/Sidebar.tsx
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import {
-  Home,
+  Network,
   Bike,
   Trash2,
-  Drama,
+  KeyRound,
+  Megaphone,
   User,
   Bell,
   Settings,
@@ -12,7 +13,8 @@ import {
 } from 'lucide-react';
 import styles from './Sidebar.module.css';
 import { useSyncExternalStore } from 'react';
-import { canAccessArea } from '../../../auth/authorization';
+import { DOMAIN_NAV_ITEMS } from '../../../config/domains';
+import { canAccessArea, OVERVIEW } from '../../../auth/authorization';
 import type { ProtectedArea } from '../../../auth/authorization';
 import { getAuthSnapshot, subscribeToAuth } from '../../../auth/session';
 
@@ -62,25 +64,19 @@ function AnaliticaUrbanaIcon({ size = 18 }: { size?: number }) {
   );
 }
 
-interface NavItem {
-  label: string;
-  path: string;
-  icon: React.ReactNode;
-  area: ProtectedArea;
-  isPending?: boolean;
-}
+const ICONS: Record<ProtectedArea, React.ReactNode> = {
+  overview: <AnaliticaUrbanaIcon size={18} />,
+  mobility: <Bike size={18} />,
+  waste: <Trash2 size={18} />,
+  claims: <ReclamosIcon size={18} />,
+  emergencies: <EmergenciasIcon size={18} />,
+  culture: <EspaciosPublicosIcon size={18} />,
+  login: <KeyRound size={18} />,
+  dap: <Megaphone size={18} />,
+  eda: <Network size={18} />,
+};
 
-const NAV_ITEMS: NavItem[] = [
-  { label: 'Inicio', path: '/', icon: <Home size={18} />, area: 'overview' },
-  { label: 'Movilidad', path: '/analytics/mobility', icon: <Bike size={18} />, area: 'mobility' },
-  { label: 'Residuos', path: '/analytics/waste', icon: <Trash2 size={18} />, area: 'waste' },
-  { label: 'Reclamos', path: '/analytics/claims', icon: <ReclamosIcon size={18} />, area: 'claims' },
-  { label: 'Emergencias', path: '/analytics/emergencies', icon: <EmergenciasIcon size={18} />, area: 'emergencies' },
-  { label: 'Espacios Publicos', path: '/analytics/culture', icon: <EspaciosPublicosIcon size={18} />, area: 'culture' },
-  { label: 'Cultura y Eventos', path: '/analytics/culture?tab=events', icon: <Drama size={18} />, area: 'culture' },
-  { label: 'Analitica Urbana', path: '/analytics', icon: <AnaliticaUrbanaIcon size={18} />, area: 'overview' },
-];
-
+const NAV_ITEMS = [OVERVIEW, ...DOMAIN_NAV_ITEMS.map(({ label, path, domain }) => ({ label, path, area: domain }))];
 const BOTTOM_NAV_ITEMS = [
   { label: 'Mi cuenta', path: '/account', icon: <User size={18} /> },
   { label: 'Notificaciones', path: '/notifications', icon: <Bell size={18} /> },
@@ -89,30 +85,10 @@ const BOTTOM_NAV_ITEMS = [
 ];
 
 export function Sidebar() {
-  const location = useLocation();
   const snapshot = useSyncExternalStore(subscribeToAuth, getAuthSnapshot, getAuthSnapshot);
   const visibleNavItems = snapshot.status === 'authenticated'
-    ? NAV_ITEMS.filter((item) => canAccessArea(snapshot.claims, item.area))
+    ? NAV_ITEMS.filter((item) => canAccessArea(snapshot.dashboards, item.area))
     : NAV_ITEMS;
-
-  const isItemActive = (itemPath: string) => {
-    const currentPath = location.pathname;
-    const currentSearch = location.search;
-
-    if (itemPath === '/') {
-      return currentPath === '/';
-    }
-    if (itemPath === '/analytics') {
-      return currentPath === '/analytics';
-    }
-    if (itemPath === '/analytics/culture') {
-      return currentPath === '/analytics/culture' && !currentSearch.includes('tab=events');
-    }
-    if (itemPath === '/analytics/culture?tab=events') {
-      return currentPath === '/analytics/culture' && currentSearch.includes('tab=events');
-    }
-    return currentPath === itemPath;
-  };
 
   return (
     <aside className={styles.sidebar} role="navigation" aria-label="Navegación Analítica Urbana">
@@ -146,21 +122,17 @@ export function Sidebar() {
       <nav className={styles.navSection}>
         <div className={styles.sectionLabel}>SERVICIOS</div>
 
-        {visibleNavItems.map((item) => {
-          const isActive = isItemActive(item.path);
-          return (
-            <NavLink
-              key={item.label}
-              to={item.path}
-              className={`${styles.navItem} ${isActive ? styles.active : ''} ${item.isPending ? styles.pendingItem : ''}`}
-            >
-              <span className={styles.navIcon}>{item.icon}</span>
-              <span className={styles.navLabel}>{item.label}</span>
-              {isActive && <span className={styles.activeBadge}>ACTIVO</span>}
-            </NavLink>
-          );
-        })}
-
+        {visibleNavItems.map((item) => (
+          <NavLink
+            key={item.area}
+            to={item.path}
+            end
+            className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
+          >
+            <span className={styles.navIcon}>{ICONS[item.area]}</span>
+            <span className={styles.navLabel}>{item.label}</span>
+          </NavLink>
+        ))}
         <hr className={styles.divider} />
 
         {BOTTOM_NAV_ITEMS.map((item) => (

@@ -1,83 +1,72 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { canAccessArea, getDefaultAuthorizedPath } from '../auth/authorization';
-import { authenticateWithIdp, clearTokenPair, getAuthSnapshot, parseCityPassClaims, setTokenPair, verifySessionWithBackend } from '../auth/session';
+import { authenticateWithIdp, clearTokenPair, getAuthSnapshot } from '../auth/session';
 
-function token(overrides: object = {}) {
-  const payload = {
-    iss: 'https://idp.citypass.local', sub: 'U000042', aud: ['citypass-analitica-api'], token_use: 'human', ver: 1,
-    preferred_username: 'jperez', module: 'analitica', groups: ['seguridad-urbana'],
-    iat: Date.now() / 1000 - 10, exp: Date.now() / 1000 + 60, jti: 'test-token', ...overrides,
-  };
-  return `header.${btoa(JSON.stringify(payload)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')}.signature`;
+const idp = 'https://api.citypass-login.pp.ua/auth/login';
+const api = 'https://analytics.citypass.local';
+
+function signInResponse() {
+  return { ok: true, json: async () => ({ access_token: 'access-from-idp', refresh_token: 'refresh-from-idp' }) };
 }
 
-afterEach(() => { clearTokenPair(); vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
+function verifiedSession(dashboards: string[]) {
+  return { ok: true, json: async () => ({
+    preferred_username: 'jperez', module: 'reclamos', groups: ['operadores'], dashboards,
+    expires_at: Date.now() / 1000 + 900,
+  }) };
+}
 
-describe('CityPass JWT boundary', () => {
-  it('accepts the complete documented human-token contract while valid', () => {
-    expect(parseCityPassClaims(token())).toMatchObject({ sub: 'U000042', aud: ['citypass-analitica-api'], token_use: 'human', ver: 1 });
-  });
+afterEach(() => {
+  clearTokenPair();
+  vi.unstubAllEnvs();
+  vi.unstubAllGlobals();
+});
 
-  it('rejects expired tokens and incomplete contract claims', () => {
-    expect(parseCityPassClaims(token({ exp: Date.now() / 1000 - 1 }))).toBeUndefined();
-    expect(parseCityPassClaims(token({ aud: 'citypass-analitica-api' }))).toBeUndefined();
-    expect(parseCityPassClaims(token({ token_use: 'service' }))).toBeUndefined();
-  });
-
-  it('exposes a valid pair only when authentication is enabled', () => {
-    vi.stubEnv('VITE_AUTH_ENABLED', 'true');
-    expect(setTokenPair({ accessToken: token(), refreshToken: 'opaque-refresh-token' })).toBe(true);
-    expect(getAuthSnapshot().status).toBe('authenticated');
-  });
-
-  it('does not expose a token issued for another audience or module', () => {
-    vi.stubEnv('VITE_AUTH_ENABLED', 'true');
-    setTokenPair({ accessToken: token({ aud: ['citypass-reclamos-api'] }), refreshToken: 'opaque-refresh-token' });
-    expect(getAuthSnapshot().status).toBe('invalid');
-    setTokenPair({ accessToken: token({ module: 'reclamos' }), refreshToken: 'opaque-refresh-token' });
-    expect(getAuthSnapshot().status).toBe('invalid');
-  });
-
-  it('maps only known groups to their permitted dashboards', () => {
-    const security = parseCityPassClaims(token())!;
-    const global = parseCityPassClaims(token({ groups: ['analitica-urbana'] }))!;
-    expect(canAccessArea(security, 'emergencies')).toBe(true);
-    expect(canAccessArea(security, 'culture')).toBe(false);
-    expect(getDefaultAuthorizedPath(security)).toBe('/analytics/emergencies');
-    expect(canAccessArea(global, 'overview')).toBe(true);
-    expect(canAccessArea(global, 'waste')).toBe(true);
-  });
-
-  it('delegates credentials to the IdP and keeps only the returned token pair', async () => {
-    vi.stubEnv('VITE_AUTH_ENABLED', 'true');
-    vi.stubEnv('VITE_AUTH_CLIENT_ID', 'citypass-analytics-web');
-    vi.stubEnv('VITE_AUTH_LOGIN_ENDPOINT', 'https://login.citypass.local/auth/login');
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: vi.fn().mockResolvedValue({ access_token: token(), refresh_token: 'opaque-refresh-token' }),
-    });
+describe('CityPass session', () => {
+  it('sends the selected client to Login and trusts only dashboards returned by Analytics', async () => {
+    vi.stubEnv('VITE_DATA_SOURCE', 'api');
+    vi.stubEnv('VITE_API_BASE_URL', api);
+    const fetchMock = vi.fn().mockResolvedValueOnce(signInResponse()).mockResolvedValueOnce(verifiedSession(['claims']));
     vi.stubGlobal('fetch', fetchMock);
 
-    await expect(authenticateWithIdp('jperez', 'correcta')).resolves.toBe('success');
-    expect(fetchMock).toHaveBeenCalledWith('https://login.citypass.local/auth/login', {
+    await expect(authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web')).resolves.toBe('success');
+    expect(fetchMock).toHaveBeenNthCalledWith(1, idp, expect.objectContaining({
       method: 'POST',
-      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: 'jperez', password: 'correcta', clientId: 'citypass-analytics-web' }),
-    });
-    expect(getAuthSnapshot().status).toBe('authenticated');
+      body: JSON.stringify({ username: 'jperez', password: 'correcta', clientId: 'citypass-reclamos-web' }),
+    }));
+    expect(fetchMock).toHaveBeenNthCalledWith(2, api + '/auth/session', expect.objectContaining({
+      headers: { Accept: 'application/json', Authorization: 'Bearer access-from-idp' },
+    }));
+    const session = getAuthSnapshot();
+    expect(session.status).toBe('authenticated');
+    if (session.status !== 'authenticated') throw new Error('Expected verified session');
+    expect(getDefaultAuthorizedPath(session.dashboards)).toBe('/analytics/claims');
+    expect(canAccessArea(session.dashboards, 'overview')).toBe(false);
+    expect(canAccessArea(session.dashboards, 'login')).toBe(false);
   });
 
-  it('uses the optional backend endpoint to confirm an authenticated session', async () => {
-    vi.stubEnv('VITE_AUTH_ENABLED', 'true');
-    vi.stubEnv('VITE_AUTH_VERIFY_ENDPOINT', 'https://analytics.citypass.local/auth/verify');
-    setTokenPair({ accessToken: token(), refreshToken: 'opaque-refresh-token' });
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true });
+  it('keeps protected content inaccessible until Analytics accepts the token', async () => {
+    vi.stubEnv('VITE_DATA_SOURCE', 'api');
+    vi.stubEnv('VITE_API_BASE_URL', api);
+    let resolveVerification!: (response: { ok: boolean; status: number }) => void;
+    const verification = new Promise<{ ok: boolean; status: number }>((resolve) => { resolveVerification = resolve; });
+    const fetchMock = vi.fn().mockResolvedValueOnce(signInResponse()).mockReturnValueOnce(verification);
     vi.stubGlobal('fetch', fetchMock);
+    const login = authenticateWithIdp('jperez', 'incorrecta', 'citypass-reclamos-web');
 
-    await expect(verifySessionWithBackend()).resolves.toBe(true);
-    expect(fetchMock).toHaveBeenCalledWith('https://analytics.citypass.local/auth/verify', {
-      method: 'GET',
-      headers: { Accept: 'application/json', Authorization: expect.stringMatching(/^Bearer /) },
-    });
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    expect(getAuthSnapshot().status).toBe('verifying');
+    resolveVerification({ ok: false, status: 401 });
+    await expect(login).resolves.toBe('invalid-token');
+    expect(getAuthSnapshot().status).toBe('anonymous');
+  });
+
+  it('leaves a verified account with no dashboards without access to portal routes', async () => {
+    vi.stubEnv('VITE_DATA_SOURCE', 'api');
+    vi.stubEnv('VITE_API_BASE_URL', api);
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(signInResponse()).mockResolvedValueOnce(verifiedSession([])));
+    await expect(authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web')).resolves.toBe('success');
+    expect(getAuthSnapshot()).toMatchObject({ status: 'authenticated', dashboards: [] });
+    expect(getDefaultAuthorizedPath([])).toBeUndefined();
   });
 });

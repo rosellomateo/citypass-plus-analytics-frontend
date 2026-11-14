@@ -1,3 +1,4 @@
+import { CrossModuleMetrics } from '../components/common/CrossModuleMetrics';
 // src/pages/EmergenciesDashboard.tsx
 import { useState, useMemo } from 'react';
 import { DashboardHeader } from '../components/common/DashboardHeader/DashboardHeader';
@@ -170,6 +171,12 @@ export function EmergenciesDashboard() {
                   status: 'critical',
                 }}
               />
+              {resolved.data.avgArrivalTimeMinutes !== undefined && <MetricCard metric={{
+                label: 'Tiempo promedio de llegada',
+                value: resolved.data.avgArrivalTimeMinutes,
+                unit: ' min',
+                sublabel: 'Promedio ponderado por cantidad de emergencias con datos',
+              }} />}
             </div>
           </div>
 
@@ -246,6 +253,7 @@ export function EmergenciesDashboard() {
           </div>
         </>
       ) : null}
+      <CrossModuleMetrics area="emergencies" />
     </div>
   );
 }

@@ -16,8 +16,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-La configuración de ejemplo usa datos mock, por lo que el frontend inicia sin el
-backend. Abrir <http://localhost:5173>.
+La configuración de ejemplo usa la API de Analítica. Abrir <http://localhost:5173>.
 
 ### Modo pruebas (sin backend)
 
@@ -27,9 +26,9 @@ Para ver y probar los gráficos sin levantar la API, ejecutar:
 npm run dev:mock
 ```
 
-Este comando inicia únicamente el servidor de desarrollo de Vite y carga los
-datos de ejemplo de `testingDatos/` a través de `src/data/mocks/`. No requiere
-crear ni modificar `.env.local`. Abrir <http://localhost:5173>.
+Abrir <http://127.0.0.1:5174>. La vista previa local usa datos de ejemplo y
+habilita los nueve tableros. Vite refleja los cambios al guardar. Para cerrar
+la vista previa, usar `Ctrl+C` en la terminal donde se inició.
 
 Para generar una versión estática de demostración, sin dependencia del backend:
 
@@ -72,12 +71,9 @@ npm run preview
 
 ## Estado de seguridad
 
-El login sigue siendo externo. Con `VITE_AUTH_ENABLED=true`, el panel recibe el
-par de tokens sólo en memoria desde Login, adjunta únicamente el access token a
-la API y renueva el par con el IdP. Consultar el [registro JWT para Backend](docs/jwt-security-record.md).
-
-El portal tiene una ruta `/login` como acceso visual de Analítica Urbana. Esta
-pantalla delega la autenticación al IdP de CityPass+ y no reemplaza al equipo de Login.
+En modo API, el portal pide el token a Login Federado y consulta
+`GET /auth/session` en Analítica antes de habilitar los tableros. Los tokens
+se conservan en memoria. Consultar el [registro JWT](docs/jwt-security-record.md).
 
 ## Tecnologías principales
 

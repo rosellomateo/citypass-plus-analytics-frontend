@@ -34,6 +34,9 @@ const DOMAIN_OPTIONS = [
   { value: 'Movilidad', label: 'Movilidad' },
   { value: 'Cultura', label: 'Cultura' },
   { value: 'Residuos', label: 'Residuos' },
+  { value: 'login', label: 'Login' },
+  { value: 'dap', label: 'DAP' },
+  { value: 'eda', label: 'EDA' },
 ];
 
 export function AnalyticsOverview() {
@@ -126,24 +129,16 @@ export function AnalyticsOverview() {
         <h2 className="section-title">Dominios de Analítica</h2>
         <div className={styles.domainGrid}>
           {filteredDomainItems.map((item) => (
-            <div
-              key={item.domain}
-              className={`${styles.card} ${item.isPending ? styles.pendingCard : ''}`}
-            >
+            <div key={item.domain} className={styles.card}>
               <div className={styles.cardHeader}>
                 <span className={styles.badge} style={{ backgroundColor: item.bgColor, color: item.color }}>
                   {item.label}
                 </span>
-                {item.isPending && <span className={styles.pendingPill}>Pendiente</span>}
               </div>
               <p className={styles.cardDesc}>{item.shortDescription}</p>
-              {!item.isPending ? (
-                <Link to={item.path} className={styles.cardLink}>
-                  Ver Tablero <ArrowRight size={14} />
-                </Link>
-              ) : (
-                <span className={styles.disabledLink}>Próximamente</span>
-              )}
+              <Link to={item.path} className={styles.cardLink}>
+                Ver tablero <ArrowRight size={14} />
+              </Link>
             </div>
           ))}
         </div>

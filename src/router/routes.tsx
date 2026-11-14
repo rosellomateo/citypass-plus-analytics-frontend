@@ -14,6 +14,8 @@ const EmergenciesDashboard = lazy(() => import('../pages/EmergenciesDashboard').
 const MobilityDashboard = lazy(() => import('../pages/MobilityDashboard').then((m) => ({ default: m.MobilityDashboard })));
 const CultureDashboard = lazy(() => import('../pages/CultureDashboard').then((m) => ({ default: m.CultureDashboard })));
 const WasteDashboard = lazy(() => import('../pages/WasteDashboard').then((m) => ({ default: m.WasteDashboard })));
+const LoginDashboard = lazy(() => import('../pages/LoginDashboard').then((m) => ({ default: m.LoginDashboard })));
+const CoordinationDashboard = lazy(() => import('../pages/CoordinationDashboard').then((m) => ({ default: m.CoordinationDashboard })));
 
 function SuspenseWrapper({ children }: { children: React.ReactNode }) {
   return <Suspense fallback={<LoadingFullPage />}>{children}</Suspense>;
@@ -55,6 +57,18 @@ export const router = createBrowserRouter([
       {
         path: 'analytics/waste',
         element: <RouteGuard area="waste"><SuspenseWrapper><WasteDashboard /></SuspenseWrapper></RouteGuard>,
+      },
+      {
+        path: 'analytics/login',
+        element: <RouteGuard area="login"><SuspenseWrapper><LoginDashboard /></SuspenseWrapper></RouteGuard>,
+      },
+      {
+        path: 'analytics/dap',
+        element: <RouteGuard area="dap"><SuspenseWrapper><CoordinationDashboard area="dap" /></SuspenseWrapper></RouteGuard>,
+      },
+      {
+        path: 'analytics/eda',
+        element: <RouteGuard area="eda"><SuspenseWrapper><CoordinationDashboard area="eda" /></SuspenseWrapper></RouteGuard>,
       },
     ],
   },
