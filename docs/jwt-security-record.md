@@ -11,6 +11,8 @@ usa `uid` (o `preferred_username`), `module` y `groups` para la sesión y calcul
 la visibilidad de rutas y menú con las reglas siguientes. No consulta
 `/auth/session` en Analítica ni necesita `dashboards` o `expires_at` de ese servicio.
 El vencimiento para programar el refresh sale de `expires_in` de Login/refresh.
+La preferencia opcional `initial_dashboard` solo afecta la navegación si coincide
+con un tablero visible. Su ausencia no impide iniciar sesión.
 
 Estas reglas controlan únicamente la interfaz. El backend de Analítica mantiene
 la responsabilidad de validar el JWT y autorizar cada petición de datos.
@@ -27,3 +29,11 @@ la responsabilidad de validar el JWT y autorizar cada petición de datos.
 
 El access token se envía solo por la cabecera `Authorization`. El refresh se
 hace en Login y vuelve a consultar `/me` antes de actualizar la sesión.
+
+`GET /embed/{modulo}` entrega el HTML a aplicaciones que ya tienen su propia
+sesión. El formulario de este portal consulta `/me` de Login/LDAP para obtener
+el perfil; no necesita `/auth/session` en Analítica.
+
+El origen del frontend debe estar habilitado tanto en el CORS de Login
+Federado como en el de Analítica. Para desarrollo con el IdP real se puede
+usar `http://localhost:5173` con `VITE_DATA_SOURCE=api`.

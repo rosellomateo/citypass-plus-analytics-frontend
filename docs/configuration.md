@@ -74,6 +74,9 @@ y `groups` (también se admite `preferred_username` como nombre de usuario).
 Los campos adicionales de nombre y correo no son necesarios para iniciar sesión.
 La lista visible de tableros se calcula a partir del módulo y los grupos del
 perfil, con las reglas documentadas en `docs/jwt-security-record.md`.
+Si el perfil incluye un `initial_dashboard` opcional, se usa solamente cuando
+pertenece a los tableros visibles del usuario. Si no está presente o no es válido,
+se abre el primer tablero visible. No se requiere que LDAP devuelva ese campo.
 
 Login y refresh deben devolver `access_token`, `refresh_token` y `expires_in`
 en segundos. El frontend renueva antes del vencimiento y conserva siempre el
@@ -84,6 +87,11 @@ Ambos tokens viven en memoria.
 de datos. No se requiere una ruta `/auth/session` en Analítica. Cada endpoint de
 datos del backend sigue siendo responsable de validar el JWT y sus permisos;
 la visibilidad del menú no autoriza el acceso a los datos.
+
+Los errores distinguen un fallo al obtener tokens de Login de un fallo al consultar
+el perfil en `/me`. Un `401` o `403` del perfil se considera acceso inválido;
+un `404`, un error de red o una respuesta de perfil mal formada informa que no
+se pudo consultar el perfil y mantiene el portal sin sesión.
 
 El cliente del equipo de Login Federado se puede ajustar con
 `VITE_AUTH_LOGIN_CLIENT_ID` y debe coincidir con el cliente asignado por Login.

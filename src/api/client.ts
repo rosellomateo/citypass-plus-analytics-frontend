@@ -1,4 +1,7 @@
 import { clearTokenPair, getAuthSnapshot, requiresApiToken, refreshTokenPair } from '../auth/session';
+import { getApiBaseUrl } from './config';
+
+export { getApiBaseUrl } from './config';
 
 export class ApiError extends Error {
   readonly status: number;
@@ -15,14 +18,6 @@ export class AuthenticationError extends Error {
     super('No hay una sesión válida para realizar esta solicitud.');
     this.name = 'AuthenticationError';
   }
-}
-
-export function getApiBaseUrl(): string {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
-  if (!baseUrl) {
-    throw new Error('Falta configurar VITE_API_BASE_URL.');
-  }
-  return baseUrl.replace(/\/$/, '');
 }
 
 export async function apiGet<T>(path: string): Promise<T> {

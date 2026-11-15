@@ -8,9 +8,16 @@ export interface CityPassClaims {
 }
 
 export interface TokenPair { accessToken: string; refreshToken: string; expiresAt: number; }
-export type LoginResult = 'success' | 'rejected' | 'invalid-token' | 'unavailable' | 'unconfigured';
+export type LoginResult = 'success' | 'rejected' | 'invalid-token' | 'unavailable' | 'profile-unavailable' | 'unconfigured';
 
-type Authenticated = { status: 'authenticated'; token: string; claims: CityPassClaims; dashboards: string[]; version: number };
+type Authenticated = {
+  status: 'authenticated';
+  token: string;
+  claims: CityPassClaims;
+  dashboards: string[];
+  initialDashboard?: string;
+  version: number;
+};
 export type AuthSnapshot =
   | { status: 'anonymous' }
   | { status: 'verifying' }
@@ -73,20 +80,29 @@ async function readTokenPair(response: Response): Promise<TokenPair | undefined>
 }
 
 async function confirmToken(pair: TokenPair, version: number): Promise<LoginResult> {
-  const response = await fetch(`${getIdpBaseUrl()}/me`, {
-    headers: { Accept: 'application/json', Authorization: `Bearer ${pair.accessToken}` },
-    cache: 'no-store',
-    signal: AbortSignal.timeout(10_000),
-  });
-  if (!response.ok) return response.status >= 500 ? 'unavailable' : 'invalid-token';
-  const body: unknown = await response.json();
-  if (!body || typeof body !== 'object') return 'invalid-token';
+  let body: unknown;
+  try {
+    const response = await fetch(`${getIdpBaseUrl()}/me`, {
+      method: 'GET',
+      headers: { Accept: 'application/json', Authorization: `Bearer ${pair.accessToken}` },
+      cache: 'no-store',
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (response.status === 401 || response.status === 403) return 'invalid-token';
+    if (!response.ok) return 'profile-unavailable';
+    body = await response.json();
+  } catch {
+    return 'profile-unavailable';
+  }
+  if (!body || typeof body !== 'object') return 'profile-unavailable';
   const profile = body as Record<string, unknown>;
   const preferred_username = profile.uid ?? profile.preferred_username;
   const { module, groups } = profile;
   if (typeof preferred_username !== 'string' || !preferred_username.trim() ||
-      typeof module !== 'string' || !module || !isStringArray(groups) || pair.expiresAt <= Date.now() ||
-      version !== sessionVersion) {
+      typeof module !== 'string' || !module || !isStringArray(groups)) {
+    return 'profile-unavailable';
+  }
+  if (pair.expiresAt <= Date.now() || version !== sessionVersion) {
     return 'invalid-token';
   }
 
@@ -95,11 +111,14 @@ async function confirmToken(pair: TokenPair, version: number): Promise<LoginResu
   const remainingMs = pair.expiresAt - Date.now();
   const delay = Math.max(remainingMs - 120_000, remainingMs / 2);
   refreshTimer = setTimeout(() => { void refreshTokenPair(); }, Math.max(1_000, delay));
+  const dashboards = getDashboardsForProfile(module, groups);
+  const initialDashboard = dashboards.find((area) => area === profile.initial_dashboard);
   publish({
     status: 'authenticated',
     token: pair.accessToken,
     claims: { preferred_username, module, groups },
-    dashboards: getDashboardsForProfile(module, groups),
+    dashboards,
+    initialDashboard,
     version,
   });
   return 'success';

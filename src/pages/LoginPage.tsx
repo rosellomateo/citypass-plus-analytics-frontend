@@ -14,7 +14,8 @@ import styles from './LoginPage.module.css';
 
 const LOGIN_ERRORS = {
   rejected: 'No pudimos iniciar sesión. Revisá tus datos e intentá nuevamente.',
-  unavailable: 'El servicio de acceso no está disponible. Intentá nuevamente.',
+  unavailable: 'No pudimos comunicarnos con Login Federado. Intentá nuevamente.',
+  'profile-unavailable': 'No pudimos consultar tu perfil en Login Federado. Intentá nuevamente.',
   'invalid-token': 'No pudimos validar tu acceso para este portal.',
   unconfigured: 'La sesión local de este equipo no está disponible.',
 };
@@ -60,7 +61,7 @@ export function LoginPage() {
     }
 
     const session = getAuthSnapshot();
-    const path = session.status === 'authenticated' ? getDefaultAuthorizedPath(session.dashboards) : undefined;
+    const path = session.status === 'authenticated' ? getDefaultAuthorizedPath(session.dashboards, session.initialDashboard) : undefined;
     navigate(path ?? '/', { replace: true });
   }
 

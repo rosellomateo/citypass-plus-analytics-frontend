@@ -15,7 +15,7 @@ function NoAccess() {
 
 export function DefaultDashboardRedirect() {
   const snapshot = useSyncExternalStore(subscribeToAuth, getAuthSnapshot, getAuthSnapshot);
-  const path = snapshot.status === 'authenticated' ? getDefaultAuthorizedPath(snapshot.dashboards) : undefined;
+  const path = snapshot.status === 'authenticated' ? getDefaultAuthorizedPath(snapshot.dashboards, snapshot.initialDashboard) : undefined;
   return path ? <Navigate to={path} replace /> : <NoAccess />;
 }
 
@@ -23,6 +23,6 @@ export function RouteGuard({ area, children }: { area: ProtectedArea; children: 
   const snapshot = useSyncExternalStore(subscribeToAuth, getAuthSnapshot, getAuthSnapshot);
   if (snapshot.status !== 'authenticated') return <Navigate to="/login" replace />;
   if (canAccessArea(snapshot.dashboards, area)) return <>{children}</>;
-  const path = getDefaultAuthorizedPath(snapshot.dashboards);
+  const path = getDefaultAuthorizedPath(snapshot.dashboards, snapshot.initialDashboard);
   return path ? <Navigate to={path} replace /> : <NoAccess />;
 }

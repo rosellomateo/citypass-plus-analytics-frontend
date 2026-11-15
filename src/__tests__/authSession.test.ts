@@ -9,9 +9,9 @@ function signInResponse(overrides: Record<string, unknown> = {}) {
   return { ok: true, json: async () => ({ access_token: 'access-from-idp', refresh_token: 'refresh-from-idp', expires_in: 900, ...overrides }) };
 }
 
-function ldapProfile(groups: string[] = ['operadores']) {
+function ldapProfile(groups: string[] = ['operadores'], overrides: Record<string, unknown> = {}) {
   return { ok: true, json: async () => ({
-    uid: 'jperez', cn: 'Juan Pérez', mail: 'jperez@example.test', module: 'reclamos', groups,
+    uid: 'jperez', cn: 'Juan Pérez', mail: 'jperez@example.test', module: 'reclamos', groups, ...overrides,
   }) };
 }
 
@@ -50,6 +50,7 @@ describe('CityPass session', () => {
       body: JSON.stringify({ username: 'jperez', password: 'correcta', clientId: 'citypass-reclamos-web' }),
     }));
     expect(fetchMock).toHaveBeenNthCalledWith(2, 'https://api.citypass-login.pp.ua/me', expect.objectContaining({
+      method: 'GET',
       headers: { Accept: 'application/json', Authorization: 'Bearer access-from-idp' },
       cache: 'no-store',
     }));
@@ -60,6 +61,60 @@ describe('CityPass session', () => {
     expect(getDefaultAuthorizedPath(session.dashboards)).toBe('/analytics/claims');
     expect(canAccessArea(session.dashboards, 'overview')).toBe(false);
     expect(canAccessArea(session.dashboards, 'login')).toBe(false);
+  });
+
+  it('only opens an authorized initial dashboard', () => {
+    expect(getDefaultAuthorizedPath(['overview', 'eda'], 'eda')).toBe('/analytics/eda');
+    expect(getDefaultAuthorizedPath(['claims'], 'eda')).toBe('/analytics/claims');
+  });
+
+  it('uses an optional initial dashboard from the LDAP profile only within the visible areas', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(signInResponse())
+      .mockResolvedValueOnce(ldapProfile(['admin'], { module: 'analitica', initial_dashboard: 'eda' })));
+    await expect(authenticateWithIdp('analista', 'correcta', 'citypass-analitica-web')).resolves.toBe('success');
+    const session = getAuthSnapshot();
+    expect(session).toMatchObject({ status: 'authenticated', initialDashboard: 'eda' });
+    if (session.status !== 'authenticated') throw new Error('Expected authenticated session');
+    expect(getDefaultAuthorizedPath(session.dashboards, session.initialDashboard)).toBe('/analytics/eda');
+  });
+
+  it.each([undefined, 'overview', 'eda', '/analytics/login', 42])(
+    'falls back to the visible dashboard when initial_dashboard is absent or unauthorized (%s)', async (initial_dashboard) => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(signInResponse())
+        .mockResolvedValueOnce(ldapProfile(['operadores'], { initial_dashboard })));
+      await expect(authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web')).resolves.toBe('success');
+      const session = getAuthSnapshot();
+      expect(session).toMatchObject({ status: 'authenticated', initialDashboard: undefined, dashboards: ['claims'] });
+      if (session.status !== 'authenticated') throw new Error('Expected authenticated session');
+      expect(getDefaultAuthorizedPath(session.dashboards, session.initialDashboard)).toBe('/analytics/claims');
+    },
+  );
+
+  it('reports a missing LDAP profile endpoint as a profile service failure', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(signInResponse()).mockResolvedValueOnce({ ok: false, status: 404 }));
+    await expect(authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web')).resolves.toBe('profile-unavailable');
+    expect(getAuthSnapshot().status).toBe('anonymous');
+  });
+
+  it('distinguishes a login service failure from a profile failure', async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce({ ok: false, status: 503 });
+    vi.stubGlobal('fetch', fetchMock);
+    await expect(authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web')).resolves.toBe('unavailable');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(getAuthSnapshot().status).toBe('anonymous');
+  });
+
+  it('reports a network failure in /me without blaming Analytics', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(signInResponse()).mockRejectedValueOnce(new TypeError('Failed to fetch')));
+    await expect(authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web')).resolves.toBe('profile-unavailable');
+    expect(getAuthSnapshot().status).toBe('anonymous');
+  });
+
+  it('reports a non-JSON response from /me as a profile failure', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(signInResponse())
+      .mockResolvedValueOnce({ ok: true, json: async () => { throw new SyntaxError('Invalid JSON'); } }));
+    await expect(authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web')).resolves.toBe('profile-unavailable');
+    expect(getAuthSnapshot().status).toBe('anonymous');
   });
 
   it('keeps protected content inaccessible until LDAP accepts the token', async () => {
@@ -125,11 +180,11 @@ describe('CityPass session', () => {
   ])('rejects a malformed LDAP profile (%j)', async (profile) => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(signInResponse())
       .mockResolvedValueOnce({ ok: true, json: async () => profile }));
-    await expect(authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web')).resolves.toBe('invalid-token');
+    await expect(authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web')).resolves.toBe('profile-unavailable');
     expect(getAuthSnapshot().status).toBe('anonymous');
   });
 
-  it.each([[401, 'invalid-token'], [403, 'invalid-token'], [503, 'unavailable']] as const)(
+  it.each([[401, 'invalid-token'], [403, 'invalid-token'], [503, 'profile-unavailable']] as const)(
     'does not establish a session when /me returns %s', async (status, result) => {
       vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(signInResponse()).mockResolvedValueOnce({ ok: false, status }));
       await expect(authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web')).resolves.toBe(result);
