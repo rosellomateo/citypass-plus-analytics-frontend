@@ -1,3 +1,4 @@
+import { DashboardImpactCards } from '../common/DashboardImpactCards';
 import { BarChart } from '../charts/BarChart';
 import { PieChart } from '../charts/PieChart';
 import { ChartCard } from '../common/ChartCard/ChartCard';
@@ -102,6 +103,7 @@ export function WasteAlertsDashboard({
               status: 'warning',
             }}
           />
+          <DashboardImpactCards area="waste" />
         </div>
       </div>
 

@@ -6,7 +6,7 @@ import type {
   EmergenciaCerradaEvent,
   AIAnalysisReport,
 } from '../../types';
-import rawEmergenciesSummary from '../../../testingDatos/emergencies_summary.json';
+import rawEmergenciesSummary from './fixtures/emergencies_summary.json';
 
 const now = new Date();
 function minsAgo(m: number) {

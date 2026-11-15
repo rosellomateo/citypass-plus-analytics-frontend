@@ -1,5 +1,5 @@
 import type { DashboardFilters, WasteMetrics, ContainerStatus, WasteInputJson } from '../types';
-import rawWasteJson from '../../testingDatos/waste_records.json';
+import rawWasteJson from '../data/mocks/fixtures/waste_records.json';
 import { mockWasteAIReport } from '../data/mocks/waste.mock';
 import { adaptWasteInput } from '../adapters/wasteAdapter';
 import { delay } from '../utils';
@@ -8,7 +8,7 @@ import { isWithinDateRange } from '../utils/dates';
 /**
  * Servicio Analítico del Dominio de Residuos
  * Responsabilidades:
- * - Obtener datos JSON de entrada desde testingDatos/waste_records.json.
+ * - Obtener datos JSON de entrada desde src/data/mocks/fixtures/waste_records.json.
  * - Invocar el adaptador para obtener modelos internos normalizados.
  * - Aplicar DashboardFilters (zona, tipo de residuo, búsqueda, rango temporal).
  * - Calcular los 4 KPIs principales.

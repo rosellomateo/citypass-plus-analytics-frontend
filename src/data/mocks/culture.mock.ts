@@ -7,7 +7,7 @@ import type {
   EventoCanceladoEvent,
   AIAnalysisReport,
 } from '../../types';
-import rawCultureSummary from '../../../testingDatos/culture_summary.json';
+import rawCultureSummary from './fixtures/culture_summary.json';
 
 const now = new Date();
 function daysAgo(d: number) {

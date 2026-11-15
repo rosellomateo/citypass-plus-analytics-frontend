@@ -1,3 +1,4 @@
+import { DashboardImpactCards } from '../components/common/DashboardImpactCards';
 // src/pages/WasteDashboard.tsx
 import { DashboardHeader } from '../components/common/DashboardHeader/DashboardHeader';
 import { MetricCard } from '../components/common/MetricCard/MetricCard';
@@ -134,6 +135,7 @@ export function WasteDashboard() {
                   status: 'warning',
                 }}
               />
+              <DashboardImpactCards area="waste" />
             </div>
           </div>
 
@@ -225,6 +227,7 @@ export function WasteDashboard() {
           </div>
         </>
       )}
+      {!resolved.loading && (resolved.error || resolved.isEmpty || !resolved.data) && <DashboardImpactCards area="waste" standalone />}
     </div>
   );
 }
