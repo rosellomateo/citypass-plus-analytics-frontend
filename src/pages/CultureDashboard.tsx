@@ -1,5 +1,7 @@
+import { DashboardImpactCards } from '../components/common/DashboardImpactCards';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { Anchor } from '@mantine/core';
 import { DashboardHeader } from '../components/common/DashboardHeader/DashboardHeader';
 import { MetricCard } from '../components/common/MetricCard/MetricCard';
 import { ChartCard } from '../components/common/ChartCard/ChartCard';
@@ -19,16 +21,10 @@ export function CultureDashboard() {
   const location = useLocation();
 
   useEffect(() => {
-    if (location.search.includes('tab=events')) {
-      const timer = setTimeout(() => {
-        const el = document.getElementById('cultura-eventos-section');
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 150);
-      return () => clearTimeout(timer);
+    if (!resolved.loading && new URLSearchParams(location.search).get('tab') === 'events') {
+      document.getElementById('cultura-eventos-section')?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [location]);
+  }, [location.search, resolved.loading]);
 
   return (
     <div>
@@ -39,6 +35,7 @@ export function CultureDashboard() {
         aiReport={resolved.data?.aiReport}
         onDateRangeChange={(range) => updateFilter('dateRange', range)}
         onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)}
+        actions={resolved.data && <Anchor href="#cultura-eventos-section" size="sm">Ver eventos</Anchor>}
       />
 
       {resolved.loading ? (
@@ -87,6 +84,7 @@ export function CultureDashboard() {
                   status: 'info',
                 }}
               />
+              <DashboardImpactCards area="culture" />
             </div>
           </div>
 
@@ -105,7 +103,14 @@ export function CultureDashboard() {
                   { key: 'cancelled', label: 'Canceladas', color: '#C83E4D' },
                 ]}
                 showLegend={true}
-                height={260}
+                height={300}
+                scrollable={true}
+                minWidth={Math.max(800, resolved.data.reservationsBySpace.length * 125)}
+                xAxisTickAngle={-35}
+                xAxisTickFormatter={(value) => {
+                  const label = String(value);
+                  return label.length > 18 ? `${label.slice(0, 18)}…` : label;
+                }}
               />
             </ChartCard>
           </div>
@@ -171,6 +176,7 @@ export function CultureDashboard() {
           </div>
         </>
       ) : null}
+      {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="culture" standalone />}
     </div>
   );
 }

@@ -12,7 +12,8 @@ export interface AsyncState<T> {
 
 export function useAsync<T>(
   fn: () => Promise<T>,
-  deps: unknown[]
+  deps: unknown[],
+  { retainDataOnError = false, clearDataOnRequest = false }: { retainDataOnError?: boolean; clearDataOnRequest?: boolean } = {},
 ): AsyncState<T> & { refetch: () => void } {
   const [state, setState] = useState<AsyncState<T>>({
     data: null,
@@ -36,7 +37,7 @@ export function useAsync<T>(
   useEffect(() => {
     let cancelled = false;
 
-    setState((prev) => ({ ...prev, loading: true, error: null }));
+    setState((prev) => ({ data: clearDataOnRequest ? null : prev.data, loading: true, error: null }));
 
     fn()
       .then((data) => {
@@ -46,11 +47,11 @@ export function useAsync<T>(
       })
       .catch((err) => {
         if (!cancelled && isMounted.current) {
-          setState({
-            data: null,
+          setState((prev) => ({
+            data: retainDataOnError ? prev.data : null,
             loading: false,
             error: err instanceof Error ? err.message : 'Error desconocido',
-          });
+          }));
         }
       });
 
@@ -58,7 +59,7 @@ export function useAsync<T>(
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [...deps, refetchCount]);
+  }, [...deps, refetchCount, retainDataOnError, clearDataOnRequest]);
 
   const refetch = useCallback(() => {
     setRefetchCount((c) => c + 1);

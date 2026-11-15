@@ -19,6 +19,10 @@
   min-height: calc(100vh - 56px);
 }
 
+.demo {
+  margin-bottom: 12px;
+}
+
 @media (max-width: 900px) {
   .main {
     margin-left: 0;

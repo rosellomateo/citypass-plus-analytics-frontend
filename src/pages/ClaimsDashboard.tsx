@@ -1,3 +1,4 @@
+import { DashboardImpactCards } from '../components/common/DashboardImpactCards';
 // src/pages/ClaimsDashboard.tsx
 import { useState, useMemo } from 'react';
 import { DashboardHeader } from '../components/common/DashboardHeader/DashboardHeader';
@@ -101,6 +102,7 @@ export function ClaimsDashboard() {
                   status: 'normal',
                 }}
               />
+              <DashboardImpactCards area="claims" />
             </div>
           </div>
 
@@ -162,6 +164,7 @@ export function ClaimsDashboard() {
           </div>
         </>
       ) : null}
+      {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="claims" standalone />}
     </div>
   );
 }

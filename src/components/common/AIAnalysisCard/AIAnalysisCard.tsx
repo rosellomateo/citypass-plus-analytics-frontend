@@ -8,7 +8,6 @@ import {
   Lightbulb,
   AlertTriangle,
   Cpu,
-  Calendar,
   Layers,
 } from 'lucide-react';
 import type { AIAnalysisReport, AIAnalysisItem } from '../../../types';
@@ -20,20 +19,40 @@ interface AIAnalysisCardProps {
   defaultExpanded?: boolean;
 }
 
+function getAnalysisWeek(item: AIAnalysisItem) {
+  return item.semana ?? item.metadata?.semana_actual;
+}
+
+function getLatestAnalysis(report?: AIAnalysisReport) {
+  const analyses = report?.analisis;
+  if (!analyses?.length) {
+    return undefined;
+  }
+
+  // ultima_semana is the authoritative pointer supplied by the report. Do not
+  // rely on the array order: Azure retains analyses from previous weeks there.
+  const latestWeek = report?.ultima_semana;
+  if (latestWeek) {
+    return analyses.find((analysis) => getAnalysisWeek(analysis) === latestWeek);
+  }
+
+  // Legacy reports without ultima_semana contain a single/current entry last.
+  return analyses.at(-1);
+}
+
 export function AIAnalysisCard({ report, item: directItem, defaultExpanded = true }: AIAnalysisCardProps) {
   const [expanded, setExpanded] = useState(defaultExpanded);
 
   // Extract analysis item from report or direct item prop
-  const activeItem: AIAnalysisItem | undefined =
-    directItem || (report && report.analisis && report.analisis.length > 0 ? report.analisis[0] : undefined);
+  const activeItem: AIAnalysisItem | undefined = directItem ?? getLatestAnalysis(report);
 
   if (!activeItem || !activeItem.resumen) {
     return null;
   }
 
-  const { resumen, metadata, semana } = activeItem;
-  const llmInfo = metadata?.llm;
-  const semanaDisplay = semana || metadata?.semana_actual || report?.ultima_semana;
+  const { resumen, metadata } = activeItem;
+  const model = metadata?.llm?.modelo_respuesta || metadata?.llm?.deployment;
+  const modelLabel = model?.toLowerCase() === 'gpt-5-mini' ? 'GPT-5 mini' : model;
   const casoDeUsoDisplay = metadata?.caso_de_uso || report?.caso_de_uso;
 
   return (
@@ -51,17 +70,10 @@ export function AIAnalysisCard({ report, item: directItem, defaultExpanded = tru
         </div>
 
         <div className={styles.headerRight}>
-          {semanaDisplay && (
-            <span className={styles.metaPill}>
-              <Calendar size={12} />
-              {semanaDisplay}
-            </span>
-          )}
-
-          {llmInfo?.deployment && (
+          {modelLabel && (
             <span className={styles.metaPill}>
               <Cpu size={12} />
-              {llmInfo.deployment}
+              {modelLabel}
             </span>
           )}
 

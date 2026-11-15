@@ -1,8 +1,13 @@
 // src/components/layout/Header/Header.tsx
-import { Search, Bell } from 'lucide-react';
+import { Search, Bell, LogOut } from 'lucide-react';
 import styles from './Header.module.css';
+import { useSyncExternalStore } from 'react';
+import { getAuthSnapshot, logout, subscribeToAuth } from '../../../auth/session';
 
 export function Header() {
+  const snapshot = useSyncExternalStore(subscribeToAuth, getAuthSnapshot, getAuthSnapshot);
+  const username = snapshot.status === 'authenticated' ? snapshot.claims.preferred_username : 'Analítica Urbana';
+  const module = snapshot.status === 'authenticated' ? snapshot.claims.module : 'Analista';
   return (
     <header className={styles.header} role="banner">
       <div className={styles.left}>
@@ -32,10 +37,15 @@ export function Header() {
         <div className={styles.userArea}>
           <div className={styles.avatar} aria-hidden="true">AU</div>
           <div className={styles.userInfo}>
-            <span className={styles.userName}>Analítica Urbana</span>
-            <span className={styles.userRole}>Analista</span>
+            <span className={styles.userName}>{username}</span>
+            <span className={styles.userRole}>{module}</span>
           </div>
         </div>
+        {snapshot.status === 'authenticated' && (
+          <button type="button" className={styles.notifButton} aria-label="Cerrar sesión" title="Cerrar sesión" onClick={() => void logout()}>
+            <LogOut size={18} />
+          </button>
+        )}
       </div>
     </header>
   );
