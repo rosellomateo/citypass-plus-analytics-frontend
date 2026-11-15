@@ -21,7 +21,6 @@ token sea válido pero sus grupos no alcancen para el dominio solicitado.
 
 | Pantalla | Endpoint del backend |
 | --- | --- |
-| Sesión del portal | `GET /auth/session` |
 | Reclamos | `GET /analytics/reclamos` |
 | Emergencias | `GET /analytics/seguridad-emergencias` |
 | Movilidad | `GET /analytics/movilidad-urbana` |
@@ -29,6 +28,11 @@ token sea válido pero sus grupos no alcancen para el dominio solicitado.
 | Residuos | `GET /analytics/residuos` |
 | Login Federado | `GET /analytics/identidad` |
 | EDA e impactos por tablero | `GET /analytics/{area}/parte2` |
+
+El perfil de sesión se consulta en `GET /me` de Login/LDAP, con la base
+`VITE_IDP_BASE_URL`. No es un endpoint del backend de Analítica ni utiliza
+`VITE_API_BASE_URL`. Login, perfil, refresh y logout se dirigen al IdP;
+las consultas `/analytics/*` siguen utilizando el backend de Analítica.
 
 El tablero de Login muestra el último corte del resumen de autenticación.
 Los totales y el gráfico usan eventos agregados por departamento.
@@ -141,7 +145,13 @@ Primero comprobar el backend:
 
 ```bash
 curl --fail http://localhost:8000/health
-curl --fail -H "Authorization: Bearer <access-token>" http://localhost:8000/auth/session
+curl --fail -H "Authorization: Bearer <access-token>" http://localhost:8000/analytics/reclamos
+```
+
+Comprobar el perfil de sesión por separado en Login/LDAP:
+
+```bash
+curl --fail -H "Authorization: Bearer <access-token>" https://api.citypass-login.pp.ua/me
 ```
 
 Luego iniciar el frontend:

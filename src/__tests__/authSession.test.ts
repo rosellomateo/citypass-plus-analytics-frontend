@@ -1,23 +1,23 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { canAccessArea, getDefaultAuthorizedPath } from '../auth/authorization';
-import { authenticatePresentationTeam, authenticateWithIdp, clearTokenPair, getAuthSnapshot } from '../auth/session';
+import { authenticatePresentationTeam, authenticateWithIdp, clearTokenPair, getAuthSnapshot, logout } from '../auth/session';
 
 const idp = 'https://api.citypass-login.pp.ua/auth/login';
 const api = 'https://analytics.citypass.local';
 
-function signInResponse() {
-  return { ok: true, json: async () => ({ access_token: 'access-from-idp', refresh_token: 'refresh-from-idp' }) };
+function signInResponse(overrides: Record<string, unknown> = {}) {
+  return { ok: true, json: async () => ({ access_token: 'access-from-idp', refresh_token: 'refresh-from-idp', expires_in: 900, ...overrides }) };
 }
 
-function verifiedSession(dashboards: string[]) {
+function ldapProfile(groups: string[] = ['operadores']) {
   return { ok: true, json: async () => ({
-    preferred_username: 'jperez', module: 'reclamos', groups: ['operadores'], dashboards,
-    expires_at: Date.now() / 1000 + 900,
+    uid: 'jperez', cn: 'Juan Pérez', mail: 'jperez@example.test', module: 'reclamos', groups,
   }) };
 }
 
 afterEach(() => {
   clearTokenPair();
+  vi.useRealTimers();
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
 });
@@ -38,10 +38,10 @@ describe('CityPass session', () => {
     await expect(authenticatePresentationTeam('claims')).resolves.toBe('unconfigured');
   });
 
-  it('sends the selected client to Login and trusts only dashboards returned by Analytics', async () => {
+  it('sends the selected client to Login and obtains the profile from LDAP /me, never Analytics', async () => {
     vi.stubEnv('VITE_DATA_SOURCE', 'api');
     vi.stubEnv('VITE_API_BASE_URL', api);
-    const fetchMock = vi.fn().mockResolvedValueOnce(signInResponse()).mockResolvedValueOnce(verifiedSession(['claims']));
+    const fetchMock = vi.fn().mockResolvedValueOnce(signInResponse()).mockResolvedValueOnce(ldapProfile());
     vi.stubGlobal('fetch', fetchMock);
 
     await expect(authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web')).resolves.toBe('success');
@@ -49,18 +49,20 @@ describe('CityPass session', () => {
       method: 'POST',
       body: JSON.stringify({ username: 'jperez', password: 'correcta', clientId: 'citypass-reclamos-web' }),
     }));
-    expect(fetchMock).toHaveBeenNthCalledWith(2, api + '/auth/session', expect.objectContaining({
+    expect(fetchMock).toHaveBeenNthCalledWith(2, 'https://api.citypass-login.pp.ua/me', expect.objectContaining({
       headers: { Accept: 'application/json', Authorization: 'Bearer access-from-idp' },
+      cache: 'no-store',
     }));
     const session = getAuthSnapshot();
     expect(session.status).toBe('authenticated');
     if (session.status !== 'authenticated') throw new Error('Expected verified session');
+    expect(session.claims).toEqual({ preferred_username: 'jperez', module: 'reclamos', groups: ['operadores'] });
     expect(getDefaultAuthorizedPath(session.dashboards)).toBe('/analytics/claims');
     expect(canAccessArea(session.dashboards, 'overview')).toBe(false);
     expect(canAccessArea(session.dashboards, 'login')).toBe(false);
   });
 
-  it('keeps protected content inaccessible until Analytics accepts the token', async () => {
+  it('keeps protected content inaccessible until LDAP accepts the token', async () => {
     vi.stubEnv('VITE_DATA_SOURCE', 'api');
     vi.stubEnv('VITE_API_BASE_URL', api);
     let resolveVerification!: (response: { ok: boolean; status: number }) => void;
@@ -79,9 +81,100 @@ describe('CityPass session', () => {
   it('leaves a verified account with no dashboards without access to portal routes', async () => {
     vi.stubEnv('VITE_DATA_SOURCE', 'api');
     vi.stubEnv('VITE_API_BASE_URL', api);
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(signInResponse()).mockResolvedValueOnce(verifiedSession([])));
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(signInResponse()).mockResolvedValueOnce(ldapProfile([])));
     await expect(authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web')).resolves.toBe('success');
     expect(getAuthSnapshot()).toMatchObject({ status: 'authenticated', dashboards: [] });
     expect(getDefaultAuthorizedPath([])).toBeUndefined();
+  });
+
+  it('uses a configurable LDAP base URL independently from Analytics and the login endpoint', async () => {
+    vi.stubEnv('VITE_API_BASE_URL', '');
+    vi.stubEnv('VITE_IDP_BASE_URL', 'https://ldap.example.test/');
+    vi.stubEnv('VITE_AUTH_LOGIN_ENDPOINT', 'https://ldap.example.test/custom-login');
+    const fetchMock = vi.fn().mockResolvedValueOnce(signInResponse()).mockResolvedValueOnce(ldapProfile());
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web')).resolves.toBe('success');
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      'https://ldap.example.test/custom-login', 'https://ldap.example.test/me',
+    ]);
+  });
+
+  it.each([undefined, '900', 0, -1, NaN, Infinity])('rejects an invalid expires_in (%s)', async (expiry) => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(signInResponse({ expires_in: expiry }));
+    vi.stubGlobal('fetch', fetchMock);
+    await expect(authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web')).resolves.toBe('invalid-token');
+    expect(getAuthSnapshot().status).toBe('anonymous');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('ignores unexpected dashboards in /me and uses only the configured module and group rules', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(signInResponse()).mockResolvedValueOnce({
+      ok: true, json: async () => ({ uid: 'jperez', module: 'reclamos', groups: [], dashboards: ['overview', 'login'] }),
+    }));
+    await expect(authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web')).resolves.toBe('success');
+    expect(getAuthSnapshot()).toMatchObject({ status: 'authenticated', dashboards: [] });
+  });
+
+  it.each([
+    null,
+    { uid: 'jperez', module: 'reclamos' },
+    { uid: 'jperez', module: 'reclamos', groups: 'admin' },
+    { uid: '', module: 'reclamos', groups: ['operadores'] },
+    { uid: 'jperez', groups: ['operadores'] },
+  ])('rejects a malformed LDAP profile (%j)', async (profile) => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(signInResponse())
+      .mockResolvedValueOnce({ ok: true, json: async () => profile }));
+    await expect(authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web')).resolves.toBe('invalid-token');
+    expect(getAuthSnapshot().status).toBe('anonymous');
+  });
+
+  it.each([[401, 'invalid-token'], [403, 'invalid-token'], [503, 'unavailable']] as const)(
+    'does not establish a session when /me returns %s', async (status, result) => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(signInResponse()).mockResolvedValueOnce({ ok: false, status }));
+      await expect(authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web')).resolves.toBe(result);
+      expect(getAuthSnapshot().status).toBe('anonymous');
+    },
+  );
+
+  it('does not restore a session if logout completes while /me is pending', async () => {
+    let resolveProfile!: (response: ReturnType<typeof ldapProfile>) => void;
+    const profile = new Promise<ReturnType<typeof ldapProfile>>((resolve) => { resolveProfile = resolve; });
+    const fetchMock = vi.fn().mockResolvedValueOnce(signInResponse()).mockReturnValueOnce(profile);
+    vi.stubGlobal('fetch', fetchMock);
+    const login = authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web');
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    await logout();
+    resolveProfile(ldapProfile());
+    await expect(login).resolves.toBe('invalid-token');
+    expect(getAuthSnapshot().status).toBe('anonymous');
+  });
+
+  it('refreshes before expires_in elapses and uses the rotated refresh token on logout', async () => {
+    vi.useFakeTimers();
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(signInResponse())
+      .mockResolvedValueOnce(ldapProfile())
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ access_token: 'new-access', refresh_token: 'new-refresh', expires_in: 900 }) })
+      .mockResolvedValueOnce(ldapProfile())
+      .mockResolvedValueOnce({ ok: true });
+    vi.stubGlobal('fetch', fetchMock);
+    await authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web');
+
+    await vi.advanceTimersByTimeAsync(779_999);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(fetchMock).toHaveBeenNthCalledWith(3, 'https://api.citypass-login.pp.ua/auth/refresh', expect.objectContaining({
+      body: JSON.stringify({ refreshToken: 'refresh-from-idp' }),
+    }));
+    expect(fetchMock).toHaveBeenNthCalledWith(4, 'https://api.citypass-login.pp.ua/me', expect.objectContaining({
+      headers: { Accept: 'application/json', Authorization: 'Bearer new-access' },
+    }));
+    expect(getAuthSnapshot()).toMatchObject({ status: 'authenticated', token: 'new-access' });
+
+    await logout();
+    expect(fetchMock).toHaveBeenLastCalledWith('https://api.citypass-login.pp.ua/auth/logout', expect.objectContaining({
+      body: JSON.stringify({ refreshToken: 'new-refresh' }),
+    }));
   });
 });
