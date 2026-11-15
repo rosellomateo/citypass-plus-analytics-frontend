@@ -14,10 +14,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Activar esta variable del repositorio cuando el equipo entregue build:embed.
   embed:
     name: Validate embedded package
-    if: vars.EMBED_BUILD_ENABLED == 'true'
     needs: quality
     uses: ./.github/workflows/build-embed.yml
 

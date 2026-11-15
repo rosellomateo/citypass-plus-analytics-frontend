@@ -17,7 +17,7 @@ import { getWasteAnalyticsData as getMockWasteAnalyticsData } from '../services/
 import type { DashboardFilters } from '../types';
 
 export async function getClaimsAnalyticsData(filters: DashboardFilters) {
-  if (getDataSource() === 'api') {
+  if (getDataSource() !== 'mock') {
     return getApiClaimsAnalyticsData(filters);
   }
 
@@ -26,25 +26,25 @@ export async function getClaimsAnalyticsData(filters: DashboardFilters) {
 }
 
 export function getEmergencyAnalyticsData(filters: DashboardFilters) {
-  return getDataSource() === 'api'
+  return getDataSource() !== 'mock'
     ? getApiEmergencyAnalyticsData(filters)
     : getMockEmergencyAnalyticsData(filters);
 }
 
 export function getMobilityAnalyticsData(filters: DashboardFilters) {
-  return getDataSource() === 'api'
+  return getDataSource() !== 'mock'
     ? getApiMobilityAnalyticsData(filters)
     : getMockMobilityAnalyticsData(filters);
 }
 
 export function getCultureAnalyticsData(filters: DashboardFilters) {
-  return getDataSource() === 'api'
+  return getDataSource() !== 'mock'
     ? getApiCultureAnalyticsData(filters)
     : getMockCultureAnalyticsData(filters);
 }
 
 export async function getWasteAnalyticsData(filters: DashboardFilters) {
-  if (getDataSource() === 'api') {
+  if (getDataSource() !== 'mock') {
     return getApiWasteAnalyticsData(filters);
   }
 

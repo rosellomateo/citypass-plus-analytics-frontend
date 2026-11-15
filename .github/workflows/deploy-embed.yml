@@ -18,9 +18,10 @@ concurrency:
 # - Environment de GitHub: embed.
 # - Variables: AZURE_STORAGE_ACCOUNT y AZURE_STORAGE_CONTAINER (default plantillas).
 # - Secretos: AZURE_CLIENT_ID, AZURE_TENANT_ID y AZURE_SUBSCRIPTION_ID.
-# - OIDC subject: repo:rosellomateo/citypass-plus-analytics-frontend:environment:embed
+# - OIDC subject de este repositorio (con IDs inmutables):
+#   repo:rosellomateo@104503379/citypass-plus-analytics-frontend@1334548695:environment:embed
 # - Rol de la identidad: Storage Blob Data Contributor sobre el contenedor.
-# - Activar EMBED_BUILD_ENABLED=true a nivel de repositorio cuando exista build:embed.
+# - Activar EMBED_BUILD_ENABLED=true a nivel de repositorio para permitir la publicación.
 jobs:
   quality:
     name: Lint and unit tests
@@ -154,6 +155,7 @@ jobs:
             echo "- Container: $AZURE_STORAGE_CONTAINER (private)"
             echo "- Template blob: $prefix/embed.html"
             echo "- Manifest: $prefix/manifest.json"
+            echo "- Backend setting: EMBED_RELEASE_SHA=$GITHUB_SHA"
             echo '- Remote contents verified. Configure the backend to load this version.'
           } >> "$GITHUB_STEP_SUMMARY"
 
