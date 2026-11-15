@@ -1,14 +1,35 @@
 import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
-import { BarChart3, Eye, EyeOff, LogIn } from 'lucide-react';
+import {
+  ArrowRight, BarChart3, Bike, CircleAlert, Eye, EyeOff, KeyRound,
+  Landmark, MessageSquare, Network, Trees, Trash2,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { authenticatePresentationTeam, authenticateWithIdp, getAuthSnapshot } from '../auth/session';
+import { authenticatePresentationTeam, authenticateWithIdp, getAuthSnapshot, getPresentationUsernames } from '../auth/session';
 import type { LoginResult } from '../auth/session';
 import { getDefaultAuthorizedPath, LOGIN_TEAMS } from '../auth/authorization';
 import { isLocalPreview } from '../config/localPreview';
+import { useAsync } from '../hooks/useAsync';
 import styles from './LoginPage.module.css';
 
-const GENERIC_LOGIN_ERROR = 'No pudimos iniciar sesión. Revisá tus datos e intentá nuevamente.';
+const LOGIN_ERRORS = {
+  rejected: 'No pudimos iniciar sesión. Revisá tus datos e intentá nuevamente.',
+  unavailable: 'El servicio de acceso no está disponible. Intentá nuevamente.',
+  'invalid-token': 'No pudimos validar tu acceso para este portal.',
+  unconfigured: 'La sesión local de este equipo no está disponible.',
+};
+
+const TEAM_ICONS = {
+  overview: BarChart3,
+  eda: Network,
+  login: KeyRound,
+  emergencies: CircleAlert,
+  culture: Trees,
+  mobility: Bike,
+  claims: MessageSquare,
+  waste: Trash2,
+};
+
 const isPresentation = isLocalPreview();
 
 export function LoginPage() {
@@ -17,10 +38,11 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [team, setTeam] = useState<string>('overview');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string>();
+  const [error, setError] = useState<{ source: string; message: string }>();
   const [pending, setPending] = useState<string>();
   const submitting = useRef(false);
   const isSubmitting = pending !== undefined;
+  const { data: presentationUsernames } = useAsync(getPresentationUsernames, []);
 
   async function signIn(source: string, request: () => Promise<LoginResult>) {
     if (submitting.current) return;
@@ -33,10 +55,7 @@ export function LoginPage() {
     setPending(undefined);
 
     if (result !== 'success') {
-      if (result === 'unavailable') setError('El servicio de acceso no está disponible. Intentá nuevamente.');
-      else if (result === 'invalid-token') setError('No pudimos validar tu acceso para este portal.');
-      else if (result === 'unconfigured') setError('La sesión local de este equipo no está disponible.');
-      else setError(GENERIC_LOGIN_ERROR);
+      setError({ source, message: LOGIN_ERRORS[result] });
       return;
     }
 
@@ -54,80 +73,109 @@ export function LoginPage() {
 
   return (
     <main className={styles.page}>
-      <section className={`${styles.card} ${isPresentation ? styles.presentationCard : ''}`} aria-labelledby="login-title">
-        <header className={styles.brandHeader}>
-          <div className={styles.brandLine}><BarChart3 aria-hidden="true" size={28} /><span>CityPass<span>+</span></span></div>
-          <p>Analítica Urbana</p>
-        </header>
+      <div className={styles.stack}>
+        <section className={styles.card} aria-labelledby="login-title">
+          <header className={styles.brandHeader}>
+            <div className={styles.brandIcon}><BarChart3 aria-hidden="true" size={23} /></div>
+            <div className={styles.brandLine}>CityPass<span>+</span></div>
+            <h1 id="login-title">Bienvenido</h1>
+            <p>Acceso al portal de Analítica Urbana.</p>
+          </header>
 
-        <form className={styles.form} onSubmit={handleSubmit} noValidate>
-          <h1 id="login-title" className={styles.srOnly}>Ingresar a Analítica Urbana</h1>
-
-          <label htmlFor="team">Equipo</label>
-          <select id="team" value={team} disabled={isSubmitting} onChange={(event) => setTeam(event.target.value)}>
-            {LOGIN_TEAMS.map(({ area, label }) => <option key={area} value={area}>{label}</option>)}
-          </select>
-
-          <label htmlFor="username">Usuario <span aria-hidden="true">*</span></label>
-          <input
-            id="username"
-            name="username"
-            autoComplete="username"
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
-            disabled={isSubmitting}
-            required
-          />
-
-          <label htmlFor="password">Contraseña <span aria-hidden="true">*</span></label>
-          <div className={styles.passwordField}>
-            <input
-              id="password"
-              name="password"
-              type={showPassword ? 'text' : 'password'}
-              autoComplete="current-password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              disabled={isSubmitting}
-              required
-            />
-            <button
-              type="button"
-              className={styles.passwordToggle}
-              onClick={() => setShowPassword((visible) => !visible)}
-              aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-            >
-              {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
-            </button>
+          <div className={styles.accessType}>
+            <Landmark size={18} aria-hidden="true" />
+            Personal municipal (LDAP)
           </div>
 
-          {error && <p className={styles.error} role="alert">{error}</p>}
+          <form className={styles.form} onSubmit={handleSubmit} noValidate>
+            <div className={styles.field}>
+              <label htmlFor="team">Equipo</label>
+              <select id="team" value={team} disabled={isSubmitting} onChange={(event) => setTeam(event.target.value)}>
+                {LOGIN_TEAMS.map(({ area, label }) => <option key={area} value={area}>{label}</option>)}
+              </select>
+            </div>
 
-          <button className={styles.submit} type="submit" disabled={isSubmitting || !username.trim() || !password}>
-            <LogIn size={16} />
-            {pending === 'manual' ? 'Verificando acceso…' : 'Ingresar'}
-          </button>
-        </form>
-        {isPresentation && <section className={styles.teamSection} aria-labelledby="quick-sign-in">
-          <h2 id="quick-sign-in">Accesos de presentación</h2>
-          <div className={styles.teamGrid}>
-            {LOGIN_TEAMS.map(({ area, label }) => (
-              <button
-                key={area}
-                type="button"
+            <div className={styles.field}>
+              <label htmlFor="username">Usuario</label>
+              <input
+                id="username"
+                name="username"
+                autoComplete="username"
+                placeholder="Tu usuario"
+                value={username}
+                onChange={(event) => setUsername(event.target.value)}
                 disabled={isSubmitting}
-                onClick={() => {
-                  setTeam(area);
-                  void signIn(area, () => authenticatePresentationTeam(area));
-                }}
-              >
-                {pending === area ? 'Verificando…' : label}
-              </button>
-            ))}
-          </div>
-        </section>}
-        <p className={styles.notice}>Tu acceso se determina por los grupos asignados en CityPass+.</p>
-      </section>
+                required
+              />
+            </div>
+
+            <div className={styles.field}>
+              <label htmlFor="password">Contraseña</label>
+              <div className={styles.passwordField}>
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  placeholder="Tu contraseña"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  disabled={isSubmitting}
+                  required
+                />
+                <button
+                  type="button"
+                  className={styles.passwordToggle}
+                  onClick={() => setShowPassword((visible) => !visible)}
+                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  disabled={isSubmitting}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            {error?.source === 'manual' && <p className={styles.error} role="alert">{error.message}</p>}
+
+            <button className={styles.submit} type="submit" disabled={isSubmitting || !username.trim() || !password}>
+              {pending === 'manual' ? 'Verificando acceso…' : 'Iniciar sesión'}
+              <ArrowRight size={21} aria-hidden="true" />
+            </button>
+          </form>
+          <p className={styles.notice}>Tu equipo determina qué tableros podés ver.</p>
+        </section>
+
+        {isPresentation && (
+          <section className={styles.teamSection} aria-labelledby="quick-sign-in">
+            <h2 id="quick-sign-in">Demo · Entrar sin contraseña</h2>
+            <div className={styles.teamGrid}>
+              {LOGIN_TEAMS.map(({ area, label }) => {
+                const Icon = TEAM_ICONS[area];
+                const account = presentationUsernames?.[area];
+                return (
+                  <button
+                    key={area}
+                    type="button"
+                    className={styles.quickAccess}
+                    disabled={isSubmitting}
+                    onClick={() => {
+                      setTeam(area);
+                      void signIn(area, () => authenticatePresentationTeam(area));
+                    }}
+                  >
+                    <Icon size={18} aria-hidden="true" />
+                    <span>
+                      <strong>{pending === area ? 'Verificando…' : label}</strong>
+                      {account && <span className={styles.account}>{account}</span>}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            {error && error.source !== 'manual' && <p className={styles.error} role="alert">{error.message}</p>}
+          </section>
+        )}
+      </div>
     </main>
   );
 }
