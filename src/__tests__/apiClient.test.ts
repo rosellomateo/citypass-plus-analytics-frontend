@@ -28,13 +28,12 @@ afterEach(() => {
 });
 
 function tokenResponse(access: string, refresh: string) {
-  return { ok: true, json: async () => ({ access_token: access, refresh_token: refresh }) };
+  return { ok: true, json: async () => ({ access_token: access, refresh_token: refresh, expires_in: 900 }) };
 }
 
 function verificationResponse() {
   return { ok: true, json: async () => ({
-    preferred_username: 'jperez', module: 'reclamos', groups: ['operadores'],
-    dashboards: ['claims'], expires_at: Date.now() / 1000 + 900,
+    uid: 'jperez', module: 'reclamos', groups: ['operadores'],
   }) };
 }
 
@@ -116,7 +115,7 @@ describe('API client', () => {
     expect(fetchMock.mock.calls.slice(2).map(([url]) => url)).toEqual([
       'http://localhost:8000/analytics/reclamos',
       'https://api.citypass-login.pp.ua/auth/refresh',
-      'http://localhost:8000/auth/session',
+      'https://api.citypass-login.pp.ua/me',
       'http://localhost:8000/analytics/reclamos',
     ]);
     expect(fetchMock.mock.calls[3][1]).toMatchObject({ body: JSON.stringify({ refreshToken: 'old-refresh' }) });

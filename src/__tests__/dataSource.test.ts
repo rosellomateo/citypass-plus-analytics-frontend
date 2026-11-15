@@ -68,13 +68,12 @@ describe('data source selection', () => {
       vi.fn()
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({ access_token: 'access-token', refresh_token: 'refresh-token' }),
+          json: async () => ({ access_token: 'access-token', refresh_token: 'refresh-token', expires_in: 900 }),
         })
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
-            preferred_username: 'jperez', module: 'reclamos', groups: ['operadores'],
-            dashboards: ['claims'], expires_at: Date.now() / 1000 + 900,
+            uid: 'jperez', module: 'reclamos', groups: ['operadores'],
           }),
         })
         .mockResolvedValue({

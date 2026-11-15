@@ -1,4 +1,5 @@
 import { isLocalPreview } from '../config/localPreview';
+import { getDashboardsForProfile } from './authorization';
 
 export interface CityPassClaims {
   preferred_username: string;
@@ -6,10 +7,17 @@ export interface CityPassClaims {
   groups: string[];
 }
 
-export interface TokenPair { accessToken: string; refreshToken: string; }
-export type LoginResult = 'success' | 'rejected' | 'invalid-token' | 'unavailable' | 'unconfigured';
+export interface TokenPair { accessToken: string; refreshToken: string; expiresAt: number; }
+export type LoginResult = 'success' | 'rejected' | 'invalid-token' | 'unavailable' | 'profile-unavailable' | 'unconfigured';
 
-type Authenticated = { status: 'authenticated'; token: string; claims: CityPassClaims; dashboards: string[]; version: number };
+type Authenticated = {
+  status: 'authenticated';
+  token: string;
+  claims: CityPassClaims;
+  dashboards: string[];
+  initialDashboard?: string;
+  version: number;
+};
 export type AuthSnapshot =
   | { status: 'anonymous' }
   | { status: 'verifying' }
@@ -54,12 +62,6 @@ function getIdpBaseUrl(): string {
   return (import.meta.env.VITE_IDP_BASE_URL?.trim() || IDP_URL).replace(/\/$/, '');
 }
 
-function getVerificationUrl(): string {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL?.trim() || (import.meta.env.DEV ? 'http://localhost:8000' : '');
-  if (!baseUrl) throw new Error('Falta configurar VITE_API_BASE_URL.');
-  return `${baseUrl.replace(/\/$/, '')}/auth/session`;
-}
-
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === 'string' && item.length > 0);
 }
@@ -67,39 +69,56 @@ function isStringArray(value: unknown): value is string[] {
 async function readTokenPair(response: Response): Promise<TokenPair | undefined> {
   const body: unknown = await response.json();
   if (!body || typeof body !== 'object') return undefined;
-  const { access_token, refresh_token } = body as Record<string, unknown>;
-  if (typeof access_token !== 'string' || !access_token || typeof refresh_token !== 'string' || !refresh_token) {
+  const { access_token, refresh_token, expires_in } = body as Record<string, unknown>;
+  if (typeof access_token !== 'string' || !access_token || typeof refresh_token !== 'string' || !refresh_token ||
+      typeof expires_in !== 'number' || !Number.isSafeInteger(expires_in) || expires_in <= 0) {
     return undefined;
   }
-  return { accessToken: access_token, refreshToken: refresh_token };
+  const expiresAt = Date.now() + expires_in * 1000;
+  if (!Number.isSafeInteger(expiresAt)) return undefined;
+  return { accessToken: access_token, refreshToken: refresh_token, expiresAt };
 }
 
 async function confirmToken(pair: TokenPair, version: number): Promise<LoginResult> {
-  const response = await fetch(getVerificationUrl(), {
-    headers: { Accept: 'application/json', Authorization: `Bearer ${pair.accessToken}` },
-    signal: AbortSignal.timeout(10_000),
-  });
-  if (!response.ok) return response.status >= 500 ? 'unavailable' : 'invalid-token';
-  const body: unknown = await response.json();
-  if (!body || typeof body !== 'object') return 'invalid-token';
-  const { preferred_username, module, groups, dashboards, expires_at } = body as Record<string, unknown>;
-  if (typeof preferred_username !== 'string' || typeof module !== 'string' ||
-      !isStringArray(groups) || !isStringArray(dashboards) ||
-      typeof expires_at !== 'number' || !Number.isFinite(expires_at) || expires_at <= Date.now() / 1000 ||
-      version !== sessionVersion) {
+  let body: unknown;
+  try {
+    const response = await fetch(`${getIdpBaseUrl()}/me`, {
+      method: 'GET',
+      headers: { Accept: 'application/json', Authorization: `Bearer ${pair.accessToken}` },
+      cache: 'no-store',
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (response.status === 401 || response.status === 403) return 'invalid-token';
+    if (!response.ok) return 'profile-unavailable';
+    body = await response.json();
+  } catch {
+    return 'profile-unavailable';
+  }
+  if (!body || typeof body !== 'object') return 'profile-unavailable';
+  const profile = body as Record<string, unknown>;
+  const preferred_username = profile.uid ?? profile.preferred_username;
+  const { module, groups } = profile;
+  if (typeof preferred_username !== 'string' || !preferred_username.trim() ||
+      typeof module !== 'string' || !module || !isStringArray(groups)) {
+    return 'profile-unavailable';
+  }
+  if (pair.expiresAt <= Date.now() || version !== sessionVersion) {
     return 'invalid-token';
   }
 
   tokenPair = pair;
   clearTimeout(refreshTimer);
-  const remainingMs = expires_at * 1000 - Date.now();
+  const remainingMs = pair.expiresAt - Date.now();
   const delay = Math.max(remainingMs - 120_000, remainingMs / 2);
   refreshTimer = setTimeout(() => { void refreshTokenPair(); }, Math.max(1_000, delay));
+  const dashboards = getDashboardsForProfile(module, groups);
+  const initialDashboard = dashboards.find((area) => area === profile.initial_dashboard);
   publish({
     status: 'authenticated',
     token: pair.accessToken,
     claims: { preferred_username, module, groups },
     dashboards,
+    initialDashboard,
     version,
   });
   return 'success';
