@@ -119,17 +119,32 @@ export function authenticateWithIdp(username: string, password: string, clientId
   return openSession(() => postJson(endpoint, { username, password, clientId }));
 }
 
+async function readPresentationProfiles(): Promise<Record<string, unknown> | undefined> {
+  if (!isLocalPreview()) return undefined;
+  const response = await fetch('/__presentation/sessions.json', { cache: 'no-store' });
+  if (!response.ok) return undefined;
+  const records: unknown = await response.json();
+  return records && typeof records === 'object' && !Array.isArray(records)
+    ? records as Record<string, unknown>
+    : undefined;
+}
+
+export async function getPresentationUsernames(): Promise<Record<string, string>> {
+  const records = await readPresentationProfiles();
+  return Object.fromEntries(Object.entries(records ?? {}).flatMap(([area, profile]) =>
+    profile && typeof profile === 'object' && 'preferred_username' in profile &&
+    typeof profile.preferred_username === 'string' ? [[area, profile.preferred_username]] : [],
+  ));
+}
+
 export async function authenticatePresentationTeam(area: string): Promise<LoginResult> {
   if (!isLocalPreview()) return 'unconfigured';
   clearTokenPair();
   const version = sessionVersion;
   publish({ status: 'verifying' });
   try {
-    const response = await fetch('/__presentation/sessions.json', { cache: 'no-store' });
-    if (!response.ok) return 'unconfigured';
-    const records: unknown = await response.json();
-    if (!records || typeof records !== 'object') return 'unconfigured';
-    const profile = (records as Record<string, unknown>)[area];
+    const records = await readPresentationProfiles();
+    const profile = records?.[area];
     if (!profile || typeof profile !== 'object') return 'unconfigured';
     const { token, preferred_username, module, groups, dashboards } = profile as Record<string, unknown>;
     if (typeof token !== 'string' || !token.startsWith('local-demo:') ||
