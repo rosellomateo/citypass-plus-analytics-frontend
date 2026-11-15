@@ -1,4 +1,6 @@
 import { analyticsApi } from '../api/analyticsApi';
+import { embeddedApi } from '../api/embeddedApi';
+import { getDataSource } from './dataSource';
 import type {
   ClaimApiRecord,
   CultureApiRecord,
@@ -24,6 +26,11 @@ import { isWithinDateRange } from '../utils/dates';
 export type ClaimsDataSourceData = ClaimsAnalyticsData & {
   records: BackendAnalyticsRecord[];
 };
+
+function getAnalyticsApi(): Pick<typeof analyticsApi,
+  'getClaims' | 'getEmergencies' | 'getMobility' | 'getCulture' | 'getWaste'> {
+  return getDataSource() === 'embedded' ? embeddedApi : analyticsApi;
+}
 
 function numberOrZero(value: number | null): number {
   return value ?? 0;
@@ -70,7 +77,7 @@ function mapClaimRecord(row: ClaimApiRecord): BackendAnalyticsRecord {
 export async function getApiClaimsAnalyticsData(
   filters: DashboardFilters
 ): Promise<ClaimsDataSourceData> {
-  const respuesta = await analyticsApi.getClaims();
+  const respuesta = await getAnalyticsApi().getClaims();
 
   const records = respuesta.datos.map(mapClaimRecord);
   const analytics = await calculateClaimsAnalyticsData(filters, records);
@@ -153,7 +160,7 @@ export function mapEmergencyApiData(
 export async function getApiEmergencyAnalyticsData(
   filters: DashboardFilters
 ): Promise<EmergencyAnalyticsData> {
-  const respuesta = await analyticsApi.getEmergencies();
+  const respuesta = await getAnalyticsApi().getEmergencies();
   const analytics = mapEmergencyApiData(respuesta.datos, filters);
 
   return {
@@ -191,7 +198,7 @@ export async function mapMobilityApiData(
 export async function getApiMobilityAnalyticsData(
   filters: DashboardFilters
 ): Promise<MobilityAnalyticsData> {
-  const respuesta = await analyticsApi.getMobility();
+  const respuesta = await getAnalyticsApi().getMobility();
   const analytics = await mapMobilityApiData(respuesta.datos, filters);
 
   return {
@@ -262,7 +269,7 @@ export function mapCultureApiData(
 export async function getApiCultureAnalyticsData(
   filters: DashboardFilters
 ): Promise<CultureAnalyticsData> {
-  const respuesta = await analyticsApi.getCulture();
+  const respuesta = await getAnalyticsApi().getCulture();
   const analytics = mapCultureApiData(respuesta.datos, filters);
 
   return {
@@ -391,7 +398,7 @@ export function mapWasteApiData(
 export async function getApiWasteAnalyticsData(
   filters: DashboardFilters
 ): Promise<WasteAlertMetrics> {
-  const respuesta = await analyticsApi.getWaste();
+  const respuesta = await getAnalyticsApi().getWaste();
   const analytics = mapWasteApiData(respuesta.datos, filters);
 
   return {

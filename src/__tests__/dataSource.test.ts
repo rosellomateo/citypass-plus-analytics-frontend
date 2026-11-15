@@ -36,7 +36,7 @@ afterEach(() => {
 });
 
 describe('data source selection', () => {
-  it.each(['api', 'mock'] as const)('selects %s explicitly', (source) => {
+  it.each(['api', 'mock', 'embedded'] as const)('selects %s explicitly', (source) => {
     vi.stubEnv('VITE_DATA_SOURCE', source);
     expect(getDataSource()).toBe(source);
   });
@@ -44,7 +44,7 @@ describe('data source selection', () => {
   it('rejects a missing or unsupported value', () => {
     vi.stubEnv('VITE_DATA_SOURCE', 'auto');
     expect(() => getDataSource()).toThrow(
-      'VITE_DATA_SOURCE debe configurarse como "api" o "mock".'
+      'VITE_DATA_SOURCE debe configurarse como "api", "mock" o "embedded".'
     );
   });
 
