@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import { MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
+import './fonts.css';
 import './index.css';
 import { router } from './router/routes';
 import { theme } from './theme/mantineTheme';

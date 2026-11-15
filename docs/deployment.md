@@ -9,6 +9,11 @@
 | `.github/workflows/cd.yml` | Tag `v*.*.*` | Publica una imagen versionada en GitHub Container Registry. |
 | `.github/workflows/deploy-frontend-storage.yml` | Tag `frontend-test-v*` | Compila `dist/` y lo sube al sitio estático de Azure Storage. |
 | `.github/workflows/deploy-production.yml` | Push a `main` o ejecución manual | Valida, construye la imagen en modo API, la publica en GHCR y la despliega en el Web App productivo. |
+| `.github/workflows/deploy-embed.yml` | Tag `embed-v*` o ejecución manual desde `main` | Construye, prueba y publica el HTML autocontenido en el contenedor privado `plantillas`. |
+
+El empaquetado embed y la variable del backend `EMBED_RELEASE_SHA` se explican
+en [embed-deployment.md](embed-deployment.md). Este flujo es independiente del
+contenedor que sirve la web con login.
 
 La imagen de test se publica como:
 
