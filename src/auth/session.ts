@@ -1,4 +1,5 @@
 import { isLocalPreview } from '../config/localPreview';
+import { getApiBaseUrl } from '../api/config';
 
 export interface CityPassClaims {
   preferred_username: string;
@@ -7,9 +8,16 @@ export interface CityPassClaims {
 }
 
 export interface TokenPair { accessToken: string; refreshToken: string; }
-export type LoginResult = 'success' | 'rejected' | 'invalid-token' | 'unavailable' | 'unconfigured';
+export type LoginResult = 'success' | 'rejected' | 'invalid-token' | 'unavailable' | 'analytics-unavailable' | 'unconfigured';
 
-type Authenticated = { status: 'authenticated'; token: string; claims: CityPassClaims; dashboards: string[]; version: number };
+type Authenticated = {
+  status: 'authenticated';
+  token: string;
+  claims: CityPassClaims;
+  dashboards: string[];
+  initialDashboard?: string;
+  version: number;
+};
 export type AuthSnapshot =
   | { status: 'anonymous' }
   | { status: 'verifying' }
@@ -54,12 +62,6 @@ function getIdpBaseUrl(): string {
   return (import.meta.env.VITE_IDP_BASE_URL?.trim() || IDP_URL).replace(/\/$/, '');
 }
 
-function getVerificationUrl(): string {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL?.trim() || (import.meta.env.DEV ? 'http://localhost:8000' : '');
-  if (!baseUrl) throw new Error('Falta configurar VITE_API_BASE_URL.');
-  return `${baseUrl.replace(/\/$/, '')}/auth/session`;
-}
-
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === 'string' && item.length > 0);
 }
@@ -75,18 +77,30 @@ async function readTokenPair(response: Response): Promise<TokenPair | undefined>
 }
 
 async function confirmToken(pair: TokenPair, version: number): Promise<LoginResult> {
-  const response = await fetch(getVerificationUrl(), {
-    headers: { Accept: 'application/json', Authorization: `Bearer ${pair.accessToken}` },
-    signal: AbortSignal.timeout(10_000),
-  });
-  if (!response.ok) return response.status >= 500 ? 'unavailable' : 'invalid-token';
-  const body: unknown = await response.json();
-  if (!body || typeof body !== 'object') return 'invalid-token';
-  const { preferred_username, module, groups, dashboards, expires_at } = body as Record<string, unknown>;
+  let body: unknown;
+  try {
+    const response = await fetch(`${getApiBaseUrl()}/auth/session`, {
+      method: 'GET',
+      headers: { Accept: 'application/json', Authorization: `Bearer ${pair.accessToken}` },
+      cache: 'no-store',
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (response.status === 401 || response.status === 403) return 'invalid-token';
+    if (!response.ok) return 'analytics-unavailable';
+    body = await response.json();
+  } catch {
+    return 'analytics-unavailable';
+  }
+  if (!body || typeof body !== 'object') return 'analytics-unavailable';
+  const { preferred_username, module, groups, dashboards, expires_at, initial_dashboard } = body as Record<string, unknown>;
   if (typeof preferred_username !== 'string' || typeof module !== 'string' ||
       !isStringArray(groups) || !isStringArray(dashboards) ||
-      typeof expires_at !== 'number' || !Number.isFinite(expires_at) || expires_at <= Date.now() / 1000 ||
-      version !== sessionVersion) {
+      typeof expires_at !== 'number' || !Number.isFinite(expires_at) ||
+      (initial_dashboard !== undefined && initial_dashboard !== null &&
+        (typeof initial_dashboard !== 'string' || !dashboards.includes(initial_dashboard)))) {
+    return 'analytics-unavailable';
+  }
+  if (expires_at <= Date.now() / 1000 || version !== sessionVersion) {
     return 'invalid-token';
   }
 
@@ -100,6 +114,7 @@ async function confirmToken(pair: TokenPair, version: number): Promise<LoginResu
     token: pair.accessToken,
     claims: { preferred_username, module, groups },
     dashboards,
+    initialDashboard: typeof initial_dashboard === 'string' ? initial_dashboard : undefined,
     version,
   });
   return 'success';

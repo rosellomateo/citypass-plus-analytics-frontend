@@ -22,6 +22,7 @@ export function canAccessArea(dashboards: readonly string[], area: ProtectedArea
   return dashboards.includes(area);
 }
 
-export function getDefaultAuthorizedPath(dashboards: readonly string[]): string | undefined {
-  return AREAS.find(({ area }) => canAccessArea(dashboards, area))?.path;
+export function getDefaultAuthorizedPath(dashboards: readonly string[], initialDashboard?: string): string | undefined {
+  const initial = AREAS.find(({ area }) => area === initialDashboard && canAccessArea(dashboards, area));
+  return initial?.path ?? AREAS.find(({ area }) => canAccessArea(dashboards, area))?.path;
 }

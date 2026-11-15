@@ -65,7 +65,10 @@ y `clientId` a `POST /auth/login` de Login Federado. El equipo seleccionado
 determina el cliente de Login. Analítica lee el módulo y los roles del token
 verificado para determinar el acceso.
 
-El frontend confirma la sesión en `GET /auth/session` del backend de Analítica.
+El frontend confirma la sesión en `GET {VITE_API_BASE_URL}/auth/session` del
+backend de Analítica, usando solo el access token en la cabecera
+`Authorization: Bearer`. Analítica devuelve `initial_dashboard` para elegir
+la pantalla inicial y `dashboards` para controlar rutas y menú.
 Las consultas usan el access token en la cabecera `Authorization: Bearer`.
 El refresh token se usa en Login para renovar y cerrar la sesión. Ambos tokens
 viven en memoria.
