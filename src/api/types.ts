@@ -1,5 +1,35 @@
 import type { AIAnalysisReport } from '../types/ai';
 
+export interface LoginEventRecord {
+  department: string | null;
+  event_type: string | null;
+  cantidadEventos: number | null;
+  fecha_snapshot: string | null;
+}
+
+export interface LoginApiResponse {
+  datos: LoginEventRecord[];
+  informe: AIAnalysisReport | null;
+}
+
+export interface CrossModuleMetric {
+  id: string;
+  etiqueta?: string | null;
+  valor: number;
+  unidad?: string | null;
+  detalle?: Array<{ etiqueta: string; valor: number }>;
+}
+
+export interface CrossModuleResponse {
+  fecha_snapshot: string | null;
+  datos: CrossModuleMetric[];
+  actualizado_en?: string | null;
+  impactos?: Array<{ caso: number | null; origen: string; emergencias: number; ultimo_vinculo: string }>;
+  eventos_publicos?: Array<{ evento_id: string; emergencias: number; ultimo_vinculo: string }> | null;
+  informe?: AIAnalysisReport | null;
+  version_cultura?: number | null;
+}
+
 export interface ClaimApiRecord {
   barrio: string | null;
   categoria: string | null;

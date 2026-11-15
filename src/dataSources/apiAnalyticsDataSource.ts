@@ -123,6 +123,11 @@ export function mapEmergencyApiData(
     values.push({ value, weight });
     dispatchByPriority.set(priority, values);
   });
+  const arrivalRows = filtered.flatMap(({ tiempoPromRespuestaLugar, cantidadEmergencias }) =>
+    tiempoPromRespuestaLugar != null && cantidadEmergencias != null && cantidadEmergencias > 0
+      ? [{ value: tiempoPromRespuestaLugar, weight: cantidadEmergencias }]
+      : [],
+  );
 
   return {
     totalEmergencies: activeCount + closedCount,
@@ -134,6 +139,7 @@ export function mapEmergencyApiData(
       count,
     })),
     avgDispatchTimeMinutes: weightedAverage(dispatchRows),
+    avgArrivalTimeMinutes: arrivalRows.length > 0 ? weightedAverage(arrivalRows) : undefined,
     avgDispatchTimeByPriority: Array.from(
       dispatchByPriority,
       ([priority, values]) => ({ priority, minutes: weightedAverage(values) })

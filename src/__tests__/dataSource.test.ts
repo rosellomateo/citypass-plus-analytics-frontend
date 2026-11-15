@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { getDataSource } from '../dataSources/dataSource';
 import { getClaimsAnalyticsData } from '../dataSources/analyticsDataSource';
+import { authenticateWithIdp, clearTokenPair } from '../auth/session';
 import {
   mapCultureApiData,
   mapEmergencyApiData,
@@ -29,6 +30,7 @@ const informeMock = {
 const filters = { dateRange: '30d' as const };
 
 afterEach(() => {
+  clearTokenPair();
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
 });
@@ -63,13 +65,21 @@ describe('data source selection', () => {
     vi.stubEnv('VITE_API_BASE_URL', 'http://localhost:8000');
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: vi.fn().mockResolvedValue({
-          informe: informeMock,
-          datos: [
-          {
+      vi.fn()
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ access_token: 'access-token', refresh_token: 'refresh-token', expires_in: 900 }),
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            uid: 'jperez', module: 'reclamos', groups: ['operadores'],
+          }),
+        })
+        .mockResolvedValue({
+          ok: true,
+          status: 200,
+          json: async () => ({ informe: informeMock, datos: [{
             barrio: 'Palermo',
             categoria: 'Alumbrado',
             prioridad: 'Alta',
@@ -78,12 +88,11 @@ describe('data source selection', () => {
             row_count: 15,
             tiempo_prom_hasta_estado_actual: 24.5,
             fecha_snapshot: new Date().toISOString(),
-          },
-          ],
-        }),
-      })
+          }] }),
+        })
     );
 
+    await authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web');
     const result = await getClaimsAnalyticsData(filters);
 
     expect(result.totalClaims).toBe(15);

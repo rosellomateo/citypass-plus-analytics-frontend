@@ -56,13 +56,15 @@ Crear en GitHub un environment llamado `production` con estos valores:
 | Variable | `AZURE_WEBAPP_NAME` | Nombre del Web App productivo del frontend. |
 | Variable | `AZURE_RESOURCE_GROUP` | Resource group que contiene el Web App productivo. |
 | Variable | `VITE_API_BASE_URL` | URL HTTPS pública del backend productivo. |
+| Variable opcional | `VITE_IDP_BASE_URL` | Base HTTPS de Login/LDAP; por defecto `https://api.citypass-login.pp.ua`. |
+| Variable opcional | `VITE_AUTH_LOGIN_ENDPOINT` | URL de login alternativa; si está vacía, se usa la base de LDAP seguida de `/auth/login`. |
 | Variable | `FRONTEND_PUBLIC_URL` | URL HTTPS pública del frontend productivo. |
 | Secreto | `GHCR_PULL_TOKEN` | PAT con `read:packages`, usado por Azure para descargar la imagen privada. |
 | Secreto | `AZURE_CLIENT_ID` | Client ID de la identidad usada por GitHub Actions. |
 | Secreto | `AZURE_TENANT_ID` | Tenant de Microsoft Entra. |
 | Secreto | `AZURE_SUBSCRIPTION_ID` | Suscripción donde existe el Web App. |
 
-El workflow comprueba que todos estén definidos antes del build y el despliegue.
+El workflow comprueba que los valores obligatorios estén definidos antes del build y el despliegue.
 Opcionalmente se pueden exigir revisores para aprobar cada despliegue mediante
 las reglas de protección del environment.
 
@@ -81,6 +83,8 @@ Para una imagen Docker, los valores deben enviarse como build args:
 build-args: |
   VITE_DATA_SOURCE=api
   VITE_API_BASE_URL=${{ vars.VITE_API_BASE_URL }}
+  VITE_IDP_BASE_URL=${{ vars.VITE_IDP_BASE_URL || 'https://api.citypass-login.pp.ua' }}
+  VITE_AUTH_LOGIN_ENDPOINT=${{ vars.VITE_AUTH_LOGIN_ENDPOINT }}
 ```
 
 ## Estado actual de los workflows
@@ -149,7 +153,8 @@ manualmente desde Actions sobre el commit actual de `main`.
 - [ ] `/health` del frontend responde `200`.
 - [ ] Ninguna variable `VITE_*` contiene secretos.
 - [ ] Los tableros muestran datos reales y no mocks.
-- [ ] Se reconoce que login y tokens todavía no están implementados.
+- [ ] Login/LDAP permite el origen del frontend y `Authorization` por CORS.
+- [ ] Login, consulta de `/me`, refresh y logout funcionan contra Login/LDAP.
 
 ## Rollback
 

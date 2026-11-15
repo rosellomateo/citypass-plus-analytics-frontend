@@ -1,0 +1,28 @@
+import { useSyncExternalStore } from 'react';
+import type { ReactNode } from 'react';
+import { Navigate } from 'react-router-dom';
+import { canAccessArea, getDefaultAuthorizedPath } from './authorization';
+import type { ProtectedArea } from './authorization';
+import { getAuthSnapshot, subscribeToAuth } from './session';
+
+function NoAccess() {
+  return <main role="alert" style={{ maxWidth: 640, margin: '5rem auto', padding: '0 1.5rem' }}>
+    <h1>Sin accesos asignados</h1>
+    <p>Tu sesión es válida, pero no pertenecés a un grupo con acceso a este panel.</p>
+    <p>Pedile a la persona delegada de tu módulo que revise tus grupos.</p>
+  </main>;
+}
+
+export function DefaultDashboardRedirect() {
+  const snapshot = useSyncExternalStore(subscribeToAuth, getAuthSnapshot, getAuthSnapshot);
+  const path = snapshot.status === 'authenticated' ? getDefaultAuthorizedPath(snapshot.dashboards, snapshot.initialDashboard) : undefined;
+  return path ? <Navigate to={path} replace /> : <NoAccess />;
+}
+
+export function RouteGuard({ area, children }: { area: ProtectedArea; children: ReactNode }) {
+  const snapshot = useSyncExternalStore(subscribeToAuth, getAuthSnapshot, getAuthSnapshot);
+  if (snapshot.status !== 'authenticated') return <Navigate to="/login" replace />;
+  if (canAccessArea(snapshot.dashboards, area)) return <>{children}</>;
+  const path = getDefaultAuthorizedPath(snapshot.dashboards, snapshot.initialDashboard);
+  return path ? <Navigate to={path} replace /> : <NoAccess />;
+}

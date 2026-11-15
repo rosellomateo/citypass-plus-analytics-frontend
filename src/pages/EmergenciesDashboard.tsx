@@ -1,3 +1,4 @@
+import { DashboardImpactCards } from '../components/common/DashboardImpactCards';
 // src/pages/EmergenciesDashboard.tsx
 import { useState, useMemo } from 'react';
 import { DashboardHeader } from '../components/common/DashboardHeader/DashboardHeader';
@@ -170,6 +171,13 @@ export function EmergenciesDashboard() {
                   status: 'critical',
                 }}
               />
+              {resolved.data.avgArrivalTimeMinutes !== undefined && <MetricCard metric={{
+                label: 'Tiempo promedio de llegada',
+                value: resolved.data.avgArrivalTimeMinutes,
+                unit: ' min',
+                sublabel: 'Promedio ponderado por cantidad de emergencias con datos',
+              }} />}
+              <DashboardImpactCards area="emergencies" />
             </div>
           </div>
 
@@ -246,6 +254,7 @@ export function EmergenciesDashboard() {
           </div>
         </>
       ) : null}
+      {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="emergencies" standalone />}
     </div>
   );
 }

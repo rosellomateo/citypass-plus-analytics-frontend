@@ -1,3 +1,4 @@
+import { DashboardImpactCards } from '../components/common/DashboardImpactCards';
 // src/pages/MobilityDashboard.tsx
 import { useState, useMemo } from 'react';
 import { DashboardHeader } from '../components/common/DashboardHeader/DashboardHeader';
@@ -139,6 +140,7 @@ export function MobilityDashboard() {
                   status: 'normal',
                 }}
               />
+              <DashboardImpactCards area="mobility" />
             </div>
           </div>
 
@@ -240,6 +242,7 @@ export function MobilityDashboard() {
           </div>
         </>
       ) : null}
+      {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="mobility" standalone />}
     </div>
   );
 }

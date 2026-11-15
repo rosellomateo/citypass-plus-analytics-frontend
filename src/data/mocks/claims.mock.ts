@@ -1,5 +1,5 @@
 import type { BackendAnalyticsRecord, AIAnalysisReport } from '../../types';
-import rawClaimsSummary from '../../../testingDatos/claims_summary.json';
+import rawClaimsSummary from './fixtures/claims_summary.json';
 
 export const mockClaimRecords: BackendAnalyticsRecord[] = [
   {
