@@ -38,16 +38,16 @@ describe('CityPass session', () => {
     await expect(authenticatePresentationTeam('claims')).resolves.toBe('unconfigured');
   });
 
-  it('sends the selected client to Login and trusts only dashboards returned by Analytics', async () => {
+  it('uses the shared client in Login and trusts only dashboards returned by Analytics', async () => {
     vi.stubEnv('VITE_DATA_SOURCE', 'api');
     vi.stubEnv('VITE_API_BASE_URL', api);
     const fetchMock = vi.fn().mockResolvedValueOnce(signInResponse()).mockResolvedValueOnce(verifiedSession(['claims'], 'claims'));
     vi.stubGlobal('fetch', fetchMock);
 
-    await expect(authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web')).resolves.toBe('success');
+    await expect(authenticateWithIdp('jperez', 'correcta')).resolves.toBe('success');
     expect(fetchMock).toHaveBeenNthCalledWith(1, idp, expect.objectContaining({
       method: 'POST',
-      body: JSON.stringify({ username: 'jperez', password: 'correcta', clientId: 'citypass-reclamos-web' }),
+      body: JSON.stringify({ username: 'jperez', password: 'correcta', clientId: 'citypass-admin-web' }),
     }));
     expect(fetchMock).toHaveBeenNthCalledWith(2, api + '/auth/session', {
       method: 'GET',
@@ -72,7 +72,7 @@ describe('CityPass session', () => {
   it('reports a missing verification endpoint as an Analytics failure', async () => {
     vi.stubEnv('VITE_API_BASE_URL', api);
     vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(signInResponse()).mockResolvedValueOnce({ ok: false, status: 404 }));
-    await expect(authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web')).resolves.toBe('analytics-unavailable');
+    await expect(authenticateWithIdp('jperez', 'correcta')).resolves.toBe('analytics-unavailable');
     expect(getAuthSnapshot().status).toBe('anonymous');
   });
 
@@ -83,7 +83,7 @@ describe('CityPass session', () => {
     const verification = new Promise<{ ok: boolean; status: number }>((resolve) => { resolveVerification = resolve; });
     const fetchMock = vi.fn().mockResolvedValueOnce(signInResponse()).mockReturnValueOnce(verification);
     vi.stubGlobal('fetch', fetchMock);
-    const login = authenticateWithIdp('jperez', 'incorrecta', 'citypass-reclamos-web');
+    const login = authenticateWithIdp('jperez', 'incorrecta');
 
     await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
     expect(getAuthSnapshot().status).toBe('verifying');
@@ -96,7 +96,7 @@ describe('CityPass session', () => {
     vi.stubEnv('VITE_DATA_SOURCE', 'api');
     vi.stubEnv('VITE_API_BASE_URL', api);
     vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(signInResponse()).mockResolvedValueOnce(verifiedSession([])));
-    await expect(authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web')).resolves.toBe('success');
+    await expect(authenticateWithIdp('jperez', 'correcta')).resolves.toBe('success');
     expect(getAuthSnapshot()).toMatchObject({ status: 'authenticated', dashboards: [] });
     expect(getDefaultAuthorizedPath([])).toBeUndefined();
   });

@@ -93,7 +93,7 @@ describe('data source selection', () => {
         })
     );
 
-    await authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web');
+    await authenticateWithIdp('jperez', 'correcta');
     const result = await getClaimsAnalyticsData(filters);
 
     expect(result.totalClaims).toBe(15);

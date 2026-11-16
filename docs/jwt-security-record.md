@@ -1,10 +1,9 @@
 # Acceso a los tableros de Analítica
 
-El formulario del portal envía el usuario, la contraseña y el cliente
-correspondiente al equipo a `POST /auth/login` de Login Federado. Para Analítica
-Urbana, el cliente predeterminado es `citypass-analitica-web` y su audiencia
-es `citypass-analitica-api`. El cliente administrativo sigue siendo compatible
-cuando el token trae el módulo y los roles autorizados.
+El formulario envía el usuario, la contraseña y el identificador del cliente
+compartido `citypass-admin-web` a `POST /auth/login` de Login Federado. El token
+tiene audiencia `citypass-admin-api` y conserva el módulo y los roles del
+usuario. El backend admite también la audiencia específica de cada módulo.
 
 `GET /auth/session` del backend de Analítica recibe `Authorization: Bearer`
 con el access token. Devuelve el módulo, los grupos, el vencimiento, el tablero

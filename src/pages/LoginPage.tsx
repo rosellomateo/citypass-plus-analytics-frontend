@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import {
   ArrowRight, BarChart3, Bike, CircleAlert, Eye, EyeOff, KeyRound,
-  Landmark, MessageSquare, Network, Trees, Trash2,
+  MessageSquare, Network, Trees, Trash2,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { authenticatePresentationTeam, authenticateWithIdp, getAuthSnapshot, getPresentationUsernames } from '../auth/session';
@@ -31,19 +31,19 @@ const TEAM_ICONS = {
   waste: Trash2,
 };
 
-const isPresentation = isLocalPreview();
-
-export function LoginPage() {
+export function LoginPage({ presentation = false }: { presentation?: boolean }) {
+  const isPresentation = presentation && isLocalPreview();
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [team, setTeam] = useState<string>('overview');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<{ source: string; message: string }>();
   const [pending, setPending] = useState<string>();
   const submitting = useRef(false);
   const isSubmitting = pending !== undefined;
-  const { data: presentationUsernames } = useAsync(getPresentationUsernames, []);
+  const { data: presentationUsernames } = useAsync(
+    () => isPresentation ? getPresentationUsernames() : Promise.resolve(null), [isPresentation],
+  );
 
   async function signIn(source: string, request: () => Promise<LoginResult>) {
     if (submitting.current) return;
@@ -67,9 +67,8 @@ export function LoginPage() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const selectedTeam = LOGIN_TEAMS.find(({ area }) => area === team);
-    if (!username.trim() || !password || !selectedTeam) return;
-    void signIn('manual', () => authenticateWithIdp(username.trim(), password, selectedTeam.clientId));
+    if (!username.trim() || !password) return;
+    void signIn('manual', () => authenticateWithIdp(username.trim(), password));
   }
 
   return (
@@ -77,27 +76,14 @@ export function LoginPage() {
       <div className={styles.stack}>
         <section className={styles.card} aria-labelledby="login-title">
           <header className={styles.brandHeader}>
-            <div className={styles.brandIcon}><BarChart3 aria-hidden="true" size={23} /></div>
             <div className={styles.brandLine}>CityPass<span>+</span></div>
             <h1 id="login-title">Bienvenido</h1>
             <p>Acceso al portal de Analítica Urbana.</p>
           </header>
 
-          <div className={styles.accessType}>
-            <Landmark size={18} aria-hidden="true" />
-            Personal municipal (LDAP)
-          </div>
-
           <form className={styles.form} onSubmit={handleSubmit} noValidate>
             <div className={styles.field}>
-              <label htmlFor="team">Equipo</label>
-              <select id="team" value={team} disabled={isSubmitting} onChange={(event) => setTeam(event.target.value)}>
-                {LOGIN_TEAMS.map(({ area, label }) => <option key={area} value={area}>{label}</option>)}
-              </select>
-            </div>
-
-            <div className={styles.field}>
-              <label htmlFor="username">Usuario</label>
+              <label htmlFor="username">Nombre de usuario</label>
               <input
                 id="username"
                 name="username"
@@ -143,7 +129,6 @@ export function LoginPage() {
               <ArrowRight size={21} aria-hidden="true" />
             </button>
           </form>
-          <p className={styles.notice}>Tu equipo determina qué tableros podés ver.</p>
         </section>
 
         {isPresentation && (
@@ -159,10 +144,7 @@ export function LoginPage() {
                     type="button"
                     className={styles.quickAccess}
                     disabled={isSubmitting}
-                    onClick={() => {
-                      setTeam(area);
-                      void signIn(area, () => authenticatePresentationTeam(area));
-                    }}
+                    onClick={() => void signIn(area, () => authenticatePresentationTeam(area))}
                   >
                     <Icon size={18} aria-hidden="true" />
                     <span>
