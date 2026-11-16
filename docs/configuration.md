@@ -8,7 +8,7 @@ Estas variables configuran el portal:
 | `VITE_DATA_SOURCE` | `mock` o `api` | Selecciona la fuente utilizada por todos los tableros. |
 | `VITE_API_BASE_URL` | URL HTTP(S) | URL base del backend, sin ruta de endpoint. |
 | `VITE_IDP_BASE_URL` | URL HTTPS | Base de Login/LDAP para `/me`, `/auth/login`, `/auth/refresh` y `/auth/logout`. Por defecto `https://api.citypass-login.pp.ua`. |
-| `VITE_AUTH_CLIENT_ID` | texto asignado por IdP | Cliente de Analítica Urbana (por defecto, citypass-analitica-web). |
+| `VITE_AUTH_CLIENT_ID` | texto asignado por IdP | Cliente compartido del portal (por defecto, `citypass-admin-web`). |
 | `VITE_AUTH_LOGIN_ENDPOINT` | URL HTTPS | Endpoint del IdP que recibe usuario, contraseña y `clientId`. |
 
 ## Configuración local
@@ -65,8 +65,8 @@ tokens, contraseñas, SAS de Azure ni secretos en estas variables.
 ## Autenticación delegada a Login
 
 En modo API, la pantalla de ingreso envía los campos `username`, `password`
-y `clientId` a `POST /auth/login` de Login Federado. El equipo seleccionado
-determina el cliente de Login.
+y `clientId` a `POST /auth/login` de Login Federado. Todos los usuarios usan
+el cliente compartido configurado en `VITE_AUTH_CLIENT_ID`.
 
 El frontend consulta el perfil en `GET /me` de Login/LDAP con
 `Authorization: Bearer <access_token>`. Se espera un objeto con `uid`, `module`
@@ -93,8 +93,14 @@ el perfil en `/me`. Un `401` o `403` del perfil se considera acceso inválido;
 un `404`, un error de red o una respuesta de perfil mal formada informa que no
 se pudo consultar el perfil y mantiene el portal sin sesión.
 
-El cliente del equipo de Login Federado se puede ajustar con
-`VITE_AUTH_LOGIN_CLIENT_ID` y debe coincidir con el cliente asignado por Login.
+El cliente compartido se configura con `VITE_AUTH_CLIENT_ID`. En Docker se incorpora
+durante el build; los workflows de test y producción toman la variable de GitHub
+y usan `citypass-admin-web` si no está definida. No se usa `VITE_AUTH_LOGIN_CLIENT_ID`.
+
+La API debe aceptar la audiencia emitida para el cliente elegido antes de desplegar
+el portal. Con el cliente compartido se espera `citypass-admin-api`; un backend
+configurado únicamente para `citypass-analitica-api` puede rechazar esas consultas
+con 401. Integrar este frontend no modifica el contrato ni la configuración del backend.
 
 Login Federado debe permitir por CORS el origen del portal para `GET /me`,
 `POST /auth/login`, `POST /auth/refresh` y `POST /auth/logout`, incluida la cabecera
@@ -105,7 +111,7 @@ El modo local `mock` muestra primero la pantalla de acceso y usa datos de demost
 
 ## Modo presentación
 
-Ejecutar `npm run dev:presentation` y abrir <http://127.0.0.1:5175/login>.
+Ejecutar `npm run dev:presentation` y abrir <http://127.0.0.1:5175/presentacion>.
 Los ocho botones leen perfiles simulados de `testingDatos/sesiones-presentacion.json`.
 Cada perfil tiene un identificador con prefijo `local-demo:`, un usuario
 ficticio y su lista de tableros. El directorio está ignorado por Git y Docker.

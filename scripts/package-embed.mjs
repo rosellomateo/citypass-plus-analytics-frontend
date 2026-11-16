@@ -34,7 +34,7 @@ assert.match(commit, /^[a-f0-9]{40}$/);
 const manifest = {
   schemaVersion: 1,
   commit,
-  modules: ['reclamos', 'emergencias', 'movilidad', 'espacios', 'residuos'],
+  modules: ['reclamos', 'emergencias', 'movilidad', 'espacios', 'residuos', 'identidad'],
   template: 'embed.html',
   sha256: createHash('sha256').update(html).digest('hex'),
   bytes: html.length,

@@ -27,8 +27,8 @@ npm run dev:mock
 ```
 
 Abrir <http://127.0.0.1:5174>. La vista previa local empieza en el login.
-Los accesos rápidos usan datos de ejemplo y muestran los tableros del equipo
-elegido. Vite refleja los cambios al guardar. Para cerrar
+Los accesos rápidos están en <http://127.0.0.1:5174/presentacion> y usan datos
+de ejemplo. Vite refleja los cambios al guardar. Para cerrar
 la vista previa, usar `Ctrl+C` en la terminal donde se inició.
 
 Los seis casos de la Parte 2 se pueden ensayar con **Simular escenario** en
@@ -37,7 +37,7 @@ cuando están disponibles.
 
 ### Presentación local por equipo
 
-`npm run dev:presentation` abre <http://127.0.0.1:5175/login> con ocho accesos
+`npm run dev:presentation` sirve <http://127.0.0.1:5175/presentacion> con ocho accesos
 rápidos para ensayar los permisos y ver datos de ejemplo. Consultá la
 [configuración de las sesiones locales](docs/configuration.md#modo-presentación).
 
@@ -82,8 +82,8 @@ npm run preview
 
 ## Estado de seguridad
 
-En modo API, el portal pide el token a Login Federado y consulta
-`GET /auth/session` en Analítica antes de habilitar los tableros. Los tokens
+En modo API, el portal usa el cliente compartido configurado en `VITE_AUTH_CLIENT_ID`
+y consulta `GET /me` de Login/LDAP antes de habilitar los tableros. Los tokens
 se conservan en memoria. Consultar el [registro JWT](docs/jwt-security-record.md).
 
 ## Tecnologías principales
