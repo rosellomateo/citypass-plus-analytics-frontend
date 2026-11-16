@@ -82,7 +82,7 @@ npm run preview
 
 ## Estado de seguridad
 
-En modo API, el portal usa el cliente compartido configurado en `VITE_AUTH_CLIENT_ID`
+En modo API, el portal usa el cliente de Analítica `citypass-analitica-web`, configurable en `VITE_AUTH_CLIENT_ID`,
 y consulta `GET /me` de Login/LDAP antes de habilitar los tableros. Los tokens
 se conservan en memoria. Consultar el [registro JWT](docs/jwt-security-record.md).
 

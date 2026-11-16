@@ -38,16 +38,18 @@ describe('CityPass session', () => {
     await expect(authenticatePresentationTeam('claims')).resolves.toBe('unconfigured');
   });
 
-  it('sends the shared client to Login and obtains the profile from LDAP /me, never Analytics', async () => {
+  it('defaults to the Analytics client and obtains the profile from LDAP /me, never Analytics', async () => {
+    vi.stubEnv('VITE_AUTH_CLIENT_ID', '');
     vi.stubEnv('VITE_DATA_SOURCE', 'api');
     vi.stubEnv('VITE_API_BASE_URL', api);
-    const fetchMock = vi.fn().mockResolvedValueOnce(signInResponse()).mockResolvedValueOnce(ldapProfile());
+    const fetchMock = vi.fn().mockResolvedValueOnce(signInResponse())
+      .mockResolvedValueOnce(ldapProfile(['admin'], { module: 'analitica' }));
     vi.stubGlobal('fetch', fetchMock);
 
     await expect(authenticateWithIdp('jperez', 'correcta')).resolves.toBe('success');
     expect(fetchMock).toHaveBeenNthCalledWith(1, idp, expect.objectContaining({
       method: 'POST',
-      body: JSON.stringify({ username: 'jperez', password: 'correcta', clientId: 'citypass-admin-web' }),
+      body: JSON.stringify({ username: 'jperez', password: 'correcta', clientId: 'citypass-analitica-web' }),
     }));
     expect(fetchMock).toHaveBeenNthCalledWith(2, 'https://api.citypass-login.pp.ua/me', expect.objectContaining({
       method: 'GET',
@@ -57,10 +59,10 @@ describe('CityPass session', () => {
     const session = getAuthSnapshot();
     expect(session.status).toBe('authenticated');
     if (session.status !== 'authenticated') throw new Error('Expected verified session');
-    expect(session.claims).toEqual({ preferred_username: 'jperez', module: 'reclamos', groups: ['operadores'] });
-    expect(getDefaultAuthorizedPath(session.dashboards)).toBe('/analytics/claims');
-    expect(canAccessArea(session.dashboards, 'overview')).toBe(false);
-    expect(canAccessArea(session.dashboards, 'login')).toBe(false);
+    expect(session.claims).toEqual({ preferred_username: 'jperez', module: 'analitica', groups: ['admin'] });
+    expect(getDefaultAuthorizedPath(session.dashboards)).toBe('/analytics');
+    expect(canAccessArea(session.dashboards, 'overview')).toBe(true);
+    expect(canAccessArea(session.dashboards, 'login')).toBe(true);
   });
 
   it('only opens an authorized initial dashboard', () => {
@@ -68,13 +70,13 @@ describe('CityPass session', () => {
     expect(getDefaultAuthorizedPath(['claims'], 'eda')).toBe('/analytics/claims');
   });
 
-  it('uses the configured shared client while keeping profile verification in LDAP', async () => {
-    vi.stubEnv('VITE_AUTH_CLIENT_ID', 'citypass-analitica-web');
+  it('uses an explicit client override while keeping profile verification in LDAP', async () => {
+    vi.stubEnv('VITE_AUTH_CLIENT_ID', 'citypass-analitica-pruebas-web');
     const fetchMock = vi.fn().mockResolvedValueOnce(signInResponse()).mockResolvedValueOnce(ldapProfile());
     vi.stubGlobal('fetch', fetchMock);
     await expect(authenticateWithIdp('jperez', 'correcta')).resolves.toBe('success');
     expect(fetchMock).toHaveBeenNthCalledWith(1, idp, expect.objectContaining({
-      body: JSON.stringify({ username: 'jperez', password: 'correcta', clientId: 'citypass-analitica-web' }),
+      body: JSON.stringify({ username: 'jperez', password: 'correcta', clientId: 'citypass-analitica-pruebas-web' }),
     }));
     expect(fetchMock).toHaveBeenNthCalledWith(2, 'https://api.citypass-login.pp.ua/me', expect.anything());
   });

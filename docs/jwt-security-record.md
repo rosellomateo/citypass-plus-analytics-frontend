@@ -1,10 +1,9 @@
 # Acceso a los tableros de Analítica
 
 El formulario envía el usuario, la contraseña y el identificador del cliente
-compartido `citypass-admin-web` a `POST /auth/login` de Login Federado. El token
-tiene audiencia `citypass-admin-api` y conserva el módulo y los roles del
-usuario. El backend debe aceptar esa audiencia antes de desplegar el cliente
-compartido; su compatibilidad no se habilita por cambiar el frontend.
+de Analítica `citypass-analitica-web` a `POST /auth/login` de Login Federado. El token
+tiene audiencia `citypass-analitica-api`, compatible con la configuración actual
+del backend. El acceso a sus endpoints de datos requiere el grupo `admin`.
 `VITE_AUTH_CLIENT_ID` permite configurar el cliente durante el build.
 
 `GET /me` de Login/LDAP devuelve el perfil, el módulo y los grupos. El frontend
@@ -17,6 +16,9 @@ con un tablero visible. Su ausencia no impide iniciar sesión.
 
 Estas reglas controlan únicamente la interfaz. El backend de Analítica mantiene
 la responsabilidad de validar el JWT y autorizar cada petición de datos.
+El cliente de este portal permite el ingreso de usuarios de Analítica; las reglas
+de menú para otros módulos no habilitan su autenticación ni amplían los permisos
+del backend. Los otros equipos consumen `/embed/{modulo}` con su propio cliente y token.
 
 - Analítica Urbana con el rol `admin` o `analitica-urbana` tiene los ocho tableros.
 - Los equipos con rol `admin`, `delegados` u `operadores` reciben el tablero
