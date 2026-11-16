@@ -135,7 +135,7 @@ function postJson(url: string, payload: object): Promise<Response> {
 
 export function authenticateWithIdp(username: string, password: string): Promise<LoginResult> {
   const endpoint = import.meta.env.VITE_AUTH_LOGIN_ENDPOINT?.trim() || `${getIdpBaseUrl()}/auth/login`;
-  const clientId = import.meta.env.VITE_AUTH_CLIENT_ID?.trim() || 'citypass-admin-web';
+  const clientId = import.meta.env.VITE_AUTH_CLIENT_ID?.trim() || 'citypass-analitica-web';
   return openSession(() => postJson(endpoint, { username, password, clientId }));
 }
 
