@@ -12,7 +12,10 @@ La plantilla contiene una vez cada marcador:
 
 El backend reemplaza ambos marcadores después de autorizar el request. Los datos
 son el mismo objeto `{datos, informe}` que devuelve su endpoint de analítica.
-Se soportan `reclamos`, `emergencias`, `movilidad`, `espacios` y `residuos`.
+Se soportan `reclamos`, `emergencias`, `movilidad`, `espacios`, `residuos` e
+`identidad`. Identidad reutiliza el Tablero de Login Federado y admite
+`informe: null`, como su servicio del backend; los eventos se muestran aunque
+todavía no exista el informe de IA. En modo embed no se consulta `/analytics/identidad`.
 Los indicadores adicionales de parte 2 no se solicitan desde el iframe porque
 el contrato actual del backend no los incluye en ese objeto. No se inventan
 valores para esos indicadores.
@@ -30,7 +33,7 @@ npm run test:embed
 
 El script de empaquetado valida el HTML, el límite de 5 MiB y los marcadores;
 después genera `manifest.json` y `SHA256SUMS`. Las pruebas de navegador verifican
-los cinco tableros con datos inyectados, el CSP del backend y un iframe
+los seis tableros con datos inyectados (Identidad con y sin informe), el CSP del backend y un iframe
 `sandbox="allow-scripts"` sin `allow-same-origin`, bloqueando cualquier petición
 de red adicional. El HTML compilado y los metadatos no se guardan en Git.
 
@@ -60,6 +63,11 @@ Verifica los tres archivos descargándolos nuevamente. `SHA256SUMS` se publica a
 final para marcar una versión completa. No sobrescribe versiones diferentes.
 
 ## Activar la versión en el backend
+
+Desplegar primero el backend compatible con el manifiesto de seis módulos.
+El backend anterior solo acepta cinco y rechaza una release con Identidad.
+El backend actualizado puede seguir utilizando la release anterior para los otros
+cinco módulos; Identidad devuelve 503 hasta configurar una release que la incluya.
 
 Una vez que **publish** termina correctamente, configurar en la Web App del backend:
 

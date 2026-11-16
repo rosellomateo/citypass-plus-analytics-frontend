@@ -68,6 +68,14 @@ Los tableros consultan los impactos cada 15 segundos mientras están abiertos.
 Los cambios aparecen en las tarjetas del módulo después de que el pipeline
 publica los datos.
 
+Si el backend todavía no tiene registrada la ruta y devuelve 404, se detiene
+el polling de esa área para no repetir el mismo error cada 15 segundos. Se puede
+reintentar manualmente donde la pantalla lo permita o recargarla después del
+despliegue; una respuesta correcta reactiva el refresco. Los fallos transitorios
+siguen reintentándose y conservan el último corte disponible. Sin indicadores
+publicados, el backend devuelve `datos: []` y las tarjetas no inventan valores.
+El modo embed no consulta estas rutas porque usa el payload primario inyectado.
+
 Para Espacios Públicos, los JSON agregados deben incluir `"version_cultura": 2`.
 El backend puede calcular los indicadores desde un corte acumulado del endpoint
 HTTPS definido en `PART2_EVENTS_URL`. Si la variable está vacía, lo busca en el

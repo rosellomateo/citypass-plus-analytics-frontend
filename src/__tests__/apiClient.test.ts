@@ -88,7 +88,7 @@ describe('API client', () => {
       .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({}) });
     vi.stubGlobal('fetch', fetchMock);
 
-    await authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web');
+    await authenticateWithIdp('jperez', 'correcta');
     await apiGet('/analytics/reclamos');
 
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:8000/analytics/reclamos', {
@@ -108,7 +108,7 @@ describe('API client', () => {
       .mockResolvedValueOnce(verificationResponse())
       .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ datos: [] }) });
     vi.stubGlobal('fetch', fetchMock);
-    await authenticateWithIdp('jperez', 'correcta', 'citypass-reclamos-web');
+    await authenticateWithIdp('jperez', 'correcta');
 
     await expect(apiGet('/analytics/reclamos')).resolves.toEqual({ datos: [] });
 

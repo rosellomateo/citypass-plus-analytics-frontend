@@ -11,6 +11,7 @@ import { EmergenciesDashboard } from '../pages/EmergenciesDashboard';
 import { MobilityDashboard } from '../pages/MobilityDashboard';
 import { CultureDashboard } from '../pages/CultureDashboard';
 import { WasteDashboard } from '../pages/WasteDashboard';
+import { LoginDashboard } from '../pages/LoginDashboard';
 import { getEmbeddedModule, type EmbedModule } from './module';
 
 const pages = {
@@ -19,6 +20,7 @@ const pages = {
   movilidad: MobilityDashboard,
   espacios: CultureDashboard,
   residuos: WasteDashboard,
+  identidad: LoginDashboard,
 } satisfies Record<EmbedModule, React.ComponentType>;
 
 const root = document.getElementById('root');

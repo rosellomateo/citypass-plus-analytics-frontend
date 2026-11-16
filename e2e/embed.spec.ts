@@ -26,16 +26,24 @@ const cases = [
     zona: 'Centro', tipoAlerta: 'Contenedor lleno', prioridad: 'Alta', rangoNivelLlenado: '80-100%',
     cantidadAlertas: 17, cantidadResueltas: 12, tiempoPromResolucion: 35,
   } },
+  { module: 'identidad', title: 'Tablero de Login Federado', metric: 'Inicios de sesión exitosos', row: {
+    department: 'Movilidad', event_type: 'com.citypass.auth.LoginExitoso', cantidadEventos: 17,
+  } },
+  { module: 'identidad', title: 'Tablero de Login Federado', metric: 'Inicios de sesión exitosos', withoutReport: true, row: {
+    department: 'Movilidad', event_type: 'com.citypass.auth.LoginExitoso', cantidadEventos: 17,
+  } },
 ];
 
-for (const { module, title, metric, row } of cases) {
-  test(`${module}: renders injected data inside an opaque sandbox without network access`, async ({ page }) => {
+for (const scenario of cases) {
+  const { module, title, metric, row } = scenario;
+  const withoutReport = 'withoutReport' in scenario && scenario.withoutReport;
+  test(`${module}${withoutReport ? ' without AI report' : ''}: renders injected data inside an opaque sandbox without network access`, async ({ page }) => {
     const errors: string[] = [];
     const unexpectedRequests: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
     const payload = {
-      datos: [{ ...row, fecha_snapshot: date }],
-      informe: {
+      datos: [{ ...row, fecha_snapshot: module === 'identidad' ? date.slice(0, 10) : date }],
+      informe: withoutReport ? null : {
         actualizado_en: date, caso_de_uso: module, semanas: ['2026-W46'], ultima_semana: '2026-W46',
         version_esquema: '1.0', analisis: [{
           semana: '2026-W46', metadata: {},
@@ -76,12 +84,14 @@ for (const { module, title, metric, row } of cases) {
     await page.goto('http://citypass.test/');
     const frame = page.frameLocator('iframe');
     await expect(frame.getByRole('heading', { name: title, exact: true })).toBeVisible();
-    const label = frame.getByText(metric, { exact: true });
-    await expect(label).toBeVisible();
-    await expect(frame.getByRole('article', { name: `KPI: ${metric}`, exact: true })).toContainText('17');
+    const metricCard = frame.getByRole('article', { name: `KPI: ${metric}`, exact: true });
+    await expect(metricCard.getByText(metric, { exact: true })).toBeVisible();
+    await expect(metricCard).toContainText('17');
     await expect(frame.getByRole('alert')).toHaveCount(0);
     await expect(frame.getByRole('button', { name: 'Iniciar sesión' })).toHaveCount(0);
-    await expect(frame.getByText('</script><script>throw new Error("injected")</script>', { exact: true })).toBeVisible();
+    if (!withoutReport) {
+      await expect(frame.getByText('</script><script>throw new Error("injected")</script>', { exact: true })).toBeVisible();
+    }
     await expect.poll(() => page.evaluate(() => (window as unknown as { embedHeight: number }).embedHeight))
       .toBeGreaterThan(0);
     expect(unexpectedRequests).toEqual([]);
