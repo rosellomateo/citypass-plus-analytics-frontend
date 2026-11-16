@@ -1,4 +1,5 @@
 import { analyticsApi } from '../api/analyticsApi';
+import { embeddedApi } from '../api/embeddedApi';
 import type { LoginEventRecord } from '../api/types';
 import { BarChart } from '../components/charts/BarChart';
 import { PieChart } from '../components/charts/PieChart';
@@ -45,9 +46,10 @@ function summarize(records: LoginEventRecord[]) {
 }
 
 export function LoginDashboard() {
-  const isMock = getDataSource() === 'mock';
+  const source = getDataSource();
   const { data, loading, error, refetch } = useAsync(
-    () => isMock ? Promise.resolve(mockLoginDashboard) : analyticsApi.getLogin(), [isMock],
+    () => source === 'mock' ? Promise.resolve(mockLoginDashboard)
+      : source === 'embedded' ? embeddedApi.getLogin() : analyticsApi.getLogin(), [source],
   );
   const summary = data && summarize(data.datos);
 

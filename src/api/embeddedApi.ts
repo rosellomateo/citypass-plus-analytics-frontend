@@ -2,6 +2,7 @@ import type {
   ClaimsApiResponse,
   CultureApiResponse,
   EmergencyApiResponse,
+  LoginApiResponse,
   MobilityApiResponse,
   WasteApiResponse,
 } from './types';
@@ -20,7 +21,8 @@ async function read<T>(module: EmbedModule): Promise<T> {
   } catch {
     throw new Error('Los datos del tablero no contienen JSON válido.');
   }
-  if (!payload || !Array.isArray(payload.datos) || !payload.informe) {
+  const validReport = payload?.informe || (module === 'identidad' && payload?.informe === null);
+  if (!payload || !Array.isArray(payload.datos) || !validReport) {
     throw new Error('El tablero no trae una respuesta de analítica válida.');
   }
   return payload as T;
@@ -32,4 +34,5 @@ export const embeddedApi = {
   getMobility: () => read<MobilityApiResponse>('movilidad'),
   getCulture: () => read<CultureApiResponse>('espacios'),
   getWaste: () => read<WasteApiResponse>('residuos'),
+  getLogin: () => read<LoginApiResponse>('identidad'),
 };
