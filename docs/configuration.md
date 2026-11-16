@@ -8,7 +8,7 @@ Estas variables configuran el portal:
 | `VITE_DATA_SOURCE` | `mock` o `api` | Selecciona la fuente utilizada por todos los tableros. |
 | `VITE_API_BASE_URL` | URL HTTP(S) | URL base del backend, sin ruta de endpoint. |
 | `VITE_IDP_BASE_URL` | URL HTTPS | Base de Login/LDAP para `/me`, `/auth/login`, `/auth/refresh` y `/auth/logout`. Por defecto `https://api.citypass-login.pp.ua`. |
-| `VITE_AUTH_CLIENT_ID` | texto asignado por IdP | Cliente compartido del portal (por defecto, `citypass-admin-web`). |
+| `VITE_AUTH_CLIENT_ID` | texto asignado por IdP | Cliente LDAP de Analítica (por defecto, `citypass-analitica-web`). |
 | `VITE_AUTH_LOGIN_ENDPOINT` | URL HTTPS | Endpoint del IdP que recibe usuario, contraseña y `clientId`. |
 
 ## Configuración local
@@ -66,7 +66,7 @@ tokens, contraseñas, SAS de Azure ni secretos en estas variables.
 
 En modo API, la pantalla de ingreso envía los campos `username`, `password`
 y `clientId` a `POST /auth/login` de Login Federado. Todos los usuarios usan
-el cliente compartido configurado en `VITE_AUTH_CLIENT_ID`.
+el cliente de Analítica configurado en `VITE_AUTH_CLIENT_ID` (`citypass-analitica-web`).
 
 El frontend consulta el perfil en `GET /me` de Login/LDAP con
 `Authorization: Bearer <access_token>`. Se espera un objeto con `uid`, `module`
@@ -93,14 +93,16 @@ el perfil en `/me`. Un `401` o `403` del perfil se considera acceso inválido;
 un `404`, un error de red o una respuesta de perfil mal formada informa que no
 se pudo consultar el perfil y mantiene el portal sin sesión.
 
-El cliente compartido se configura con `VITE_AUTH_CLIENT_ID`. En Docker se incorpora
+El cliente de Analítica se configura con `VITE_AUTH_CLIENT_ID`. En Docker se incorpora
 durante el build; los workflows de test y producción toman la variable de GitHub
-y usan `citypass-admin-web` si no está definida. No se usa `VITE_AUTH_LOGIN_CLIENT_ID`.
+y usan `citypass-analitica-web` si no está definida. No se usa `VITE_AUTH_LOGIN_CLIENT_ID`.
 
-La API debe aceptar la audiencia emitida para el cliente elegido antes de desplegar
-el portal. Con el cliente compartido se espera `citypass-admin-api`; un backend
-configurado únicamente para `citypass-analitica-api` puede rechazar esas consultas
-con 401. Integrar este frontend no modifica el contrato ni la configuración del backend.
+Este cliente emite tokens para `citypass-analitica-api`, que coincide con
+`JWT_AUDIENCE` del backend actual. El acceso a los datos requiere un usuario de
+Analítica con grupo `admin`. La visibilidad del menú por sí sola no concede permisos.
+Si se define `VITE_AUTH_CLIENT_ID` en GitHub, ese valor prevalece sobre el predeterminado:
+debe mantener la compatibilidad con el backend. Cambiarlo requiere reconstruir la imagen;
+una variable de Azure o un reinicio no modifica el JavaScript ya compilado.
 
 Login Federado debe permitir por CORS el origen del portal para `GET /me`,
 `POST /auth/login`, `POST /auth/refresh` y `POST /auth/logout`, incluida la cabecera
