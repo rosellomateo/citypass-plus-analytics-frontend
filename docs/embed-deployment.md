@@ -25,14 +25,18 @@ valores para esos indicadores.
 ```bash
 npm ci
 npm run test:coverage
+node --test scripts/validate-embed-code.cases.mjs
 npm run build:embed
 node scripts/package-embed.mjs
 npx playwright install --with-deps chromium
 npm run test:embed
 ```
 
-El script de empaquetado valida el HTML, el límite de 5 MiB y los marcadores;
-después genera `manifest.json` y `SHA256SUMS`. Las pruebas de navegador verifican
+El script de empaquetado valida el HTML, el límite de 5 MiB y los marcadores.
+Rechaza el patrón de corrupción `undefined<` y verifica todos los scripts inline
+de JavaScript con `node --check`, sin ejecutarlos ni interpretar el marcador JSON.
+Solo después genera `manifest.json` y `SHA256SUMS`. Son controles preventivos:
+no reparan ni eliminan texto de una plantilla alterada. Las pruebas de navegador verifican
 los seis tableros con datos inyectados (Identidad con y sin informe), el CSP del backend y un iframe
 `sandbox="allow-scripts"` sin `allow-same-origin`, bloqueando cualquier petición
 de red adicional. El HTML compilado y los metadatos no se guardan en Git.

@@ -38,6 +38,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Test detection of corrupted inline code
+        run: node --test scripts/validate-embed-code.cases.mjs
+
       - name: Build embedded frontend
         run: npm run build:embed
 
