@@ -1,6 +1,5 @@
 // src/services/claimsService.ts
 import type { DashboardFilters, ClaimsAnalyticsData, BackendAnalyticsRecord } from '../types';
-import { mockClaimRecords, mockClaimsAIReport } from '../data/mocks/claims.mock';
 import { delay } from '../utils';
 import { isWithinDateRange } from '../utils/dates';
 
@@ -20,7 +19,7 @@ export function mapClaimStatus(status: string): string {
 
 export function getFilteredClaimRecords(
   filters: DashboardFilters,
-  records: BackendAnalyticsRecord[] = mockClaimRecords
+  records: BackendAnalyticsRecord[]
 ): BackendAnalyticsRecord[] {
   let filtered = records.filter((r) => isWithinDateRange(r.fecha_snapshot, filters));
 
@@ -109,7 +108,7 @@ export function getClaimsByCategoryFiltered(
 
 export async function getClaimsAnalyticsData(
   filters: DashboardFilters,
-  records: BackendAnalyticsRecord[] = mockClaimRecords
+  records: BackendAnalyticsRecord[]
 ): Promise<ClaimsAnalyticsData> {
   await delay();
 
@@ -164,6 +163,5 @@ export async function getClaimsAnalyticsData(
     avgResolutionTimeHours,
     avgResolutionByCategory,
     availableCategories,
-    aiReport: mockClaimsAIReport,
   };
 }

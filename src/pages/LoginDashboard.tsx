@@ -10,7 +10,6 @@ import { ErrorCard } from '../components/common/ErrorState/ErrorState';
 import { MetricsGridSkeleton } from '../components/common/LoadingState/LoadingState';
 import { MetricCard } from '../components/common/MetricCard/MetricCard';
 import { getDataSource } from '../dataSources/dataSource';
-import { mockLoginDashboard } from '../data/mocks/teamDashboards.mock';
 import { useAsync } from '../hooks/useAsync';
 import { formatDate } from '../utils/dates';
 
@@ -48,8 +47,7 @@ function summarize(records: LoginEventRecord[]) {
 export function LoginDashboard() {
   const source = getDataSource();
   const { data, loading, error, refetch } = useAsync(
-    () => source === 'mock' ? Promise.resolve(mockLoginDashboard)
-      : source === 'embedded' ? embeddedApi.getLogin() : analyticsApi.getLogin(), [source],
+    () => source === 'embedded' ? embeddedApi.getLogin() : analyticsApi.getLogin(), [source],
   );
   const summary = data && summarize(data.datos);
 

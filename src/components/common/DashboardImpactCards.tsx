@@ -1,10 +1,13 @@
 import type { Metric } from '../../types';
+import type { CrossModuleResponse } from '../../api/types';
 import { PART2_METRICS } from '../../config/crossModuleMetrics';
-import { useDashboardImpact } from '../../hooks/useDashboardImpact';
 import { MetricCard } from './MetricCard/MetricCard';
 
-export function DashboardImpactCards({ area, standalone = false }: { area: keyof typeof PART2_METRICS; standalone?: boolean }) {
-  const { data } = useDashboardImpact(area);
+export function DashboardImpactCards({ area, data, standalone = false }: {
+  area: keyof typeof PART2_METRICS;
+  data: CrossModuleResponse | null;
+  standalone?: boolean;
+}) {
   if (!data) return null;
   const compatible = area !== 'culture' || data.version_cultura === 2;
   const metrics = new Map(compatible ? data.datos.map((metric) => [metric.id, metric]) : []);
@@ -13,7 +16,8 @@ export function DashboardImpactCards({ area, standalone = false }: { area: keyof
       const id = `c${index + 1}${metricIndex === 0 ? '' : 'b'}`;
       const metric = metrics.get(id);
       if (!metric) return [];
-      const detail = metric.detalle?.map(({ etiqueta, valor }) => `${etiqueta}: ${valor.toLocaleString('es-AR')}`).join(' · ');
+      const detail = area === 'waste' && id === 'c2' ? undefined : metric.detalle
+        ?.map(({ etiqueta, valor }) => `${etiqueta}: ${valor.toLocaleString('es-AR')}`).join(' · ');
       return [{ label, value: metric.valor, unit: metric.unidad ?? undefined, sublabel: detail || undefined, status: 'info' }];
     }),
   );
@@ -27,5 +31,5 @@ export function DashboardImpactCards({ area, standalone = false }: { area: keyof
   }
   if (cards.length === 0) return null;
   const content = cards.map((metric) => <MetricCard key={metric.label} metric={metric} />);
-  return standalone ? <div className="section metrics-grid-3">{content}</div> : <>{content}</>;
+  return standalone ? <div className="section"><div className="metrics-grid-3">{content}</div></div> : <>{content}</>;
 }

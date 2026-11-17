@@ -1,4 +1,3 @@
-import { isLocalPreview } from '../config/localPreview';
 import { getDashboardsForProfile } from './authorization';
 
 export interface CityPassClaims {
@@ -8,7 +7,7 @@ export interface CityPassClaims {
 }
 
 export interface TokenPair { accessToken: string; refreshToken: string; expiresAt: number; }
-export type LoginResult = 'success' | 'rejected' | 'invalid-token' | 'unavailable' | 'profile-unavailable' | 'unconfigured';
+export type LoginResult = 'success' | 'rejected' | 'invalid-token' | 'unavailable' | 'profile-unavailable';
 
 type Authenticated = {
   status: 'authenticated';
@@ -35,10 +34,6 @@ const subscribers = new Set<() => void>();
 function publish(next: AuthSnapshot) {
   snapshot = next;
   subscribers.forEach((subscriber) => subscriber());
-}
-
-export function requiresApiToken(): boolean {
-  return import.meta.env.PROD || isLocalPreview() || import.meta.env.VITE_DATA_SOURCE !== 'mock';
 }
 
 export function getAuthSnapshot(): AuthSnapshot {
@@ -137,46 +132,6 @@ export function authenticateWithIdp(username: string, password: string): Promise
   const endpoint = import.meta.env.VITE_AUTH_LOGIN_ENDPOINT?.trim() || `${getIdpBaseUrl()}/auth/login`;
   const clientId = import.meta.env.VITE_AUTH_CLIENT_ID?.trim() || 'citypass-analitica-web';
   return openSession(() => postJson(endpoint, { username, password, clientId }));
-}
-
-async function readPresentationProfiles(): Promise<Record<string, unknown> | undefined> {
-  if (!isLocalPreview()) return undefined;
-  const response = await fetch('/__presentation/sessions.json', { cache: 'no-store' });
-  if (!response.ok) return undefined;
-  const records: unknown = await response.json();
-  return records && typeof records === 'object' && !Array.isArray(records)
-    ? records as Record<string, unknown>
-    : undefined;
-}
-
-export async function getPresentationUsernames(): Promise<Record<string, string>> {
-  const records = await readPresentationProfiles();
-  return Object.fromEntries(Object.entries(records ?? {}).flatMap(([area, profile]) =>
-    profile && typeof profile === 'object' && 'preferred_username' in profile &&
-    typeof profile.preferred_username === 'string' ? [[area, profile.preferred_username]] : [],
-  ));
-}
-
-export async function authenticatePresentationTeam(area: string): Promise<LoginResult> {
-  if (!isLocalPreview()) return 'unconfigured';
-  clearTokenPair();
-  const version = sessionVersion;
-  publish({ status: 'verifying' });
-  try {
-    const records = await readPresentationProfiles();
-    const profile = records?.[area];
-    if (!profile || typeof profile !== 'object') return 'unconfigured';
-    const { token, preferred_username, module, groups, dashboards } = profile as Record<string, unknown>;
-    if (typeof token !== 'string' || !token.startsWith('local-demo:') ||
-        typeof preferred_username !== 'string' || typeof module !== 'string' ||
-        !isStringArray(groups) || !isStringArray(dashboards) || version !== sessionVersion) return 'invalid-token';
-    publish({ status: 'authenticated', token, claims: { preferred_username, module, groups }, dashboards, version });
-    return 'success';
-  } catch {
-    return 'unavailable';
-  } finally {
-    if (version === sessionVersion && snapshot.status === 'verifying') clearTokenPair();
-  }
 }
 
 async function openSession(requestTokens: () => Promise<Response>): Promise<LoginResult> {

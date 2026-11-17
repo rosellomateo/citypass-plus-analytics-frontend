@@ -36,28 +36,16 @@ afterEach(() => {
 });
 
 describe('data source selection', () => {
-  it.each(['api', 'mock', 'embedded'] as const)('selects %s explicitly', (source) => {
+  it.each(['api', 'embedded'] as const)('selects %s explicitly', (source) => {
     vi.stubEnv('VITE_DATA_SOURCE', source);
     expect(getDataSource()).toBe(source);
   });
 
-  it('rejects a missing or unsupported value', () => {
+  it('rejects an unsupported value', () => {
     vi.stubEnv('VITE_DATA_SOURCE', 'auto');
     expect(() => getDataSource()).toThrow(
-      'VITE_DATA_SOURCE debe configurarse como "api", "mock" o "embedded".'
+      'VITE_DATA_SOURCE debe configurarse como "api" o "embedded".'
     );
-  });
-
-  it('uses the existing mocks without calling fetch in mock mode', async () => {
-    vi.stubEnv('VITE_DATA_SOURCE', 'mock');
-    const fetchMock = vi.fn();
-    vi.stubGlobal('fetch', fetchMock);
-
-    const result = await getClaimsAnalyticsData(filters);
-
-    expect(result.totalClaims).toBeGreaterThan(0);
-    expect(result.records.length).toBeGreaterThan(0);
-    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('exposes backend claim records to every chart in api mode', async () => {

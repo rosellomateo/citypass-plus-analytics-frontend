@@ -1,8 +1,7 @@
 // src/utils/dates.ts
 import type { DashboardFilters } from '../types';
 
-export function getDateRangeBounds(filters: DashboardFilters): { from: Date; to: Date } {
-  const now = new Date();
+export function getDateRangeBounds(filters: DashboardFilters, now = new Date()): { from: Date; to: Date } {
 
   if (filters.dateRange === 'today') {
     const from = new Date(now);

@@ -3,16 +3,19 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { readFile, readdir, writeFile } from 'node:fs/promises';
 import { JSDOM } from 'jsdom';
+import { validateEmbedCode } from './validate-embed-code.mjs';
 
 const directory = new URL('../dist-embed/', import.meta.url);
 assert.deepEqual(await readdir(directory), ['embed.html'], 'El build debe producir un único HTML.');
 const html = await readFile(new URL('embed.html', directory));
+const htmlText = html.toString('utf8');
 assert.ok(html.length <= 5 * 1024 * 1024, 'La plantilla supera el límite de 5 MiB del backend.');
 for (const marker of ['__CITYPASS_MODULO__', '__CITYPASS_DATOS__']) {
-  assert.equal(html.toString('utf8').split(marker).length - 1, 1, 'Cada marcador debe aparecer exactamente una vez.');
+  assert.equal(htmlText.split(marker).length - 1, 1, 'Cada marcador debe aparecer exactamente una vez.');
 }
-const dom = new JSDOM(html.toString('utf8'));
+const dom = new JSDOM(htmlText);
 const document = dom.window.document;
+validateEmbedCode(htmlText, document);
 assert.equal(document.documentElement.dataset.modulo, '__CITYPASS_MODULO__');
 assert.equal(document.querySelector('#citypass-datos[type="application/json"]')?.textContent,
   '__CITYPASS_DATOS__');

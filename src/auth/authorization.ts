@@ -7,12 +7,14 @@ export const OVERVIEW = { area: 'overview', label: 'Analítica Urbana', path: '/
 
 const AREAS = [OVERVIEW, ...DOMAIN_NAV_ITEMS.map(({ domain, path }) => ({ area: domain, path }))];
 
-export const LOGIN_TEAMS = [OVERVIEW, ...DOMAIN_NAV_ITEMS.map(({ domain, label }) => ({ area: domain, label }))];
 
 const MODULE_AREAS: Record<string, ProtectedArea> = {
   eda: 'eda',
   admin: 'login',
   login: 'login',
+  identidad: 'login',
+  ldap: 'login',
+  dap: 'login',
   emergencias: 'emergencies',
   espacios: 'culture',
   movilidad: 'mobility',

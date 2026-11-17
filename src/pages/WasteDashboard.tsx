@@ -1,233 +1,34 @@
-import { DashboardImpactCards } from '../components/common/DashboardImpactCards';
-// src/pages/WasteDashboard.tsx
 import { DashboardHeader } from '../components/common/DashboardHeader/DashboardHeader';
-import { MetricCard } from '../components/common/MetricCard/MetricCard';
-import { ChartCard } from '../components/common/ChartCard/ChartCard';
-import { BarChart } from '../components/charts/BarChart';
-import { PieChart } from '../components/charts/PieChart';
-import { DataTable } from '../components/common/DataTable/DataTable';
-import { ErrorCard } from '../components/common/ErrorState/ErrorState';
 import { EmptyState } from '../components/common/EmptyState/EmptyState';
-import { MetricsGridSkeleton, ChartSkeleton } from '../components/common/LoadingState/LoadingState';
-import { FilterBar } from '../components/common/FilterBar/FilterBar';
-import { useFilters } from '../hooks/useFilters';
-import { useWasteData } from '../hooks/useWasteData';
-import { useResolvedUiState } from '../hooks/useUiState';
+import { ErrorCard } from '../components/common/ErrorState/ErrorState';
+import { ChartSkeleton, MetricsGridSkeleton } from '../components/common/LoadingState/LoadingState';
+import { WasteAffected } from '../components/waste/WasteAffected';
 import { WasteAlertsDashboard } from '../components/waste/WasteAlertsDashboard';
-
-const ZONE_OPTIONS = [
-  { value: 'Centro', label: 'Centro' },
-  { value: 'Palermo', label: 'Palermo' },
-  { value: 'Belgrano', label: 'Belgrano' },
-  { value: 'Caballito', label: 'Caballito' },
-  { value: 'San Telmo', label: 'San Telmo' },
-  { value: 'Recoleta', label: 'Recoleta' },
-];
-
-const WASTE_TYPE_OPTIONS = [
-  { value: 'Orgánico', label: 'Orgánico' },
-  { value: 'Reciclable', label: 'Reciclable' },
-  { value: 'Peligroso', label: 'Peligroso' },
-  { value: 'Voluminoso', label: 'Voluminoso' },
-];
-
-const STATUS_COLORS: Record<string, string> = {
-  NORMAL: '#4F8A72',
-  MEDIO: '#D99838',
-  CRÍTICO: '#C83E4D',
-  DESBORDADO: '#C83E4D',
-};
+import { useDashboardImpact } from '../hooks/useDashboardImpact';
+import { useFilters } from '../hooks/useFilters';
+import { useResolvedUiState } from '../hooks/useUiState';
+import { useWasteData } from '../hooks/useWasteData';
 
 export function WasteDashboard() {
+  const impact = useDashboardImpact('waste');
   const { filters, updateFilter, updateDateRange } = useFilters();
-  const wasteAsync = useWasteData(filters);
-  const resolved = useResolvedUiState(wasteAsync);
-
-  if (resolved.data?.mode === 'alerts') {
-    return (
-      <WasteAlertsDashboard
-        data={resolved.data}
-        filters={filters}
-        onFilterChange={updateFilter}
-        onDateRangeChange={(range) => updateFilter('dateRange', range)}
-        onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)}
-      />
-    );
+  const waste = useWasteData(filters);
+  const resolved = useResolvedUiState(waste);
+  if (resolved.data) {
+    return <WasteAlertsDashboard data={resolved.data} impact={impact} filters={filters}
+      onFilterChange={updateFilter}
+      onDateRangeChange={(range) => updateFilter('dateRange', range)}
+      onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)} />;
   }
-
   return (
-    <div>
-      <DashboardHeader
-        title="Tablero de Residuos"
-        subtitle="Seguimiento analítico de vaciado y volumen recolectado."
-        filters={filters}
-        aiReport={resolved.data?.aiReport}
-        onDateRangeChange={(range) => updateFilter('dateRange', range)}
-        onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)}
-        filters_extra={
-          <FilterBar
-            filters={[
-              {
-                key: 'zone',
-                label: 'Zona',
-                options: ZONE_OPTIONS,
-                value: filters.zone ?? 'all',
-                onChange: (val) => updateFilter('zone', val),
-              },
-              {
-                key: 'wasteType',
-                label: 'Tipo de Residuo',
-                options: WASTE_TYPE_OPTIONS,
-                value: filters.wasteType ?? filters.category ?? 'all',
-                onChange: (val) => {
-                  updateFilter('wasteType', val);
-                  updateFilter('category', val);
-                },
-              },
-            ]}
-            searchValue={filters.search}
-            onSearchChange={(val) => updateFilter('search', val)}
-            searchPlaceholder="Buscar por contenedor, zona..."
-          />
-        }
-      />
-
-      {resolved.loading ? (
-        <div className="section">
-          <MetricsGridSkeleton count={3} />
-          <ChartSkeleton />
-        </div>
-      ) : resolved.error ? (
-        <ErrorCard message={resolved.error} onRetry={wasteAsync.refetch} />
-      ) : resolved.isEmpty || !resolved.data ? (
-        <div className="section">
-          <EmptyState description="No se encontraron registros de residuos para los filtros seleccionados." />
-        </div>
-      ) : (
-        <>
-          {/* KPIs Principales */}
-          <div className="section">
-            <div className="metrics-grid-3">
-              <MetricCard
-                metric={{
-                  label: 'Total Residuos Recolectados',
-                  value: resolved.data.totalCollectedTons,
-                  unit: ' ton',
-                  sublabel: 'Volumen acumulado en el período',
-                  status: 'info',
-                }}
-              />
-              <MetricCard
-                metric={{
-                  label: 'Tasa de Recolección a Tiempo',
-                  value: resolved.data.onTimeCollectionRatePct,
-                  unit: '%',
-                  sublabel: 'Vaciados antes de desbordar',
-                  status: 'normal',
-                }}
-              />
-              <MetricCard
-                metric={{
-                  label: 'Tiempo Prom. de Vaciado',
-                  value: resolved.data.avgCollectionTimeHours,
-                  unit: ' hs',
-                  sublabel: 'Horas desde alerta de llenado',
-                  status: 'warning',
-                }}
-              />
-              <DashboardImpactCards area="waste" />
-            </div>
-          </div>
-
-          {/* Gráficos Principales */}
-          <div className="section">
-            <div className="charts-grid-2">
-              <ChartCard
-                title="Estado de Llenado de Contenedores"
-                subtitle="Distribución por nivel de capacidad (NORMAL, MEDIO, CRÍTICO, DESBORDADO)"
-              >
-                <PieChart
-                  data={resolved.data.containersByStatus.map((s) => ({
-                    name: s.status,
-                    value: s.count,
-                    color: STATUS_COLORS[s.status] || '#8FB8D8',
-                  }))}
-                  height={260}
-                />
-              </ChartCard>
-
-              <ChartCard
-                title="Volumen Recolectado por Tipo de Residuo"
-                subtitle="Comparativa de toneladas recolectadas por categoría"
-              >
-                <BarChart
-                  data={resolved.data.volumeByWasteType}
-                  xKey="wasteType"
-                  bars={[{ key: 'tons', label: 'Toneladas', color: '#4F8A72' }]}
-                  height={260}
-                  unit=" ton"
-                />
-              </ChartCard>
-            </div>
-          </div>
-
-          {/* Tiempo Promedio por Zona */}
-          <div className="section">
-            <ChartCard
-              title="Tiempo Promedio de Vaciado por Zona"
-              subtitle="Horas transcurridas entre la emisión de alerta y el vaciado efectivo por zona"
-            >
-              <BarChart
-                data={resolved.data.avgCollectionTimeByZone}
-                xKey="zone"
-                bars={[{ key: 'hours', label: 'Horas promedio', color: '#2563A6' }]}
-                height={260}
-                unit=" hs"
-              />
-            </ChartCard>
-          </div>
-
-          {/* Tabla de Puntos Críticos */}
-          <div className="section">
-            <ChartCard
-              title="Puntos Críticos de Atenciones Pendientes"
-              subtitle="Contenedores con nivel de llenado superior al 80% ordenados descendentemente"
-            >
-              <DataTable
-                columns={[
-                  { key: 'containerId', label: 'Contenedor', width: '130px' },
-                  { key: 'zone', label: 'Zona', width: '140px' },
-                  { key: 'wasteType', label: 'Tipo de Residuo', width: '160px' },
-                  {
-                    key: 'fillLevelPct',
-                    label: 'Nivel de Llenado',
-                    width: '150px',
-                    render: (row) => (
-                      <span
-                        style={{
-                          fontWeight: 600,
-                          color: (row.fillLevelPct as number) >= 95 ? '#C83E4D' : '#D99838',
-                        }}
-                      >
-                        {String(row.fillLevelPct)}%
-                      </span>
-                    ),
-                  },
-                  {
-                    key: 'hoursOverfilled',
-                    label: 'Horas en Estado Crítico',
-                    width: '180px',
-                    render: (row) => <span>{String(row.hoursOverfilled)} hs</span>,
-                  },
-                ]}
-                data={resolved.data.criticalContainersDetail}
-                keyField="containerId"
-              />
-            </ChartCard>
-          </div>
-        </>
-      )}
-      {!resolved.loading && (resolved.error || resolved.isEmpty || !resolved.data) && <DashboardImpactCards area="waste" standalone />}
-    </div>
+    <>
+      <DashboardHeader title="Tablero de Residuos" subtitle="Seguimiento de alertas de llenado y tiempos de resolución."
+        filters={filters} onDateRangeChange={(range) => updateFilter('dateRange', range)}
+        onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)} />
+      {resolved.loading ? <div className="section"><MetricsGridSkeleton count={4} /><ChartSkeleton /></div>
+        : resolved.error ? <ErrorCard message={resolved.error} onRetry={waste.refetch} />
+        : <EmptyState description="No hay alertas de residuos para los filtros seleccionados." />}
+      <WasteAffected report={impact.data} zones={[]} />
+    </>
   );
 }

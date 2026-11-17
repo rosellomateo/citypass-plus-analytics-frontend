@@ -7,7 +7,6 @@ import { LoadingFullPage } from '../components/common/LoadingState/LoadingState'
 import { AuthGate } from '../auth/AuthGate';
 import { DefaultDashboardRedirect, RouteGuard } from '../auth/RouteGuard';
 import { LoginPage } from '../pages/LoginPage';
-import { isLocalPreview } from '../config/localPreview';
 
 const AnalyticsOverview = lazy(() => import('../pages/AnalyticsOverview').then((m) => ({ default: m.AnalyticsOverview })));
 const ClaimsDashboard = lazy(() => import('../pages/ClaimsDashboard').then((m) => ({ default: m.ClaimsDashboard })));
@@ -27,7 +26,6 @@ export const router = createBrowserRouter([
     path: '/login',
     element: <LoginPage />,
   },
-  ...(isLocalPreview() ? [{ path: '/presentacion', element: <LoginPage presentation /> }] : []),
   {
     path: '/',
     element: <AuthGate><DefaultDashboardRedirect /></AuthGate>,

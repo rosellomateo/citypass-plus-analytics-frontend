@@ -1,8 +1,7 @@
 # CityPass+ Analytics Frontend
 
 Aplicación web de tableros analíticos de CityPass+, construida con React,
-TypeScript y Vite. Puede funcionar con datos locales de prueba o consumir la API
-de analítica sin cambiar la lógica de las pantallas.
+TypeScript y Vite. El portal consume la API de Analítica con una sesión de Login Federado.
 
 ## Inicio rápido
 
@@ -18,36 +17,6 @@ npm run dev
 
 La configuración de ejemplo usa la API de Analítica. Abrir <http://localhost:5173>.
 
-### Modo pruebas (sin backend)
-
-Para ver y probar los gráficos sin levantar la API, ejecutar:
-
-```bash
-npm run dev:mock
-```
-
-Abrir <http://127.0.0.1:5174>. La vista previa local empieza en el login.
-Los accesos rápidos están en <http://127.0.0.1:5174/presentacion> y usan datos
-de ejemplo. Vite refleja los cambios al guardar. Para cerrar
-la vista previa, usar `Ctrl+C` en la terminal donde se inició.
-
-Los seis casos de la Parte 2 se pueden ensayar con **Simular escenario** en
-los tableros. La vista previa lee sus archivos locales en `testingDatos/`
-cuando están disponibles.
-
-### Presentación local por equipo
-
-`npm run dev:presentation` sirve <http://127.0.0.1:5175/presentacion> con ocho accesos
-rápidos para ensayar los permisos y ver datos de ejemplo. Consultá la
-[configuración de las sesiones locales](docs/configuration.md#modo-presentación).
-
-Para generar una versión estática de demostración, sin dependencia del backend:
-
-```bash
-npm run build:mock
-npm run preview
-```
-
 Para una prueba integrada, editar `.env.local`:
 
 ```dotenv
@@ -62,7 +31,6 @@ backend debe estar disponible y permitir por CORS el origen del frontend.
 
 ```bash
 npm run dev
-npm run dev:mock
 npm run lint
 npm run test
 npm run test:coverage

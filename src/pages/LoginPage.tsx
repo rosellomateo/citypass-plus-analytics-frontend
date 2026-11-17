@@ -1,15 +1,10 @@
 import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
-import {
-  ArrowRight, BarChart3, Bike, CircleAlert, Eye, EyeOff, KeyRound,
-  MessageSquare, Network, Trees, Trash2,
-} from 'lucide-react';
+import { ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { authenticatePresentationTeam, authenticateWithIdp, getAuthSnapshot, getPresentationUsernames } from '../auth/session';
+import { authenticateWithIdp, getAuthSnapshot } from '../auth/session';
 import type { LoginResult } from '../auth/session';
-import { getDefaultAuthorizedPath, LOGIN_TEAMS } from '../auth/authorization';
-import { isLocalPreview } from '../config/localPreview';
-import { useAsync } from '../hooks/useAsync';
+import { getDefaultAuthorizedPath } from '../auth/authorization';
 import styles from './LoginPage.module.css';
 
 const LOGIN_ERRORS = {
@@ -17,46 +12,28 @@ const LOGIN_ERRORS = {
   unavailable: 'No pudimos comunicarnos con Login Federado. Intentá nuevamente.',
   'profile-unavailable': 'No pudimos consultar tu perfil en Login Federado. Intentá nuevamente.',
   'invalid-token': 'No pudimos validar tu acceso para este portal.',
-  unconfigured: 'La sesión local de este equipo no está disponible.',
 };
 
-const TEAM_ICONS = {
-  overview: BarChart3,
-  eda: Network,
-  login: KeyRound,
-  emergencies: CircleAlert,
-  culture: Trees,
-  mobility: Bike,
-  claims: MessageSquare,
-  waste: Trash2,
-};
-
-export function LoginPage({ presentation = false }: { presentation?: boolean }) {
-  const isPresentation = presentation && isLocalPreview();
+export function LoginPage() {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<{ source: string; message: string }>();
-  const [pending, setPending] = useState<string>();
+  const [error, setError] = useState<string>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const submitting = useRef(false);
-  const isSubmitting = pending !== undefined;
-  const { data: presentationUsernames } = useAsync(
-    () => isPresentation ? getPresentationUsernames() : Promise.resolve(null), [isPresentation],
-  );
-
-  async function signIn(source: string, request: () => Promise<LoginResult>) {
+  async function signIn(request: () => Promise<LoginResult>) {
     if (submitting.current) return;
     submitting.current = true;
     setError(undefined);
-    setPending(source);
+    setIsSubmitting(true);
     const result = await request();
     setPassword('');
     submitting.current = false;
-    setPending(undefined);
+    setIsSubmitting(false);
 
     if (result !== 'success') {
-      setError({ source, message: LOGIN_ERRORS[result] });
+      setError(LOGIN_ERRORS[result]);
       return;
     }
 
@@ -68,7 +45,7 @@ export function LoginPage({ presentation = false }: { presentation?: boolean }) 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!username.trim() || !password) return;
-    void signIn('manual', () => authenticateWithIdp(username.trim(), password));
+    void signIn(() => authenticateWithIdp(username.trim(), password));
   }
 
   return (
@@ -122,42 +99,15 @@ export function LoginPage({ presentation = false }: { presentation?: boolean }) 
               </div>
             </div>
 
-            {error?.source === 'manual' && <p className={styles.error} role="alert">{error.message}</p>}
+            {error && <p className={styles.error} role="alert">{error}</p>}
 
             <button className={styles.submit} type="submit" disabled={isSubmitting || !username.trim() || !password}>
-              {pending === 'manual' ? 'Verificando acceso…' : 'Iniciar sesión'}
+              {isSubmitting ? 'Verificando acceso…' : 'Iniciar sesión'}
               <ArrowRight size={21} aria-hidden="true" />
             </button>
           </form>
         </section>
 
-        {isPresentation && (
-          <section className={styles.teamSection} aria-labelledby="quick-sign-in">
-            <h2 id="quick-sign-in">Demo · Entrar sin contraseña</h2>
-            <div className={styles.teamGrid}>
-              {LOGIN_TEAMS.map(({ area, label }) => {
-                const Icon = TEAM_ICONS[area];
-                const account = presentationUsernames?.[area];
-                return (
-                  <button
-                    key={area}
-                    type="button"
-                    className={styles.quickAccess}
-                    disabled={isSubmitting}
-                    onClick={() => void signIn(area, () => authenticatePresentationTeam(area))}
-                  >
-                    <Icon size={18} aria-hidden="true" />
-                    <span>
-                      <strong>{pending === area ? 'Verificando…' : label}</strong>
-                      {account && <span className={styles.account}>{account}</span>}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-            {error && error.source !== 'manual' && <p className={styles.error} role="alert">{error.message}</p>}
-          </section>
-        )}
       </div>
     </main>
   );
