@@ -25,7 +25,7 @@ const MVP_EVENTS = [
   { domain: 'Cultura', eventType: 'espacios.inscripcion.confirmada', source: 'culture-service', status: 'Pendiente confirmación' },
   { domain: 'Cultura', eventType: 'espacios.inscripcion.cancelada', source: 'culture-service', status: 'Pendiente confirmación' },
   { domain: 'Cultura', eventType: 'espacios.evento.cancelado', source: 'culture-service', status: 'Complementario' },
-  { domain: 'Residuos', eventType: 'Contrato JSON de entrada', source: 'waste-service (simulado)', status: 'Dashboard disponible (contrato a definir)' },
+  { domain: 'Residuos', eventType: 'IntervencionActualizada', source: 'Residuos', status: 'Documentado' },
 ];
 
 const DOMAIN_OPTIONS = [

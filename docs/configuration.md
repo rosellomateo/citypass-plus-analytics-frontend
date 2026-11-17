@@ -5,7 +5,7 @@ Estas variables configuran el portal:
 
 | Variable | Valores | Descripción |
 | --- | --- | --- |
-| `VITE_DATA_SOURCE` | `mock` o `api` | Selecciona la fuente utilizada por todos los tableros. |
+| `VITE_DATA_SOURCE` | `api` | Fuente del portal. El build embebido configura su propio modo. |
 | `VITE_API_BASE_URL` | URL HTTP(S) | URL base del backend, sin ruta de endpoint. |
 | `VITE_IDP_BASE_URL` | URL HTTPS | Base de Login/LDAP para `/me`, `/auth/login`, `/auth/refresh` y `/auth/logout`. Por defecto `https://api.citypass-login.pp.ua`. |
 | `VITE_AUTH_CLIENT_ID` | texto asignado por IdP | Cliente LDAP de Analítica (por defecto, `citypass-analitica-web`). |
@@ -19,8 +19,6 @@ Crear un archivo ignorado por Git:
 cp .env.example .env.local
 ```
 
-Para trabajar sin backend, ejecutar `npm run dev:mock`.
-
 Para una prueba integrada:
 
 ```dotenv
@@ -32,12 +30,6 @@ Vite lee estas variables al iniciar. Después de modificarlas, detener y volver 
 ejecutar `npm run dev`.
 
 ## Comportamiento de cada modo
-
-### `mock`
-
-- ofrece accesos rápidos con sesiones de prueba en `npm run dev:mock`;
-- usa los datasets incluidos en `src/data/mocks/`;
-- permite desarrollar y demostrar la interfaz de manera aislada.
 
 ### `api`
 
@@ -108,17 +100,3 @@ Login Federado debe permitir por CORS el origen del portal para `GET /me`,
 `POST /auth/login`, `POST /auth/refresh` y `POST /auth/logout`, incluida la cabecera
 `Authorization`. El backend de Analítica también
 debe permitir ese origen y la cabecera `Authorization`.
-
-El modo local `mock` muestra primero la pantalla de acceso y usa datos de demostración.
-
-## Modo presentación
-
-Ejecutar `npm run dev:presentation` y abrir <http://127.0.0.1:5175/presentacion>.
-Los ocho botones leen perfiles simulados de `testingDatos/sesiones-presentacion.json`.
-Cada perfil tiene un identificador con prefijo `local-demo:`, un usuario
-ficticio y su lista de tableros. El directorio está ignorado por Git y Docker.
-
-El inicio de sesión normal envía usuario y contraseña a Login/LDAP. El perfil
-proviene de `/me`; el backend de Analítica valida el JWT al consultar datos. En modo API,
-los tableros consumen los JSON del backend, incluido el informe de IA cuando
-la respuesta lo trae.

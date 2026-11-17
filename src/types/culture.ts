@@ -57,6 +57,12 @@ export type InscripcionCanceladaEvent = EventEnvelope<InscripcionCanceladaData>;
 export type EventoCanceladoEvent = EventEnvelope<EventoCanceladoData>;
 
 export interface CultureAnalyticsData {
+  activities?: {
+    total: number;
+    massive: number;
+    affectedByClimate: number | null;
+    byCategory: { category: string; count: number }[];
+  };
   // CU-C1
   confirmedReservations: number;
   cancelledReservations: number;

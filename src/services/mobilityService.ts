@@ -10,7 +10,6 @@ import type {
   StationAvgDurationItem,
   MobilityWeeklyAnalysis,
 } from '../types';
-import { mockMobilityRecords, mockMobilityLLMReport } from '../data/mocks/mobility.mock';
 import { delay } from '../utils';
 import { isWithinDateRange } from '../utils/dates';
 
@@ -85,7 +84,7 @@ export function deduplicateMobilityRecords(records: BackendMobilityRecord[]): Ba
  */
 export function getFilteredMobilityRecords(
   filters: DashboardFilters,
-  records: BackendMobilityRecord[] = mockMobilityRecords
+  records: BackendMobilityRecord[]
 ): BackendMobilityRecord[] {
   const deduplicated = deduplicateMobilityRecords(records);
 
@@ -234,8 +233,8 @@ export function getStationAvgDuration(
  */
 export async function getMobilityAnalyticsData(
   filters: DashboardFilters,
-  records: BackendMobilityRecord[] = mockMobilityRecords,
-  llmReport: MobilityLLMReport = mockMobilityLLMReport
+  records: BackendMobilityRecord[],
+  llmReport: MobilityLLMReport
 ): Promise<MobilityAnalyticsData> {
   await delay();
 

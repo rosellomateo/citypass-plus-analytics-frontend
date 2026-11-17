@@ -37,7 +37,7 @@ export const DOMAIN_NAV_ITEMS: DomainNavMeta[] = [
   },
   {
     domain: 'culture',
-    label: 'Espacios Públicos y Cultura',
+    label: 'Espacios Públicos',
     shortDescription: 'Análisis de ocupación de espacios y convocatoria a eventos comunitarios.',
     path: '/analytics/culture',
     color: '#8FB8D8',
@@ -53,7 +53,7 @@ export const DOMAIN_NAV_ITEMS: DomainNavMeta[] = [
   },
   {
     domain: 'login',
-    label: 'Login Federado',
+    label: 'Login',
     shortDescription: 'Inicios de sesión, renovaciones y cierres por departamento.',
     path: '/analytics/login',
     color: '#285DA5',

@@ -8,6 +8,7 @@ interface CategorySearchFilterProps {
   selectedCategory: string;
   onSelectCategory: (category: string) => void;
   placeholder?: string;
+  ariaLabel?: string;
 }
 
 export function CategorySearchFilter({
@@ -15,6 +16,7 @@ export function CategorySearchFilter({
   selectedCategory,
   onSelectCategory,
   placeholder = 'Todas las categorías',
+  ariaLabel = 'Filtrar por categoría',
 }: CategorySearchFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -54,7 +56,7 @@ export function CategorySearchFilter({
         onClick={() => setIsOpen((prev) => !prev)}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
-        aria-label="Filtrar por categoría"
+        aria-label={ariaLabel}
       >
         <Search className={styles.searchIcon} size={15} />
         <span className={styles.triggerText}>{displayLabel}</span>

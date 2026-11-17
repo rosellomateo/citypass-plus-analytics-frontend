@@ -63,6 +63,27 @@ body {
   gap: 16px;
 }
 
+.metrics-grid-auto {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  gap: var(--space-4, 16px);
+}
+
+.section[id] {
+  scroll-margin-top: 80px;
+}
+
+.chart-source-note {
+  color: var(--color-text-muted, #586579);
+  font-size: 0.82rem;
+  font-style: oblique;
+  line-height: 1.6;
+}
+
+.event-impact-chart {
+  margin-top: 24px;
+}
+
 .charts-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;

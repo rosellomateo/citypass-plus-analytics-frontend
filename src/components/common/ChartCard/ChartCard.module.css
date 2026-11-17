@@ -23,6 +23,10 @@
   gap: 12px;
 }
 
+.centeredHeader {
+  align-items: center;
+}
+
 .titleGroup {
   display: flex;
   flex-direction: column;

@@ -8,6 +8,7 @@ interface ChartCardProps {
   subtitle?: string;
   children: ReactNode;
   actions?: ReactNode;
+  centerActions?: boolean;
   loading?: boolean;
   height?: number;
 }
@@ -17,6 +18,7 @@ export function ChartCard({
   subtitle,
   children,
   actions,
+  centerActions = false,
   loading = false,
   height = CHART_HEIGHT.md,
 }: ChartCardProps) {
@@ -26,7 +28,7 @@ export function ChartCard({
 
   return (
     <div className={styles.card}>
-      <div className={styles.header}>
+      <div className={centerActions ? `${styles.header} ${styles.centeredHeader}` : styles.header}>
         <div className={styles.titleGroup}>
           <span className={styles.title}>{title}</span>
           {subtitle && <span className={styles.subtitle}>{subtitle}</span>}

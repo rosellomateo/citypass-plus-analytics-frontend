@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { analyticsApi } from '../api/analyticsApi';
 import { apiGet, getApiBaseUrl } from '../api/client';
 import { authenticateWithIdp, clearTokenPair } from '../auth/session';
@@ -38,7 +38,12 @@ function verificationResponse() {
 }
 
 describe('API client', () => {
-  beforeEach(() => vi.stubEnv('VITE_DATA_SOURCE', 'mock'));
+  it('rejects anonymous analytics requests before contacting the backend', async () => {
+    const request = vi.fn();
+    vi.stubGlobal('fetch', request);
+    await expect(apiGet('/analytics/reclamos')).rejects.toMatchObject({ name: 'AuthenticationError' });
+    expect(request).not.toHaveBeenCalled();
+  });
 
   it('uses VITE_API_BASE_URL and removes its trailing slash', () => {
     vi.stubEnv('VITE_API_BASE_URL', 'http://localhost:8000/');
@@ -54,25 +59,33 @@ describe('API client', () => {
 
   it('performs a GET request and returns JSON', async () => {
     vi.stubEnv('VITE_API_BASE_URL', 'http://localhost:8000');
-    const fetchMock = vi.fn().mockResolvedValue({
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(tokenResponse('access-token', 'refresh-token'))
+      .mockResolvedValueOnce(verificationResponse())
+      .mockResolvedValue({
       ok: true,
       status: 200,
       json: vi.fn().mockResolvedValue({ datos: [{ categoria: 'Alumbrado' }], informe: informeMock }),
     });
     vi.stubGlobal('fetch', fetchMock);
 
+    await authenticateWithIdp('jperez', 'correcta');
     const result = await apiGet<{ datos: Array<{ categoria: string }>; informe: typeof informeMock }>('/analytics/reclamos');
 
     expect(result).toEqual({ datos: [{ categoria: 'Alumbrado' }], informe: informeMock });
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:8000/analytics/reclamos', {
       method: 'GET',
-      headers: { Accept: 'application/json' },
+      headers: { Accept: 'application/json', Authorization: 'Bearer access-token' },
     });
   });
 
   it('exposes the HTTP status when the API rejects a request', async () => {
     vi.stubEnv('VITE_API_BASE_URL', 'http://localhost:8000');
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 503 }));
+    vi.stubGlobal('fetch', vi.fn()
+      .mockResolvedValueOnce(tokenResponse('access-token', 'refresh-token'))
+      .mockResolvedValueOnce(verificationResponse())
+      .mockResolvedValue({ ok: false, status: 503 }));
+    await authenticateWithIdp('jperez', 'correcta');
 
     const request = apiGet('/analytics/reclamos');
 
@@ -124,13 +137,17 @@ describe('API client', () => {
 
   it('defines the current backend endpoint paths', async () => {
     vi.stubEnv('VITE_API_BASE_URL', 'http://localhost:8000');
-    const fetchMock = vi.fn().mockResolvedValue({
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(tokenResponse('access-token', 'refresh-token'))
+      .mockResolvedValueOnce(verificationResponse())
+      .mockResolvedValue({
       ok: true,
       status: 200,
       json: vi.fn().mockResolvedValue({ datos: [], informe: informeMock }),
     });
     vi.stubGlobal('fetch', fetchMock);
 
+    await authenticateWithIdp('jperez', 'correcta');
     await Promise.all([
       analyticsApi.getClaims(),
       analyticsApi.getEmergencies(),
@@ -140,7 +157,7 @@ describe('API client', () => {
 
     ]);
 
-    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+    expect(fetchMock.mock.calls.slice(2).map(([url]) => url)).toEqual([
       'http://localhost:8000/analytics/reclamos',
       'http://localhost:8000/analytics/seguridad-emergencias',
       'http://localhost:8000/analytics/movilidad-urbana',

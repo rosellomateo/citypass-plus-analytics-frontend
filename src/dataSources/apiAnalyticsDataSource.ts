@@ -3,6 +3,7 @@ import { embeddedApi } from '../api/embeddedApi';
 import { getDataSource } from './dataSource';
 import type {
   ClaimApiRecord,
+  CultureActivityApiRecord,
   CultureApiRecord,
   EmergencyApiRecord,
   MobilityApiRecord,
@@ -119,7 +120,18 @@ export function mapEmergencyApiData(
     else activeCount += count;
   });
 
-  const dispatchRows = filtered.map((row) => ({
+  const categories = new Map<string, EmergencyAnalyticsData['emergenciesByCategoryStacked'][number]>();
+  for (const row of filtered) {
+    const category = textOrEmpty(row.categoria ?? null);
+    const priority = textOrEmpty(row.prioridad).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+    if (!category || (priority !== 'BAJA' && priority !== 'MEDIA' && priority !== 'ALTA' && priority !== 'CRITICA')) continue;
+    const counts = categories.get(category) ?? { category, BAJA: 0, MEDIA: 0, ALTA: 0, CRITICA: 0, total: 0 };
+    const count = numberOrZero(row.cantidadEmergencias);
+    counts[priority] += count;
+    counts.total += count;
+    categories.set(category, counts);
+  }
+  const dispatchRows = filtered.filter(({ tiempoPromRespuestaDespacho }) => tiempoPromRespuestaDespacho != null).map((row) => ({
     priority: textOrEmpty(row.prioridad).toUpperCase() || 'SIN PRIORIDAD',
     value: numberOrZero(row.tiempoPromRespuestaDespacho),
     weight: numberOrZero(row.cantidadEmergencias),
@@ -151,9 +163,8 @@ export function mapEmergencyApiData(
       dispatchByPriority,
       ([priority, values]) => ({ priority, minutes: weightedAverage(values) })
     ),
-    // El endpoint actual no informa categoria.
-    emergenciesByCategoryStacked: [],
-    availableCategories: [],
+    emergenciesByCategoryStacked: [...categories.values()],
+    availableCategories: [...categories.keys()],
   };
 }
 
@@ -269,13 +280,29 @@ export function mapCultureApiData(
 export async function getApiCultureAnalyticsData(
   filters: DashboardFilters
 ): Promise<CultureAnalyticsData> {
-  const respuesta = await getAnalyticsApi().getCulture();
-  const analytics = mapCultureApiData(respuesta.datos, filters);
-
-  return {
-    ...analytics,
-    aiReport: respuesta.informe,
-  };
+  const { datos, informe } = await getAnalyticsApi().getCulture();
+  const first = datos[0];
+  if (first && 'cantidadActividades' in first) {
+    const rows = rowsInRange(datos as CultureActivityApiRecord[], filters);
+    const categories = new Map<string, number>();
+    let total = 0;
+    let massive = 0;
+    let affectedByClimate: number | null = null;
+    for (const row of rows) {
+      const count = numberOrZero(row.cantidadActividades);
+      const category = textOrEmpty(row.categoria) || 'SIN CATEGORÍA';
+      categories.set(category, (categories.get(category) ?? 0) + count);
+      total += count;
+      massive += numberOrZero(row.cantidadMasivas);
+      if (row.cantidadAfectadasPorClima != null) affectedByClimate = (affectedByClimate ?? 0) + row.cantidadAfectadasPorClima;
+    }
+    return {
+      ...mapCultureApiData([], filters),
+      activities: { total, massive, affectedByClimate, byCategory: [...categories].map(([category, count]) => ({ category, count })) },
+      aiReport: informe,
+    };
+  }
+  return { ...mapCultureApiData(datos as CultureApiRecord[], filters), aiReport: informe };
 }
 
 export function mapWasteApiData(

@@ -33,13 +33,12 @@ const defaultFilters = { dateRange: '7d' as const };
 
 describe('Domain Services Aggregations', () => {
   it('Reclamos service calculates CU-R1 (counts by category/status) and CU-R2 (avg resolution time)', async () => {
-    const data = await getClaimsAnalyticsData(defaultFilters);
+    const data = await getClaimsAnalyticsData(defaultFilters, mockClaimRecords);
     expect(data.totalClaims).toBeGreaterThan(0);
     expect(data.claimsByCategory.length).toBeGreaterThan(0);
     expect(data.claimsByStatus.length).toBe(4);
     expect(data.avgResolutionTimeHours).toBeGreaterThanOrEqual(0);
     expect(data.availableCategories.length).toBeGreaterThan(0);
-    expect(data.aiReport?.analisis?.length).toBeGreaterThan(0);
   });
 
   it('Reclamos service supports local category filtering for status distribution', () => {
@@ -273,7 +272,7 @@ describe('Domain Services Aggregations', () => {
   });
 
   it('Mobility service handles empty records gracefully avoiding NaN or division by zero', async () => {
-    const emptyData = await getMobilityAnalyticsData(defaultFilters, []);
+    const emptyData = await getMobilityAnalyticsData(defaultFilters, [], mockMobilityLLMReport);
     expect(emptyData.weightedAvgDurationMinutes).toBe(0);
     expect(emptyData.tripsByStation.length).toBe(0);
     expect(emptyData.topStationName).toBe('N/A');
@@ -281,7 +280,7 @@ describe('Domain Services Aggregations', () => {
   });
 
   it('Mobility service composes analytics data dynamically from filtered records', async () => {
-    const data = await getMobilityAnalyticsData(defaultFilters);
+    const data = await getMobilityAnalyticsData(defaultFilters, mockMobilityRecords, mockMobilityLLMReport);
     expect(data.totalTrips).toBeGreaterThan(0);
     expect(data.weeklyTrips).toBeGreaterThan(0);
     expect(data.totalDurationMinutes).toBeGreaterThan(0);
