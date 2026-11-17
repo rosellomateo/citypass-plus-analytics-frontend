@@ -10,6 +10,7 @@ interface MetricCardProps {
   iconColor?: string;
   iconBg?: string;
   loading?: boolean;
+  action?: React.ReactNode;
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -19,7 +20,7 @@ const STATUS_COLORS: Record<string, string> = {
   info: '#2563A6',
 };
 
-export function MetricCard({ metric, icon, iconColor = '#2563A6', iconBg = '#EBF3FC', loading = false }: MetricCardProps) {
+export function MetricCard({ metric, icon, iconColor = '#2563A6', iconBg = '#EBF3FC', loading = false, action }: MetricCardProps) {
   if (loading) {
     return <MetricCardSkeleton />;
   }
@@ -74,6 +75,7 @@ export function MetricCard({ metric, icon, iconColor = '#2563A6', iconBg = '#EBF
           )}
         </div>
       )}
+      {action}
     </div>
   );
 }

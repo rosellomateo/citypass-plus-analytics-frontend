@@ -1,4 +1,5 @@
-import { DashboardImpactCards } from '../common/DashboardImpactCards';
+import { WasteAffected, WasteAffectedMetric } from './WasteAffected';
+import type { useDashboardImpact } from '../../hooks/useDashboardImpact';
 import { BarChart } from '../charts/BarChart';
 import { PieChart } from '../charts/PieChart';
 import { ChartCard } from '../common/ChartCard/ChartCard';
@@ -10,6 +11,7 @@ import type { DashboardFilters, WasteAlertMetrics } from '../../types';
 
 interface WasteAlertsDashboardProps {
   data: WasteAlertMetrics;
+  impact: ReturnType<typeof useDashboardImpact>;
   filters: DashboardFilters;
   onFilterChange: <K extends keyof DashboardFilters>(
     key: K,
@@ -23,6 +25,7 @@ const CHART_COLORS = ['#4F8A72', '#D99838', '#C83E4D', '#2563A6', '#8FB8D8'];
 
 export function WasteAlertsDashboard({
   data,
+  impact,
   filters,
   onFilterChange,
   onDateRangeChange,
@@ -69,7 +72,7 @@ export function WasteAlertsDashboard({
       />
 
       <div className="section">
-        <div className="metrics-grid-4">
+        <div className="metrics-grid-auto">
           <MetricCard
             metric={{
               label: 'Total de Alertas',
@@ -103,7 +106,7 @@ export function WasteAlertsDashboard({
               status: 'warning',
             }}
           />
-          <DashboardImpactCards area="waste" />
+          <WasteAffectedMetric report={impact.data} />
         </div>
       </div>
 
@@ -180,6 +183,7 @@ export function WasteAlertsDashboard({
           />
         </ChartCard>
       </div>
+      <WasteAffected report={impact.data} zones={data.availableZones} />
     </div>
   );
 }

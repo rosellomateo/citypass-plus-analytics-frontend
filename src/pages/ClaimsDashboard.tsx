@@ -1,4 +1,7 @@
 import { DashboardImpactCards } from '../components/common/DashboardImpactCards';
+import { DashboardImpactCharts } from '../components/common/DashboardImpactCharts';
+import { GoldReportCharts } from '../components/common/GoldReportCharts';
+import { useDashboardImpact } from '../hooks/useDashboardImpact';
 // src/pages/ClaimsDashboard.tsx
 import { useState, useMemo } from 'react';
 import { DashboardHeader } from '../components/common/DashboardHeader/DashboardHeader';
@@ -27,6 +30,7 @@ const claimStatusPillOptions = [
 ];
 
 export function ClaimsDashboard() {
+  const impact = useDashboardImpact('claims');
   const { filters, updateFilter, updateDateRange } = useFilters();
   const claimsAsync = useClaimsData(filters);
   const resolved = useResolvedUiState(claimsAsync);
@@ -102,7 +106,7 @@ export function ClaimsDashboard() {
                   status: 'normal',
                 }}
               />
-              <DashboardImpactCards area="claims" />
+              <DashboardImpactCards area="claims" data={impact.data} />
             </div>
           </div>
 
@@ -164,7 +168,9 @@ export function ClaimsDashboard() {
           </div>
         </>
       ) : null}
-      {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="claims" standalone />}
+      {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="claims" data={impact.data} standalone />}
+      <DashboardImpactCharts area="claims" {...impact} />
+      <GoldReportCharts title="Causas de reclamos" charts={impact.data?.resumen_gold} />
     </div>
   );
 }

@@ -1,4 +1,8 @@
 import { DashboardImpactCards } from '../components/common/DashboardImpactCards';
+import { Anchor } from '@mantine/core';
+import { CausePie } from '../components/common/CausePie';
+import { StationAffectations } from '../components/mobility/StationAffectations';
+import { useDashboardImpact } from '../hooks/useDashboardImpact';
 // src/pages/MobilityDashboard.tsx
 import { useState, useMemo } from 'react';
 import { DashboardHeader } from '../components/common/DashboardHeader/DashboardHeader';
@@ -35,6 +39,7 @@ const DATE_RANGE_LABELS: Record<string, string> = {
 };
 
 export function MobilityDashboard() {
+  const impact = useDashboardImpact('mobility');
   const { filters, updateFilter, updateDateRange } = useFilters();
   const mobilityAsync = useMobilityData(filters);
   const resolved = useResolvedUiState(mobilityAsync);
@@ -66,6 +71,17 @@ export function MobilityDashboard() {
   }, [records]);
 
   const activeRangeLabel = DATE_RANGE_LABELS[filters.dateRange || '7d'] || 'Período seleccionado';
+  const gold = impact.data?.resumen_gold;
+  const interruptions = gold?.find(({ id }) => id === 'mobility-interruptions');
+  const affectedTrips = interruptions?.puntos.reduce((total, { etiqueta, valor }) => (
+    etiqueta === 'Operación normal' ? total : total + valor
+  ), 0);
+  const stationsByCause = gold?.find(({ id }) => id === 'mobility-stations');
+  const causes = new Map<string, number>();
+  for (const { etiqueta, valor } of stationsByCause?.puntos ?? []) {
+    const cause = etiqueta === 'Reserva' ? 'Evento público' : etiqueta;
+    causes.set(cause, (causes.get(cause) ?? 0) + valor);
+  }
 
   return (
     <div>
@@ -134,13 +150,14 @@ export function MobilityDashboard() {
               />
               <MetricCard
                 metric={{
-                  label: 'Franja Predominante',
-                  value: resolved.data.predominantDurationBucket,
-                  sublabel: 'Rango de duración líder',
-                  status: 'normal',
+                  label: 'Viajes afectados',
+                  value: affectedTrips ?? 'Sin datos',
+                  sublabel: 'Interrupciones por causas externas',
+                  status: 'warning',
                 }}
+                action={<Anchor href="#viajes-afectados" size="sm">Ver viajes afectados</Anchor>}
               />
-              <DashboardImpactCards area="mobility" />
+              <DashboardImpactCards area="mobility" data={impact.data} />
             </div>
           </div>
 
@@ -242,7 +259,19 @@ export function MobilityDashboard() {
           </div>
         </>
       ) : null}
-      {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="mobility" standalone />}
+      {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="mobility" data={impact.data} standalone />}
+      <section className="section" id="viajes-afectados" aria-label="Viajes afectados">
+        <h2 className="section-title">Viajes afectados</h2>
+        <CausePie title="Estaciones afectadas por causa" date={stationsByCause?.fecha_snapshot}
+            description="Conteos por causa"
+            points={[...causes.entries()].map(([etiqueta, valor]) => ({ etiqueta, valor }))}
+            filters={{
+              scope: 'estación',
+              options: resolved.data?.availableStations ?? [],
+              groups: impact.data?.afectaciones?.estaciones ?? [],
+            }} />
+        <StationAffectations rows={impact.data?.afectaciones?.estado_estaciones ?? []} />
+      </section>
     </div>
   );
 }
