@@ -15,7 +15,6 @@ const MobilityDashboard = lazy(() => import('../pages/MobilityDashboard').then((
 const CultureDashboard = lazy(() => import('../pages/CultureDashboard').then((m) => ({ default: m.CultureDashboard })));
 const WasteDashboard = lazy(() => import('../pages/WasteDashboard').then((m) => ({ default: m.WasteDashboard })));
 const LoginDashboard = lazy(() => import('../pages/LoginDashboard').then((m) => ({ default: m.LoginDashboard })));
-const EdaDashboard = lazy(() => import('../pages/EdaDashboard').then((m) => ({ default: m.EdaDashboard })));
 
 function SuspenseWrapper({ children }: { children: React.ReactNode }) {
   return <Suspense fallback={<LoadingFullPage />}>{children}</Suspense>;
@@ -65,10 +64,6 @@ export const router = createBrowserRouter([
       {
         path: 'analytics/dap',
         element: <Navigate to="/analytics/login" replace />,
-      },
-      {
-        path: 'analytics/eda',
-        element: <RouteGuard area="eda"><SuspenseWrapper><EdaDashboard /></SuspenseWrapper></RouteGuard>,
       },
     ],
   },

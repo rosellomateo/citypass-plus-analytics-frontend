@@ -31,7 +31,7 @@ export interface TimeSeriesPoint {
 }
 
 export interface DashboardFilters {
-  dateRange: 'today' | '7d' | '30d' | 'custom';
+  dateRange: 'all' | 'today' | '7d' | '30d' | 'custom';
   from?: string;
   to?: string;
   domain?: Domain;

@@ -33,8 +33,8 @@ export function EmergencyZonePanel({ data, filters, loading }: {
   filters: DashboardFilters;
   loading: boolean;
 }) {
-  const [view, setView] = useState('elevated');
-  if (getDataSource() === 'embedded') return null;
+  const [view, setView] = useState('nearby');
+  if (getDataSource() === 'embedded' || (!loading && !data?.emergencias_zona?.length)) return null;
   const { from, to } = getZonePeriod(filters);
   const rows = (data?.emergencias_zona ?? []).filter((record) => {
     const linked = Date.parse(record.vinculada_en);
@@ -68,11 +68,11 @@ export function EmergencyZonePanel({ data, filters, loading }: {
         <DataTable<EmergencyZoneLink & { key: string }>
           keyField="key"
           data={table}
-          emptyMessage={view === 'elevated' ? 'El período seleccionado no tiene aumentos de criticidad confirmados.'
-            : 'El período seleccionado no tiene vínculos con eventos cercanos.'}
+          emptyMessage={view === 'elevated' ? 'El corte no informa aumentos de criticidad confirmados.'
+            : 'El corte no informa vínculos con eventos cercanos.'}
           columns={[
-            { key: 'criticidad', label: 'Criticidad', render: (row) => row.criticidad
-              ? <Badge color={PRIORITY_COLOR[row.criticidad]} variant="light">{PRIORITY_LABEL[row.criticidad]}</Badge>
+            { key: 'criticidad', label: 'Criticidad', width: '110px', render: (row) => row.criticidad
+              ? <Badge color={PRIORITY_COLOR[row.criticidad]} variant="light" style={{ maxWidth: 'none' }}>{PRIORITY_LABEL[row.criticidad]}</Badge>
               : 'Sin informar' },
             { key: 'nombre_evento', label: 'Evento asociado', render: (row) => row.nombre_evento ?? row.evento_id ?? 'Sin informar' },
             { key: 'tipo', label: 'Tipo', render: (row) => row.tipo ?? 'Sin informar' },
@@ -82,6 +82,7 @@ export function EmergencyZonePanel({ data, filters, loading }: {
               const previous = row.criticidad_original ? `Antes ${PRIORITY_LABEL[row.criticidad_original]}` : 'Aumento confirmado';
               return row.causa_repetida ? `${previous} · Causa repetida` : previous;
             } },
+            { key: 'distancia_metros', label: 'Distancia', render: (row) => row.distancia_metros == null ? '—' : `${Math.round(row.distancia_metros)} m` },
             { key: 'sector', label: 'Sector', render: (row) => row.sector ?? 'Sin informar' },
             { key: 'estado', label: 'Estado', render: (row) => row.estado?.replaceAll('_', ' ') ?? 'Sin informar' },
             ...response,
@@ -92,7 +93,7 @@ export function EmergencyZonePanel({ data, filters, loading }: {
       </ChartCard>
       {sectors.size > 0 && (
         <ChartCard title="Emergencias resueltas y no resueltas por sector"
-          subtitle="Emergencias distintas vinculadas a eventos en el período seleccionado.">
+          subtitle="Emergencias distintas vinculadas a eventos en el corte publicado.">
           <BarChart data={[...sectors.values()].sort((a, b) => a.sector.localeCompare(b.sector, 'es-AR'))}
             xKey="sector" bars={BARS} horizontal showLegend height={Math.max(230, 60 + sectors.size * 35)} />
         </ChartCard>

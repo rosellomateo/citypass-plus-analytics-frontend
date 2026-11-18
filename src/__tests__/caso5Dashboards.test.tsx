@@ -35,15 +35,16 @@ it('Emergencias muestra las emergencias en bici y su tiempo de resolución', () 
   render(<><DashboardImpactCards area="emergencies" data={data} /><DashboardImpactCharts area="emergencies" data={data} /></>);
   expect(screen.getByText('Emergencias durante viajes en bicicleta')).toBeInTheDocument();
   expect(screen.getByText('Tiempo promedio de resolución de emergencias durante viajes en bicicleta')).toBeInTheDocument();
-  expect(screen.getByText('Viajes en bicicleta 3')).toBeInTheDocument();
-  expect(screen.getByText('Tiempo de resolución de emergencias en viajes en bicicleta')).toBeInTheDocument();
+  expect(screen.getByText('Viajes en bicicleta 866')).toBeInTheDocument();
+  expect(screen.queryByText(/Sólo se informa el promedio de viajes en bicicleta/)).not.toBeInTheDocument();
+  expect(screen.getByText('Tiempo de resolución promedio por emergencia')).toBeInTheDocument();
 });
 
 it('Reclamos compara los originados por emergencias contra otras causas', () => {
   const data = report([{ id: 'c5', valor: 1, detalle: [{ etiqueta: 'Otras causas', valor: 41 }] }] as CrossModuleResponse['datos']);
   render(<><DashboardImpactCards area="claims" data={data} /><DashboardImpactCharts area="claims" data={data} /></>);
-  expect(screen.getByText('Reclamos viales por accidentes en bicicleta frente a otras causas')).toBeInTheDocument();
-  expect(screen.getByText('Otras causas 41')).toBeInTheDocument();
+  expect(screen.getByText('Reclamos por accidentes viales')).toBeInTheDocument();
+  expect(screen.getByText('Otros reclamos viales 41')).toBeInTheDocument();
 });
 
 it('Movilidad y Espacios muestran su tarjeta del caso 5', () => {

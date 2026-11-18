@@ -3,10 +3,11 @@ import type { CrossModuleResponse } from '../../api/types';
 import { PART2_METRICS } from '../../config/crossModuleMetrics';
 import { MetricCard } from './MetricCard/MetricCard';
 
-export function DashboardImpactCards({ area, data, standalone = false }: {
+export function DashboardImpactCards({ area, data, standalone = false, excludeIds = [] }: {
   area: keyof typeof PART2_METRICS;
   data: CrossModuleResponse | null;
   standalone?: boolean;
+  excludeIds?: readonly string[];
 }) {
   if (!data) return null;
   const compatible = area !== 'culture' || data.version_cultura === 2;
@@ -15,7 +16,7 @@ export function DashboardImpactCards({ area, data, standalone = false }: {
     labels.flatMap((label, metricIndex) => {
       const id = `c${index + 1}${metricIndex === 0 ? '' : 'b'}`;
       const metric = metrics.get(id);
-      if (!metric) return [];
+      if (!metric || excludeIds.includes(id)) return [];
       const detail = area === 'waste' && id === 'c2' ? undefined : metric.detalle
         ?.map(({ etiqueta, valor }) => `${etiqueta}: ${valor.toLocaleString('es-AR')}`).join(' · ');
       return [{ label, value: metric.valor, unit: metric.unidad ?? undefined, sublabel: detail || undefined, status: 'info' }];

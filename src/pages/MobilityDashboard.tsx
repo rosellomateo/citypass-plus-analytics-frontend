@@ -1,7 +1,8 @@
 import { DashboardImpactCards } from '../components/common/DashboardImpactCards';
-import { Anchor } from '@mantine/core';
+import { Anchor, TextInput } from '@mantine/core';
+import { visibleStationTrips } from '../utils/dashboardPresentation';
 import { CausePie } from '../components/common/CausePie';
-import { StationAffectations } from '../components/mobility/StationAffectations';
+import { PublicEventStations } from '../components/mobility/PublicEventStations';
 import { useDashboardImpact } from '../hooks/useDashboardImpact';
 // src/pages/MobilityDashboard.tsx
 import { useState, useMemo } from 'react';
@@ -31,7 +32,10 @@ const DURATION_COLORS: Record<string, string> = {
   '>1h': '#EF4444',
 };
 
+const minutesFormatter = new Intl.NumberFormat('es-AR', { maximumFractionDigits: 2 });
+
 const DATE_RANGE_LABELS: Record<string, string> = {
+  all: 'Datos publicados',
   today: 'Hoy',
   '7d': 'Semana (7d)',
   '30d': 'Mes (30d)',
@@ -40,12 +44,13 @@ const DATE_RANGE_LABELS: Record<string, string> = {
 
 export function MobilityDashboard() {
   const impact = useDashboardImpact('mobility');
-  const { filters, updateFilter, updateDateRange } = useFilters();
+  const { filters } = useFilters();
   const mobilityAsync = useMobilityData(filters);
   const resolved = useResolvedUiState(mobilityAsync);
 
   // Filtros locales independientes por gráfico
   const [selectedStationChart2, setSelectedStationChart2] = useState<string>('ALL');
+  const [stationSearch, setStationSearch] = useState('');
 
   // Registros planos filtrados
   const records = useMemo(() => resolved.data?.records || [], [resolved.data]);
@@ -54,6 +59,7 @@ export function MobilityDashboard() {
   const tripsByStationData = useMemo(() => {
     return getTripsByStation(records);
   }, [records]);
+  const visibleTripsByStation = visibleStationTrips(tripsByStationData, stationSearch);
 
   // Gráfico 2: Distribución por Duración de Viaje (PieChart sin solapamiento de etiquetas)
   const tripsByDurationData = useMemo(() => {
@@ -88,10 +94,9 @@ export function MobilityDashboard() {
       <DashboardHeader
         title="Tablero de Movilidad Urbana"
         subtitle="Analítica de Viajes, Demanda Estacional y Trazabilidad por Estación"
-        filters={filters}
+
         aiReport={resolved.data?.aiReport}
-        onDateRangeChange={(range) => updateFilter('dateRange', range)}
-        onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)}
+
       />
 
       {resolved.loading ? (
@@ -168,14 +173,18 @@ export function MobilityDashboard() {
               <ChartCard
                 title="Cantidad de Viajes por Estación de Inicio"
                 subtitle="SUM(cantidadViajes) agrupado por estación"
+                actions={<TextInput size="xs" w={200} aria-label="Buscar estación de inicio" placeholder="Buscar estación..."
+                  value={stationSearch} onChange={(event) => setStationSearch(event.currentTarget.value)} />}
               >
+                <div style={{ maxHeight: 420, overflowY: 'auto', minWidth: 0 }}>
                 <BarChart
-                  data={tripsByStationData}
+                  data={visibleTripsByStation}
                   xKey="station"
                   bars={[{ key: 'cantidadViajes', label: 'Viajes Iniciados', color: '#2563A6' }]}
                   horizontal={true}
-                  height={280}
+                  height={Math.max(320, visibleTripsByStation.length * 34 + 35)}
                 />
+                </div>
               </ChartCard>
 
               {/* Gráfico 2: Distribución por Duración de Viaje */}
@@ -206,7 +215,10 @@ export function MobilityDashboard() {
                 data={stationAvgDurationData}
                 xKey="station"
                 bars={[{ key: 'promDuracionPonderada', label: 'Minutos Promedio', color: '#F59E0B' }]}
-                height={280}
+                height={360}
+                scrollable
+                minWidth={Math.max(700, stationAvgDurationData.length * 145)}
+                xAxisTickAngle={-30}
               />
             </ChartCard>
           </div>
@@ -235,7 +247,7 @@ export function MobilityDashboard() {
 
               <DataTable
                 columns={[
-                  { key: 'fechaInicio', label: 'Fecha Viaje', width: '130px' },
+                  { key: 'fechaInicio', label: 'Fecha Viaje', width: '130px', render: (row) => row.fechaInicio.slice(0, 10) },
                   {
                     key: 'estacionInicioFormatted',
                     label: 'Estación Inicio',
@@ -243,9 +255,10 @@ export function MobilityDashboard() {
                   },
                   { key: 'duracionViaje', label: 'Rango Duración', width: '140px' },
                   { key: 'cantidadViajes', label: 'Cantidad Viajes', width: '140px' },
-                  { key: 'duracionTotalViajes', label: 'Duración Total (min)', width: '170px' },
-                  { key: 'promDuracion', label: 'Promedio Fila (min)', width: '160px' },
-                  { key: 'fecha_snapshot', label: 'Fecha Snapshot', width: '140px' },
+                  { key: 'duracionTotalViajes', label: 'Duración Total (min)', width: '170px',
+                    render: (row) => minutesFormatter.format(row.duracionTotalViajes) },
+                  { key: 'promDuracion', label: 'Promedio por viaje (min)', width: '175px',
+                    render: (row) => <span title="Duración total de esta fila dividida por su cantidad de viajes">{minutesFormatter.format(row.promDuracion)}</span> },
                 ]}
                 data={records.map((r, idx) => ({
                   ...r,
@@ -270,7 +283,7 @@ export function MobilityDashboard() {
               options: resolved.data?.availableStations ?? [],
               groups: impact.data?.afectaciones?.estaciones ?? [],
             }} />
-        <StationAffectations rows={impact.data?.afectaciones?.estado_estaciones ?? []} />
+        <PublicEventStations report={impact.data} />
       </section>
     </div>
   );

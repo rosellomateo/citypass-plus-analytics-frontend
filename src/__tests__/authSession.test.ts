@@ -51,7 +51,7 @@ describe('CityPass session', () => {
   });
 
   it('only opens an authorized initial dashboard', () => {
-    expect(getDefaultAuthorizedPath(['overview', 'eda'], 'eda')).toBe('/analytics/eda');
+    expect(getDefaultAuthorizedPath(['overview', 'eda'], 'eda')).toBe('/analytics');
     expect(getDefaultAuthorizedPath(['claims'], 'eda')).toBe('/analytics/claims');
   });
 
@@ -68,12 +68,12 @@ describe('CityPass session', () => {
 
   it('uses an optional initial dashboard from the LDAP profile only within the visible areas', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(signInResponse())
-      .mockResolvedValueOnce(ldapProfile(['admin'], { module: 'analitica', initial_dashboard: 'eda' })));
+      .mockResolvedValueOnce(ldapProfile(['admin'], { module: 'analitica', initial_dashboard: 'login' })));
     await expect(authenticateWithIdp('analista', 'correcta')).resolves.toBe('success');
     const session = getAuthSnapshot();
-    expect(session).toMatchObject({ status: 'authenticated', initialDashboard: 'eda' });
+    expect(session).toMatchObject({ status: 'authenticated', initialDashboard: 'login' });
     if (session.status !== 'authenticated') throw new Error('Expected authenticated session');
-    expect(getDefaultAuthorizedPath(session.dashboards, session.initialDashboard)).toBe('/analytics/eda');
+    expect(getDefaultAuthorizedPath(session.dashboards, session.initialDashboard)).toBe('/analytics/login');
   });
 
   it.each([undefined, 'overview', 'eda', '/analytics/login', 42])(

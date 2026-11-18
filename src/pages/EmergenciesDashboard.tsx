@@ -29,7 +29,7 @@ const stackedPriorityBars = [
 
 export function EmergenciesDashboard() {
   const impact = useDashboardImpact('emergencies');
-  const { filters, updateFilter, updateDateRange } = useFilters();
+  const { filters } = useFilters();
   const emergencyAsync = useEmergencyData(filters);
   const resolved = useResolvedUiState(emergencyAsync);
 
@@ -46,10 +46,9 @@ export function EmergenciesDashboard() {
       <DashboardHeader
         title="Tablero de Emergencias"
         subtitle="CU-E1: Emergencias por estado y prioridad | CU-E2: Tiempo de despacho"
-        filters={filters}
+
         aiReport={resolved.data?.aiReport}
-        onDateRangeChange={(range) => updateFilter('dateRange', range)}
-        onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)}
+
       />
 
       {resolved.loading ? (
@@ -151,7 +150,7 @@ export function EmergenciesDashboard() {
         </>
       ) : null}
       {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="emergencies" data={impact.data} standalone />}
-      <DashboardImpactCharts area="emergencies" {...impact} />
+      <DashboardImpactCharts area="emergencies" {...impact} emergencyData={resolved.data} />
       <EmergencyZonePanel data={impact.data} loading={impact.loading} filters={filters} />
     </div>
   );

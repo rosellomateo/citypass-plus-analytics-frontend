@@ -62,6 +62,8 @@ export interface CultureAnalyticsData {
     massive: number;
     affectedByClimate: number | null;
     byCategory: { category: string; count: number }[];
+    byOrganizer?: { organizer: string; count: number }[];
+    byZone?: { zone: string; count: number }[];
   };
   // CU-C1
   confirmedReservations: number;

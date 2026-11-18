@@ -1,4 +1,4 @@
-import type { CrossModuleResponse, LoginApiResponse } from '../../api/types';
+import type { LoginApiResponse } from '../../api/types';
 import type { AIAnalysisReport } from '../../types';
 
 const demoDate = '2026-11-12';
@@ -48,24 +48,4 @@ export const mockLoginDashboard: LoginApiResponse = {
       cantidadEventos: counts[index],
       fecha_snapshot: demoDate,
     }))),
-};
-
-export const mockEdaDashboard: CrossModuleResponse = {
-  fecha_snapshot: demoDate,
-  datos: [
-    { id: 'received', etiqueta: 'Eventos recibidos', valor: 1240 },
-    { id: 'delivered', etiqueta: 'Eventos distribuidos', valor: 1226 },
-    { id: 'pending', etiqueta: 'Eventos pendientes', valor: 14 },
-  ],
-  eventos_publicos: [
-    { evento_id: 'festival-plaza-demo', emergencias: 3, ultimo_vinculo: '2026-11-13T15:01:16Z' },
-    { evento_id: 'feria-barrial-demo', emergencias: 1, ultimo_vinculo: '2026-11-13T15:00:00Z' },
-  ],
-  informe: demoReport(
-    'EDA',
-    'El corte de ejemplo muestra 1.240 eventos recibidos. Se distribuyeron 1.226 y quedaron 14 pendientes. Se registraron vínculos con dos eventos públicos.',
-    ['Se distribuyó el 98,9 % de los eventos recibidos.'],
-    ['Revisar si los pendientes bajan en el próximo corte.'],
-    ['Un vínculo con un evento público no confirma por sí solo un cambio efectivo de prioridad.'],
-  ),
 };

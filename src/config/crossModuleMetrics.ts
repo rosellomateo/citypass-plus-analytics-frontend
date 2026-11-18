@@ -11,7 +11,7 @@ export const PART2_METRICS = {
     ['Cuadrillas afectadas por clima'],
     ['Cuadrillas enviadas por reclamos'],
     ['Cuadrillas planificadas cerca de eventos masivos'],
-    ['Cuadrillas afectadas por incidentes'],
+    ['Intervenciones afectadas por incidentes viales'],
     ['Intervenciones por accidentes en bicicleta frente a alertas normales'],
     ['Cuadrillas enviadas cerca de espacios reservados'],
   ],
@@ -20,7 +20,7 @@ export const PART2_METRICS = {
     ['Reclamos que afectaron a otros módulos'],
     ['Reclamos vinculados a eventos masivos'],
     ['Reclamos vinculados a incidentes programados'],
-    ['Reclamos viales por accidentes en bicicleta frente a otras causas'],
+    ['Reclamos por accidentes viales'],
     ['Reclamos vinculados a eventos ciudadanos'],
   ],
   emergencies: [

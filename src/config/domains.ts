@@ -59,14 +59,6 @@ export const DOMAIN_NAV_ITEMS: DomainNavMeta[] = [
     color: '#285DA5',
     bgColor: '#EBF3FC',
   },
-  {
-    domain: 'eda',
-    label: 'EDA',
-    shortDescription: 'Recepción y distribución de eventos entre equipos.',
-    path: '/analytics/eda',
-    color: '#377A70',
-    bgColor: '#E8F4F2',
-  },
 ];
 
 export const DOMAIN_CONFIG: Record<string, DomainNavMeta> = DOMAIN_NAV_ITEMS.reduce((acc, item) => {

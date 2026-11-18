@@ -1,4 +1,5 @@
 import type { AIAnalysisReport } from '../types/ai';
+import type { TerritorialContext, TerritorialMatch } from '../types/territorial';
 
 export interface LoginEventRecord {
   department: string | null;
@@ -63,6 +64,8 @@ export interface RouteAffectation {
   inicio?: string | null;
   fin?: string | null;
   inicio_afectacion?: string | null;
+  distancia_metros?: number;
+  criterio?: 'proximidad';
 }
 
 export interface RouteEffect {
@@ -88,6 +91,24 @@ export interface CrossModuleResponse {
   resumen_gold?: GoldReportChart[];
   tipos_recibidos?: { etiqueta: string; valor: number }[];
   afectaciones?: Affectations | null;
+  /** Optional original envelopes, when supplied by the data source. */
+  intervenciones?: WasteInterventionEvent[];
+  contexto_territorial?: TerritorialContext;
+  proximidades?: TerritorialMatch[];
+}
+
+export interface WasteInterventionEvent {
+  metadata: { eventType: string; eventId?: string; receivedAt?: number; source?: string };
+  data: {
+    intervencionId: string;
+    camionId?: string | null;
+    estadoAnterior?: string;
+    estadoNuevo: string;
+    causaId?: string | null;
+    causaTipo?: string | null;
+    correlationId?: string | null;
+    updatedAt: string;
+  };
 }
 
 export interface PublicEventZone {
@@ -105,6 +126,15 @@ export interface PublicEventZone {
   estaciones_afectadas?: number | null;
   estaciones_bloqueadas?: number | null;
   reclamos?: number | null;
+  causas?: CausePoint[];
+  efecto?: string | null;
+  descripcion_efecto?: string | null;
+  zona?: string | null;
+  emergencias_cercanas?: number | null;
+  recorridos_cercanos?: number | null;
+  estaciones_cercanas?: number | null;
+  reclamos_cercanos?: number | null;
+  radio_metros?: number | null;
 }
 
 export interface EmergencyZoneLink {
@@ -121,6 +151,8 @@ export interface EmergencyZoneLink {
   estado?: string | null;
   respondida?: boolean | null;
   causa_repetida?: boolean | null;
+  distancia_metros?: number;
+  criterio?: 'proximidad';
 }
 
 export interface ClaimApiRecord {
@@ -163,6 +195,8 @@ export interface EmergencyApiRecord {
   estado_actual: string | null;
   prioridad: string | null;
   categoria?: string | null;
+  causaTipo?: string | null;
+  tiempoPromResolucion?: number | null;
   cantidadEmergencias: number | null;
   tiempoPromRespuestaDespacho: number | null;
   tiempoPromRespuestaLugar: number | null;
@@ -195,6 +229,9 @@ export interface CultureApiRecord {
 
 export interface CultureActivityApiRecord {
   categoria: string | null;
+  organizadorTipo?: string | null;
+  barrio?: string | null;
+  zona?: string | null;
   cantidadActividades: number | null;
   cantidadMasivas: number | null;
   cantidadAfectadasPorClima: number | null;

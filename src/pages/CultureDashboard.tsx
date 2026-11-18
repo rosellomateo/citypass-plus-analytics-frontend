@@ -1,6 +1,6 @@
 import { DashboardImpactCards } from '../components/common/DashboardImpactCards';
-import { CausePie } from '../components/common/CausePie';
 import { EventZonePanel } from '../components/common/EventZonePanel';
+import { PublicEventImpact } from '../components/culture/PublicEventImpact';
 import { useDashboardImpact } from '../hooks/useDashboardImpact';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -19,31 +19,24 @@ import { useResolvedUiState } from '../hooks/useUiState';
 
 export function CultureDashboard() {
   const impact = useDashboardImpact('culture');
-  const { filters, updateFilter, updateDateRange } = useFilters();
+  const { filters } = useFilters();
   const cultureAsync = useCultureData(filters);
   const resolved = useResolvedUiState(cultureAsync);
   const location = useLocation();
   const gold = impact.data?.resumen_gold;
-  const causes = gold?.find(({ id }) => id === 'culture-cause');
   const massActivities = gold?.find(({ id }) => id === 'culture-mass');
   const organizers = gold?.find(({ id }) => id === 'culture-organizer')?.puntos;
   const activities = resolved.data?.activities;
-  const affectedCard = <MetricCard metric={{
-    label: 'Espacios públicos afectados',
-    value: impact.data?.afectaciones?.espacios_publicos ?? 'Sin datos',
-    sublabel: 'Espacios distintos con afectación registrada',
-    status: 'warning',
-  }} action={<Anchor href="#espacios-publicos-afectados" size="sm">Ver espacios afectados</Anchor>} />;
   const organizerCards = <>
     <MetricCard metric={{ label: 'Actividades de ciudadanos',
-      value: organizers?.find(({ etiqueta }) => etiqueta === 'CIUDADANO')?.valor ?? 'Sin datos', status: 'info' }} />
+      value: organizers?.find(({ etiqueta }) => etiqueta === 'CIUDADANO')?.valor ?? activities?.byOrganizer?.find(({ organizer }) => organizer === 'CIUDADANO')?.count ?? 'Sin datos', status: 'info' }} />
     <MetricCard metric={{ label: 'Actividades de la ciudad',
-      value: organizers?.find(({ etiqueta }) => etiqueta === 'CIUDAD')?.valor ?? 'Sin datos', status: 'info' }} />
+      value: organizers?.find(({ etiqueta }) => etiqueta === 'CIUDAD')?.valor ?? activities?.byOrganizer?.find(({ organizer }) => organizer === 'CIUDAD')?.count ?? 'Sin datos', status: 'info' }} />
   </>;
 
   useEffect(() => {
     if (!resolved.loading && new URLSearchParams(location.search).get('tab') === 'events') {
-      document.getElementById('cultura-eventos-section')?.scrollIntoView({ behavior: 'smooth' });
+      document.getElementById('impacto-eventos-publicos')?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [location.search, resolved.loading]);
 
@@ -52,13 +45,11 @@ export function CultureDashboard() {
       <DashboardHeader
         title="Espacios Públicos y Cultura"
         subtitle={activities ? 'Actividades y afectaciones en espacios públicos' : 'CU-C1: Ocupación de espacios públicos | CU-C2: Convocatoria de eventos comunitarios'}
-        filters={filters}
+
         aiReport={resolved.data?.aiReport}
-        onDateRangeChange={(range) => updateFilter('dateRange', range)}
-        onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)}
+
         actions={<Group gap="sm">
-          {resolved.data && <Anchor href="#cultura-eventos-section" size="sm">Ver eventos</Anchor>}
-          {impact.data?.eventos_zona?.length ? <Anchor href="#impacto-eventos-zona" size="sm">Ver impacto por evento</Anchor> : null}
+          {resolved.data && <Anchor href="#impacto-eventos-publicos" size="sm">Ver eventos</Anchor>}
         </Group>}
       />
 
@@ -75,12 +66,18 @@ export function CultureDashboard() {
             <MetricCard metric={{ label: 'Actividades', value: activities.total }} />
             <MetricCard metric={{ label: 'Actividades masivas', value: activities.massive }} />
             <MetricCard metric={{ label: 'Actividades afectadas por clima', value: activities.affectedByClimate ?? 'Sin datos' }} />
-            {affectedCard}
             {organizerCards}
+            <DashboardImpactCards area="culture" data={impact.data} />
           </div></section>
+          <section className="section">
+            <ChartCard title="Cantidad de eventos por zona">
+              <BarChart data={activities.byZone ?? []} xKey="zone" bars={[{ key: 'count', label: 'Eventos', color: '#4F8A72' }]}
+                horizontal height={Math.max(300, (activities.byZone?.length ?? 0) * 34 + 45)} />
+            </ChartCard>
+          </section>
           <section className="section" id="cultura-eventos-section">
             <ChartCard title="Actividades por categoría">
-              <BarChart data={activities.byCategory} xKey="category" bars={[{ key: 'count', label: 'Actividades' }]} horizontal />
+              <BarChart data={activities.byCategory} xKey="category" bars={[{ key: 'count', label: 'Actividades' }]} height={Math.max(280, activities.byCategory.length * 38 + 45)} horizontal />
             </ChartCard>
           </section>
         </>
@@ -123,8 +120,8 @@ export function CultureDashboard() {
                   status: 'info',
                 }}
               />
-              {affectedCard}
-              {organizerCards}
+                {organizerCards}
+            <DashboardImpactCards area="culture" data={impact.data} />
             </div>
           </div>
 
@@ -216,25 +213,15 @@ export function CultureDashboard() {
           </div>
         </>
       ) : null}
-      <section className="section" id="espacios-publicos-afectados" aria-label="Espacios públicos afectados">
-        <h2 className="section-title">Espacios públicos afectados</h2>
-        <DashboardImpactCards area="culture" data={impact.data} standalone />
-        <div className="charts-grid-2">
-          <CausePie title="Causas de afecto" date={causes?.fecha_snapshot}
-            description="Actividades por causa publicada" points={causes?.puntos ?? []}
-            note={<div className="chart-source-note">
-              <div>Incidente vial corresponde a un incidente registrado por Movilidad.</div>
-              <div>Accidente vial indica que un accidente obligó a modificar una actividad.</div>
-            </div>} />
-          {massActivities && (
-            <ChartCard title="Actividades masivas por barrio">
-              <BarChart data={massActivities.puntos} xKey="etiqueta" bars={[{ key: 'valor', label: 'Actividades masivas' }]}
-                height={Math.max(320, 45 + massActivities.puntos.length * 24)} horizontal />
-            </ChartCard>
-          )}
-        </div>
-      </section>
-      <EventZonePanel data={impact.data} loading={impact.loading} filters={filters} />
+      {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="culture" data={impact.data} standalone />}
+      <PublicEventImpact report={impact.data} />
+      {massActivities && <section className="section">
+        <ChartCard title="Actividades masivas por barrio">
+          <BarChart data={massActivities.puntos} xKey="etiqueta" bars={[{ key: 'valor', label: 'Actividades masivas' }]}
+            height={Math.max(320, 45 + massActivities.puntos.length * 24)} horizontal />
+        </ChartCard>
+      </section>}
+      <EventZonePanel data={impact.data} loading={impact.loading} />
     </div>
   );
 }

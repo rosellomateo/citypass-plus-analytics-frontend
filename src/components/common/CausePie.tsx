@@ -16,12 +16,14 @@ const COLORS: Record<string, string> = {
   'Operación normal': '#64748B',
 };
 
-export function CausePie({ title, points, date, description, note, filters }: {
+export function CausePie({ title, points, date, description, note, filters, actions, unit }: {
   title: string;
   points: CausePoint[];
   date?: string;
   description?: string;
   note?: ReactNode;
+  actions?: ReactNode;
+  unit?: string;
   filters?: { scope: 'estación' | 'zona'; options: string[]; groups: ScopedCauses[] };
 }) {
   const [chosen, setChosen] = useState('ALL');
@@ -36,21 +38,21 @@ export function CausePie({ title, points, date, description, note, filters }: {
     : 'Desglose por causa';
 
   return (
-    <ChartCard title={title} subtitle={subtitle} actions={filters && (
+    <ChartCard title={title} subtitle={subtitle} actions={actions ?? (filters && (
       <CategorySearchFilter categories={options} selectedCategory={selection} onSelectCategory={setChosen}
         placeholder={filters.scope === 'zona' ? 'Todas las zonas' : 'Todas las estaciones'}
         ariaLabel={`Filtrar por ${filters.scope}`} />
-    )}>
+    ))}>
       {selection !== 'ALL' && !scoped ? (
         <p role="status">Sin desglose publicado para {filters?.scope === 'zona' ? 'esta zona' : 'esta estación'}.</p>
       ) : (
         <>
           {leading.length > 0 && <p>
             <strong>{leading.length > 1 ? 'Causas más frecuentes:' : 'Causa más frecuente:'}</strong>{' '}
-            {leading.map(({ etiqueta }) => etiqueta).join(', ')} ({leading[0].valor.toLocaleString('es-AR')})
+            {leading.map(({ etiqueta }) => etiqueta).join(', ')} ({leading[0].valor.toLocaleString('es-AR')}{unit})
           </p>}
           <PieChart data={visible.map(({ etiqueta, valor }) => ({ name: etiqueta, value: valor, color: COLORS[etiqueta] }))}
-            donut={false} height={320} />
+            donut={false} height={320} unit={unit} />
         </>
       )}
       {note}

@@ -64,3 +64,19 @@ describe('polling de indicadores de parte 2', () => {
     expect(request.mock.calls.map(([area]) => area)).toEqual(['culture', 'mobility', 'mobility']);
   });
 });
+
+it('keeps the current chart data mounted while a slow refresh is pending', async () => {
+  const report = { fecha_snapshot: '2026-11-18', datos: [{ id: 'c1', valor: 7 }] };
+  let finish!: (value: typeof report) => void;
+  vi.spyOn(analyticsApi, 'getCrossModuleMetrics').mockResolvedValueOnce(report)
+    .mockImplementationOnce(() => new Promise((resolve) => { finish = resolve; }));
+  const { result } = renderHook(() => useDashboardImpact('claims'));
+  await act(async () => {});
+  await act(async () => { await vi.advanceTimersByTimeAsync(15_000); });
+  expect(result.current.refreshing).toBe(true);
+  expect(result.current.loading).toBe(false);
+  expect(result.current.data).toEqual(report);
+  await act(async () => { finish(report); });
+  expect(result.current.refreshing).toBe(false);
+  expect(result.current.data).toEqual(report);
+});

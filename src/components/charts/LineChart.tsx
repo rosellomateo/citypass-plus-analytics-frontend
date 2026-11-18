@@ -22,7 +22,7 @@ interface LineChartProps {
 
 export function LineChart({ data, xKey, lines, height = 280, unit, showLegend = true }: LineChartProps) {
   return (
-    <ResponsiveContainer width="100%" height={height}>
+    <ResponsiveContainer debounce={80} minWidth={0} width="100%" height={height}>
       <RechartsLineChart data={data} margin={{ top: 4, right: 12, bottom: 0, left: 0 }}>
         <CartesianGrid {...CHART_GRID} vertical={false} />
         <XAxis dataKey={xKey} {...CHART_AXIS} />
@@ -37,6 +37,7 @@ export function LineChart({ data, xKey, lines, height = 280, unit, showLegend = 
         {showLegend && <Legend wrapperStyle={CHART_LEGEND_STYLE} />}
         {lines.map((line, i) => (
           <Line
+              isAnimationActive={false}
             key={line.key}
             type="monotone"
             dataKey={line.key}

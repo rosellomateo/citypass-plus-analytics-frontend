@@ -1,17 +1,13 @@
 // src/components/common/DashboardHeader/DashboardHeader.tsx
 import type { ReactNode } from 'react';
 import { Breadcrumbs } from '../../layout/Breadcrumbs/Breadcrumbs';
-import { DateRangeSelector } from '../DateRangeSelector/DateRangeSelector';
 import { AIAnalysisCard } from '../AIAnalysisCard/AIAnalysisCard';
-import type { DashboardFilters, AIAnalysisReport } from '../../../types';
+import type { AIAnalysisReport } from '../../../types';
 import styles from './DashboardHeader.module.css';
 
 interface DashboardHeaderProps {
   title: string;
   subtitle?: string;
-  filters?: DashboardFilters;
-  onDateRangeChange?: (range: DashboardFilters['dateRange']) => void;
-  onCustomDateSelect?: (from: string, to: string) => void;
   actions?: ReactNode;
   filters_extra?: ReactNode;
   aiReport?: AIAnalysisReport;
@@ -20,9 +16,6 @@ interface DashboardHeaderProps {
 export function DashboardHeader({
   title,
   subtitle,
-  filters,
-  onDateRangeChange,
-  onCustomDateSelect,
   actions,
   filters_extra,
   aiReport,
@@ -38,13 +31,6 @@ export function DashboardHeader({
           {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
         </div>
         <div className={styles.controlsGroup}>
-          {filters && onDateRangeChange && <DateRangeSelector
-            value={filters.dateRange}
-            from={filters.from}
-            to={filters.to}
-            onChange={onDateRangeChange}
-            onCustomSelect={onCustomDateSelect}
-          />}
           {actions}
         </div>
       </div>

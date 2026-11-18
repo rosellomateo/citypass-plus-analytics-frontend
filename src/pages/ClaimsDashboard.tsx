@@ -31,7 +31,7 @@ const claimStatusPillOptions = [
 
 export function ClaimsDashboard() {
   const impact = useDashboardImpact('claims');
-  const { filters, updateFilter, updateDateRange } = useFilters();
+  const { filters } = useFilters();
   const claimsAsync = useClaimsData(filters);
   const resolved = useResolvedUiState(claimsAsync);
 
@@ -71,10 +71,9 @@ export function ClaimsDashboard() {
       <DashboardHeader
         title="Tablero de Reclamos"
         subtitle="CU-R1: Volumen por categoría y estado | CU-R2: Tiempo de resolución"
-        filters={filters}
+
         aiReport={resolved.data?.aiReport}
-        onDateRangeChange={(range) => updateFilter('dateRange', range)}
-        onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)}
+
       />
 
       {resolved.loading ? (
@@ -118,7 +117,7 @@ export function ClaimsDashboard() {
                 subtitle="Horas transcurridas hasta el cierre del reclamo (hs)"
               >
                 <BarChart
-                  data={resolved.data.avgResolutionByCategory}
+                  data={resolved.data.avgResolutionByCategory.filter(({ category }) => category.trim().toLowerCase() !== 'texto')}
                   xKey="category"
                   bars={[{ key: 'hours', label: 'Horas promedio', color: '#D99838' }]}
                   horizontal={true}

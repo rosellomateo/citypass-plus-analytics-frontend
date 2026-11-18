@@ -1,7 +1,6 @@
 // src/components/layout/Sidebar/Sidebar.tsx
 import { NavLink } from 'react-router-dom';
 import {
-  Network,
   Bike,
   Trash2,
   KeyRound,
@@ -71,7 +70,6 @@ const ICONS: Record<ProtectedArea, React.ReactNode> = {
   emergencies: <EmergenciasIcon size={18} />,
   culture: <EspaciosPublicosIcon size={18} />,
   login: <KeyRound size={18} />,
-  eda: <Network size={18} />,
 };
 
 const NAV_ITEMS = [OVERVIEW, ...DOMAIN_NAV_ITEMS.map(({ label, path, domain }) => ({ label, path, area: domain }))];
