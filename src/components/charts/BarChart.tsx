@@ -51,16 +51,17 @@ export function BarChart({
   const calculatedMinWidth = minWidth ?? (scrollable && data.length > 5 ? Math.max(600, data.length * 80) : undefined);
 
   const chartContent = (
-    <ResponsiveContainer width="100%" height={height}>
+    <ResponsiveContainer debounce={80} minWidth={0} width="100%" height={height}>
       {horizontal ? (
         <RechartsBarChart data={data} layout="vertical" margin={{ top: 4, right: 24, bottom: 0, left: 8 }}>
           <CartesianGrid {...CHART_GRID} horizontal={false} />
           <XAxis type="number" {...CHART_AXIS} tickFormatter={unit ? (v) => `${v}${unit}` : undefined} />
-          <YAxis type="category" dataKey={xKey} {...CHART_AXIS} width={145} />
+          <YAxis type="category" dataKey={xKey} {...CHART_AXIS} width={145} interval={0} />
           <Tooltip contentStyle={CHART_TOOLTIP_STYLE} formatter={(v: any) => [unit ? `${v}${unit}` : v]} />
           {showLegend && <Legend wrapperStyle={CHART_LEGEND_STYLE} />}
           {bars.map((bar, i) => (
             <Bar
+              isAnimationActive={false}
               key={bar.key}
               dataKey={bar.key}
               name={bar.label ?? bar.key}
@@ -103,6 +104,7 @@ export function BarChart({
           {showLegend && <Legend wrapperStyle={CHART_LEGEND_STYLE} verticalAlign="top" align="right" height={36} />}
           {bars.map((bar, i) => (
             <Bar
+              isAnimationActive={false}
               key={bar.key}
               dataKey={bar.key}
               name={bar.label ?? bar.key}

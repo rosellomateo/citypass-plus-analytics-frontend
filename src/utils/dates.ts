@@ -3,6 +3,8 @@ import type { DashboardFilters } from '../types';
 
 export function getDateRangeBounds(filters: DashboardFilters, now = new Date()): { from: Date; to: Date } {
 
+  if (filters.dateRange === 'all') return { from: new Date(0), to: new Date(8640000000000000) };
+
   if (filters.dateRange === 'today') {
     const from = new Date(now);
     from.setHours(0, 0, 0, 0);
@@ -53,6 +55,7 @@ export function getDateRangeBounds(filters: DashboardFilters, now = new Date()):
 }
 
 export function isWithinDateRange(isoTimestamp: string, filters: DashboardFilters): boolean {
+  if (filters.dateRange === 'all') return true;
   if (!isoTimestamp) return true;
   const date = new Date(isoTimestamp);
   if (isNaN(date.getTime())) return true;

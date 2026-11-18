@@ -1,66 +1,63 @@
 import { useState } from 'react';
-import { Anchor, Select } from '@mantine/core';
+import { Anchor, Badge, Group, Select } from '@mantine/core';
 import type { CrossModuleResponse } from '../../api/types';
-import { formatTimestamp } from '../../utils/dates';
+import { PART2_METRICS } from '../../config/crossModuleMetrics';
+import { countRoadAffectedInterventions } from '../../utils/wasteInterventions';
 import { BarChart } from '../charts/BarChart';
 import { CausePie } from '../common/CausePie';
 import { ChartCard } from '../common/ChartCard/ChartCard';
 import { DataTable } from '../common/DataTable/DataTable';
 import { MetricCard } from '../common/MetricCard/MetricCard';
 
+export function WasteIncidentMetric({ report }: { report: CrossModuleResponse | null }) {
+  const metric = report?.datos.find(({ id }) => id === 'c4');
+  const rawCount = report?.intervenciones
+    ? countRoadAffectedInterventions(report.intervenciones)
+    : undefined;
+  return <MetricCard metric={{
+    label: PART2_METRICS.waste[3][0],
+    value: metric?.valor ?? rawCount ?? 'Sin datos',
+    sublabel: 'Paradas distintas afectadas',
+    status: 'warning',
+  }} />;
+}
+
 export function WasteAffectedMetric({ report }: { report: CrossModuleResponse | null }) {
   const routes = new Set([
     ...(report?.afectaciones?.recorridos_eventos ?? []),
     ...(report?.afectaciones?.recorridos_efectos ?? []),
   ].map(({ recorrido_id }) => recorrido_id));
+  const complete = report?.contexto_territorial
+    ? report.contexto_territorial.cobertura.includes('recorrido_residuos') && (report.eventos_zona ?? []).every((event) => event.recorridos_cercanos != null)
+    : report?.afectaciones?.recorridos_eventos != null || report?.afectaciones?.recorridos_efectos != null;
   return <MetricCard metric={{
     label: 'Recorridos afectados por eventos',
-    value: routes.size || 'Sin datos',
+    value: complete ? routes.size : routes.size || 'Sin datos',
     sublabel: 'Recorridos distintos con afectación registrada',
     status: 'info',
   }} action={<Anchor href="#recorridos-afectados" size="sm">Ver recorridos afectados</Anchor>} />;
 }
 
-const EFFECT_NAMES: Record<string, string> = {
-  LLUVIA_INTENSA: 'Lluvia intensa',
-  ACCIDENTE_TRANSITO: 'Accidente de tránsito',
-  CORTE_CALLE: 'Corte de calle',
-  CORTE_CALLE_EVENTO: 'Corte de calle por evento',
-  SEMAFORO_DANADO: 'Semáforo dañado',
-  ARBOL_CAIDO: 'Árbol caído',
-  INUNDACION: 'Inundación',
-};
-
-function effectName(value: string) {
-  if (EFFECT_NAMES[value]) return EFFECT_NAMES[value];
-  if (!/^[A-Z_]+$/.test(value)) return value;
-  const words = value.toLowerCase().replaceAll('_', ' ');
-  return words.charAt(0).toUpperCase() + words.slice(1);
-}
-
-function localDate(value?: string | null) {
-  return value ? formatTimestamp(value) : 'Sin informar';
-}
-
 export function WasteAffected({ report, zones }: { report: CrossModuleResponse | null; zones: string[] }) {
   const [selectedZone, setSelectedZone] = useState<string | null>(null);
-  const [selectedEffect, setSelectedEffect] = useState<string | null>(null);
   const interventions = report?.resumen_gold?.find(({ id }) => id === 'waste-cause');
   const alerts = report?.resumen_gold?.find(({ id }) => id === 'waste-alerts');
-  const routes = report?.afectaciones?.recorridos_eventos ?? [];
-  const effects = report?.afectaciones?.recorridos_efectos ?? [];
-  const zoneName = (zone?: string | null) => zone || 'Sin zona informada';
-  const routeZones = [...new Set(routes.map((route) => zoneName(route.zona)))].sort();
-  const effectsByName = effects.map((effect) => ({ ...effect, effectLabel: effectName(effect.tipo_efecto) }));
-  const effectOptions = [...new Set(effectsByName.flatMap(({ effectLabel, causa }) => [effectLabel, causa]))].sort();
+  const catalog = new Map([
+    ...(report?.eventos_publicos ?? []), ...(report?.eventos_zona ?? []),
+  ].map((event) => [event.evento_id, event.nombre]));
+  const routes = [...new Map((report?.afectaciones?.recorridos_eventos ?? []).map((route) => [
+    `${route.recorrido_id}/${route.evento_id}`, { ...route, key: `${route.recorrido_id}/${route.evento_id}` },
+  ])).values()];
+  const routeZones = [...new Set(routes.flatMap(({ zona }) => zona ? [zona] : []))].sort();
   const activeZone = selectedZone && routeZones.includes(selectedZone) ? selectedZone : null;
-  const activeEffect = selectedEffect && effectOptions.includes(selectedEffect) ? selectedEffect : null;
+  const visibleRoutes = routes.filter((route) => !activeZone || route.zona === activeZone);
+  const eventCount = new Set(visibleRoutes.map(({ evento_id }) => evento_id)).size;
+  const routeCount = new Set(visibleRoutes.map(({ recorrido_id }) => recorrido_id)).size;
   return (
     <section className="section" id="eventos-afectados-por-residuos" aria-label="Eventos afectados por residuos">
       <h2 className="section-title">Eventos afectados por residuos</h2>
       <CausePie title="Intervenciones por causa publicada" points={interventions?.puntos ?? []}
-        date={interventions?.fecha_snapshot} description="Intervenciones de todos los estados publicados"
-        note="El total incluye intervenciones programadas y afectadas."
+        date={interventions?.fecha_snapshot} description="Cantidad de intervenciones" unit=" intervenciones"
         filters={{
           scope: 'zona',
           options: [...zones, ...(alerts?.puntos.map(({ etiqueta }) => etiqueta) ?? [])],
@@ -73,40 +70,24 @@ export function WasteAffected({ report, zones }: { report: CrossModuleResponse |
         </ChartCard>
       )}
       <section id="recorridos-afectados" className="section" aria-label="Eventos que están afectando los recorridos">
-        <ChartCard title="Eventos que están afectando los recorridos" centerActions actions={(
-          <Select aria-label="Zona de los recorridos" placeholder="Todas las zonas" data={routeZones}
-            size="xs" w={165} searchable clearable value={activeZone} onChange={setSelectedZone} />
-        )}>
-          <DataTable key={activeZone ?? 'all'} keyField="key"
-            emptyMessage="El corte no informa recorridos afectados por eventos públicos."
-            data={routes.filter((route) => !activeZone || zoneName(route.zona) === activeZone)
-              .sort((a, b) => zoneName(a.zona).localeCompare(zoneName(b.zona), 'es-AR'))
-              .map((route) => ({ ...route, key: `${route.recorrido_id}/${route.evento_id}` }))}
+        <ChartCard title="Eventos que están afectando los recorridos" centerActions actions={routes.length ? (
+          <Group gap="xs">
+            <Badge variant="light" color="blue">{eventCount} {eventCount === 1 ? 'evento' : 'eventos'}</Badge>
+            <Badge variant="light" color="teal">{routeCount} {routeCount === 1 ? 'recorrido' : 'recorridos'}</Badge>
+            {routeZones.length > 0 && <Select aria-label="Zona de los recorridos" placeholder="Todas las zonas" data={routeZones}
+              size="xs" w={165} searchable clearable value={activeZone} onChange={setSelectedZone} />}
+          </Group>
+        ) : undefined}>
+          {routes.length ? <DataTable key={activeZone ?? 'all'} keyField="key" pageSize={10}
+            emptyMessage="Sin eventos informados."
+            data={visibleRoutes}
             columns={[
-              { key: 'nombre_evento', label: 'Evento', render: (row) => row.nombre_evento || row.evento_id },
+              { key: 'nombre_evento', label: 'Evento', render: (row) => row.nombre_evento || catalog.get(row.evento_id) || row.evento_id },
               { key: 'recorrido', label: 'Recorrido afectado', render: (row) => row.recorrido || row.recorrido_id },
-              { key: 'inicio', label: 'Inicio del evento', render: (row) => localDate(row.inicio) },
-              { key: 'fin', label: 'Fin del evento', render: (row) => localDate(row.fin) },
-              { key: 'zona', label: 'Zona', render: (row) => zoneName(row.zona) },
-              { key: 'inicio_afectacion', label: 'Afectado desde', render: (row) => localDate(row.inicio_afectacion) },
-            ]} />
-        </ChartCard>
-      </section>
-      <section className="section" aria-label="Efectos sobre el recorrido">
-        <ChartCard title="Efectos sobre el recorrido" centerActions actions={(
-          <Select aria-label="Tipo de efecto" placeholder="Todos los efectos" data={effectOptions}
-            size="xs" w={165} searchable clearable value={activeEffect} onChange={setSelectedEffect} />
-        )}>
-          <DataTable key={activeEffect ?? 'all'} keyField="id"
-            emptyMessage="El corte no informa efectos sobre los recorridos para esta selección."
-            data={effectsByName.filter(({ effectLabel, causa }) => !activeEffect || effectLabel === activeEffect || causa === activeEffect)}
-            columns={[
-              { key: 'effectLabel', label: 'Tipo de efecto' },
-              { key: 'causa', label: 'Causa' },
-              { key: 'recorrido', label: 'Recorrido afectado', render: (row) => row.recorrido || row.recorrido_id },
-              { key: 'zona', label: 'Zona', render: (row) => zoneName(row.zona) },
-              { key: 'inicio_afectacion', label: 'Afectado desde', render: (row) => localDate(row.inicio_afectacion) },
-            ]} />
+              ...(routeZones.length ? [{ key: 'zona', label: 'Zona' }] : []),
+              ...(routes.some((row) => row.distancia_metros != null) ? [{ key: 'distancia_metros', label: 'Distancia al evento',
+                render: (row: typeof routes[number]) => row.distancia_metros == null ? '' : `${Math.round(row.distancia_metros)} m` }] : []),
+            ]} /> : <p role="status">Sin eventos informados.</p>}
         </ChartCard>
       </section>
     </section>

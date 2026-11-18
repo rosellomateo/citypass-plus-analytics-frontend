@@ -8,7 +8,7 @@ export const CHART_COLORS = [
   '#C83E4D', // cityRed — emergencias
   '#8FB8D8', // azul secundario — cultura
   '#1A4A7A', // azul oscuro — seguridad
-  '#142430', // sidebar — eda
+  '#142430', // azul pizarra
 ];
 
 export const CHART_FONT_FAMILY = "'Inter', sans-serif";

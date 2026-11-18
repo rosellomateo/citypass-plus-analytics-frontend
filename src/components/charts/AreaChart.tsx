@@ -31,7 +31,7 @@ export function AreaChart({
   stacked = false,
 }: AreaChartProps) {
   return (
-    <ResponsiveContainer width="100%" height={height}>
+    <ResponsiveContainer debounce={80} minWidth={0} width="100%" height={height}>
       <RechartsAreaChart data={data} margin={{ top: 4, right: 12, bottom: 0, left: 0 }}>
         <defs>
           {areas.map((area, i) => {
@@ -59,6 +59,7 @@ export function AreaChart({
           const color = area.color ?? CHART_COLORS[i % CHART_COLORS.length];
           return (
             <Area
+              isAnimationActive={false}
               key={area.key}
               type="monotone"
               dataKey={area.key}

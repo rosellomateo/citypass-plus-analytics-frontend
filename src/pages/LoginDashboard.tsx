@@ -56,7 +56,7 @@ export function LoginDashboard() {
       <DashboardHeader
         title="Tablero de Login Federado"
         subtitle={summary?.date
-          ? `Actividad de autenticación · Corte del ${formatDate(`${summary.date}T12:00:00`)}`
+          ? `Actividad de autenticación · Corte del ${formatDate(`${summary.date.slice(0, 10)}T12:00:00`)}`
           : 'Actividad de autenticación por departamento'}
         aiReport={data?.informe ?? undefined}
       />

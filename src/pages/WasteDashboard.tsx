@@ -12,20 +12,16 @@ import { useWasteData } from '../hooks/useWasteData';
 
 export function WasteDashboard() {
   const impact = useDashboardImpact('waste');
-  const { filters, updateFilter, updateDateRange } = useFilters();
+  const { filters, updateFilter } = useFilters();
   const waste = useWasteData(filters);
   const resolved = useResolvedUiState(waste);
   if (resolved.data) {
     return <WasteAlertsDashboard data={resolved.data} impact={impact} filters={filters}
-      onFilterChange={updateFilter}
-      onDateRangeChange={(range) => updateFilter('dateRange', range)}
-      onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)} />;
+      onFilterChange={updateFilter} />;
   }
   return (
     <>
-      <DashboardHeader title="Tablero de Residuos" subtitle="Seguimiento de alertas de llenado y tiempos de resolución."
-        filters={filters} onDateRangeChange={(range) => updateFilter('dateRange', range)}
-        onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)} />
+      <DashboardHeader title="Tablero de Residuos" subtitle="Seguimiento de alertas de llenado y tiempos de resolución." />
       {resolved.loading ? <div className="section"><MetricsGridSkeleton count={4} /><ChartSkeleton /></div>
         : resolved.error ? <ErrorCard message={resolved.error} onRetry={waste.refetch} />
         : <EmptyState description="No hay alertas de residuos para los filtros seleccionados." />}

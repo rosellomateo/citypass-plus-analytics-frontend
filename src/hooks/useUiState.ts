@@ -38,5 +38,5 @@ export function useResolvedUiState<T>(
     (asyncState.data === null ||
       (Array.isArray(asyncState.data) && asyncState.data.length === 0));
 
-  return { ...asyncState, isEmpty };
+  return { ...asyncState, loading: asyncState.loading && asyncState.data === null, isEmpty };
 }

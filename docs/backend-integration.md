@@ -27,7 +27,7 @@ token sea válido pero sus grupos no alcancen para el dominio solicitado.
 | Espacios y cultura | `GET /analytics/espacios-cultura` |
 | Residuos | `GET /analytics/residuos` |
 | Login Federado | `GET /analytics/identidad` |
-| EDA e impactos por tablero | `GET /analytics/{area}/parte2` |
+| Impactos por tablero | `GET /analytics/{area}/parte2` |
 
 El perfil de sesión se consulta en `GET /me` de Login/LDAP, con la base
 `VITE_IDP_BASE_URL`. No es un endpoint del backend de Analítica ni utiliza
@@ -40,7 +40,7 @@ Los totales y el gráfico usan eventos agregados por departamento.
 ### Indicadores de la Parte 2
 
 El backend busca `parte2/{area}.json` en Gold, donde `area` es `claims`,
-`emergencies`, `mobility`, `culture`, `waste` o `eda`. Ejemplo:
+`emergencies`, `mobility`, `culture` o `waste`. Ejemplo:
 
 ```json
 {
@@ -54,8 +54,7 @@ El backend busca `parte2/{area}.json` en Gold, donde `area` es `claims`,
 En los cinco módulos del modelado, `c1` a `c6` identifican los seis casos en
 el orden del documento. Emergencias admite `c4b` para recursos despachados
 y `c5b` para tiempo hasta resolución. `detalle` admite una lista de objetos
-con `etiqueta` y `valor` para comparaciones y desgloses. EDA usa los
-identificadores `received`, `delivered`, `pending` y, si se publica, `critical`.
+con `etiqueta` y `valor` para comparaciones y desgloses.
 Puede incluir `informe` con el mismo contrato de análisis de los demás tableros.
 
 Si el JSON aún no existe, el backend puede derivar algunos indicadores de
@@ -103,12 +102,29 @@ y el total del corte. Se acepta `CIUADANO` como variante de `CIUDADANO`.
 
 En Residuos, `waste` incluye `com.citypass.residuos.IntervencionProgramada` y
 `com.citypass.residuos.IntervencionActualizada` en el mismo corte. Los casos
-1, 2, 3, 4 y 6 cuentan `camionId` distintos por causa. Los casos 1 y 4
-requieren `estadoNuevo = AFECTADA`. Con cobertura de Reclamos, el caso 2
+1, 2, 3 y 6 cuentan `camionId` distintos por causa. El caso 1
+requiere `estadoNuevo = AFECTADA`. Con cobertura de Reclamos, el caso 2
 vincula `causaId` con `reclamoId` de v3 y desglosa cuadrillas por barrio.
 El caso 5 compara `intervencionId` distintos vinculados a una emergencia con
 los vinculados a una alerta. Una intervención con ambos vínculos integra
 ambas series según el contrato.
+
+Para el caso 4, Residuos presenta una única métrica,
+**Intervenciones afectadas por incidentes viales**, en `datos[id=c4].valor`
+de `GET /analytics/waste/parte2`. Se calcula con
+`com.citypass.residuos.IntervencionActualizada`, filtrando
+`estadoNuevo = AFECTADA` y `causaTipo = INCIDENTE_VIAL`, y contando
+`intervencionId` distintos. Cada intervención representa una parada.
+Los reintentos del gateway pueden cambiar `eventId`, por lo que ese campo
+no es la clave del conteo. Se excluyen las actualizaciones `CANCELADA`,
+aunque su causa sea `INCIDENTE_VIAL`. El conteo no depende de `camionId`.
+Si se publica un desglose diario, se agrupa por la fecha de `updatedAt`
+y se deduplica `intervencionId` dentro de cada día.
+
+El valor esperado para las dos intervenciones del 16/11, con prefijos
+`2708ffe6…` y `8ceb91e9…`, es 2. El frontend muestra el agregado publicado
+por el backend. Si falta `c4`, muestra «Sin datos». Los totales generales
+de intervenciones por causa no permiten reconstruir este conteo.
 
 Reclamos usa `com.citypass.reclamos.ReclamoCreado.v3`. Los casos 1 y 3
 cuentan reclamos distintos con `alertaId` y `actividadId`, respectivamente.
@@ -179,8 +195,7 @@ del recorrido. Una intervención programada por sí sola no acredita un cambio.
 Los recorridos afectados por causas como clima o incidentes llegan en
 `afectaciones.recorridos_efectos`. El tipo proviene del efecto publicado o del
 evento causal vinculado. El contador reúne ambas listas por identificador de recorrido.
-En Espacios Públicos, el panel consulta el corte cada 15 segundos y usa el reloj
-actual para mostrar el estado según el inicio y el fin informados.
+El panel de impacto por evento público fue retirado de Espacios Públicos.
 En Emergencias, la lista usa el aumento registrado por el productor. La
 repetición de una causa requiere una confirmación explícita y los promedios
 del Parquet no acreditan la atención de un caso individual.
@@ -244,3 +259,128 @@ configurada.
 
 No hay fallback automático de API a mock. Un error real se presenta como error,
 no como datos de demostración.
+
+
+## Ajustes del frontend verificados contra el deployment (18/11/2026)
+
+- Se retiraron el tablero, la ruta y la navegación de EDA. Esto no modifica los servicios de eventos del proyecto.
+- Las pantallas muestran el corte completo publicado. No hay selectores de tiempo ni un filtro oculto de siete días.
+- El refresco de Parte 2 conserva los datos visibles durante la solicitud. Los gráficos no vuelven a animarse en cada actualización.
+- Las categorías de actividades se agrupan al presentar los datos, sin modificar el JSON recibido ni los Parquet: Cultura/CULTURAL, diferencias de mayúsculas, espacios y la variante dañada M�sica.
+- Las actividades por organizador pueden obtenerse de `organizadorTipo` y `cantidadActividades` del resumen de actividades.
+
+### Emergencias: alcance de los datos
+
+La respuesta real de `/analytics/seguridad-emergencias` incluye `causaTipo`.
+El gráfico de vínculos agrupa todas las causas recibidas, incluyendo las no informadas.
+Se presenta como **Emergencias por causa**, inmediatamente después de las tarjetas principales,
+usando `SUM(cantidadEmergencias)` por `causaTipo` del endpoint principal.
+`MOVILIDAD_BICICLETA` se presenta separado de `INCIDENTE_VIAL`; no se infiere la causa a partir de la categoría TRANSITO.
+El corte consultado tiene cinco emergencias de bicicleta y ninguna fila con causa INCIDENTE_VIAL.
+
+Si llega `tiempoPromResolucion`, se calcula el promedio por categoría ponderando por
+`cantidadEmergencias`, excluyendo los valores ausentes. El endpoint actual no trae ese campo.
+La métrica `c5b = 866 min` corresponde solamente a bicicletas y se mantiene identificada como tal;
+no permite calcular el promedio de todas las emergencias ni reemplazarlo por el tiempo de despacho.
+
+### Residuos: paradas y recorridos
+
+El evento `com.citypass.residuos.IntervencionActualizada` suministrado identifica una
+intervención/parada, un camión, su estado, causa y actualización. No identifica recorrido,
+zona, nombre del evento ni sus horarios. No se usa `camionId` ni `intervencionId` como ID de recorrido.
+
+El frontend conserva el soporte para los detalles opcionales `afectaciones.recorridos_eventos`
+y `afectaciones.recorridos_efectos`. El deployment consultado no entrega esos campos.
+Si una fuente proporciona los envelopes originales en `intervenciones`, se puede calcular
+la cantidad de paradas AFECTADA deduplicadas por `intervencionId`. No se muestran como recorridos.
+Este campo opcional se usa en el mock local con el ejemplo suministrado; no se asume que
+ya exista en el contrato del endpoint de producción y no se agrega otra solicitud HTTP.
+La métrica c4 publicada tiene prioridad; si está ausente y existen los envelopes,
+se cuentan IDs distintos con `estadoNuevo = AFECTADA` y `causaTipo = INCIDENTE_VIAL`.
+Los reintentos con otro `eventId` y las intervenciones CANCELADA no suman.
+
+Los ejemplos y respuestas de comparación permanecen en `testingDatos/`, ignorado por Git
+y excluido del build y del deployment. No se modificó ningún archivo del backend ni Parquet.
+
+### Cobertura visible de los casos de uso
+
+Reclamos presenta tarjetas para `causaTipo = INCIDENTE_VIAL` y `RESERVA`, sumando
+`row_count` del endpoint principal. Esos dos valores prevalecen sobre c4/c6 cuando existe
+el campo. El caso 2 mantiene el agregado `datos[id=c2]` de reclamos distintos vinculados
+a acciones de otros servicios; no se reconstruye a partir de la causa de origen.
+
+Si faltan c2/c3/c4/c6 de Movilidad, se usan respectivamente los puntos Reclamo,
+Evento público, Incidente vial y Reserva de `resumen_gold[id=mobility-stations]`.
+Reserva y Evento público quedan separados en esas tarjetas, aunque la torta agrupe sus etiquetas.
+Los valores explícitos publicados, incluido cero, tienen prioridad sobre el respaldo.
+La tarjeta de afectación prevista utiliza el criterio EVENTO_PUBLICO solicitado; ese agregado
+no acredita por sí solo que el evento sea masivo ni permite calcular cuándo empezará.
+
+Movilidad separa c5 (viajes interrumpidos por accidente en bicicleta) del detalle de viajes
+finalizados normalmente. No utiliza todas las interrupciones viales como sinónimo de bicicletas.
+Espacios Públicos compara los organizadores CIUDADANO/CIUADANO y CIUDAD con el total del
+mismo resumen principal, conservando en el total las actividades sin organizador informado.
+
+Los indicadores pendientes de Reclamos, Emergencias y Movilidad permanecen visibles como
+«Sin datos» cuando no existe un valor verificable. No se agregan endpoints ni datos sintéticos
+al flujo de producción. Ver [cobertura y validación](cobertura-casos-dashboard.md).
+
+
+### Presentación de tablas, filtros y rangos
+
+El gráfico de inicios de viajes muestra estaciones con más de tres viajes por defecto.
+Al escribir en la búsqueda, incluye todas las coincidencias por nombre, incluso con tres
+viajes o menos. La búsqueda ignora mayúsculas y tildes; no cambia los KPI ni otros gráficos.
+
+La tabla de alertas usa filtros locales de zona, prioridad y tipo de alerta. Ordena
+Crítica, Alta, Media y Baja, conserva la paginación de diez filas y formatea los tiempos
+con un máximo de dos decimales. Las filas recibidas no se modifican.
+Los rangos de llenado se muestran como porcentajes; los valores ausentes (SIN RANGO)
+no forman una porción de la torta, pero sus alertas se conservan en la tabla y los totales.
+El filtro de zona de esa torta es independiente de los filtros de la tabla.
+
+En Espacios Públicos se retiró la tarjeta genérica de espacios afectados y se movieron
+las métricas de cancelaciones por clima y modificaciones por accidentes a la grilla superior.
+La sección Impacto sobre eventos públicos utiliza los eventos identificados en
+`eventos_zona`/`eventos_publicos`. El detalle y el filtro no se obtienen de un conteo agregado.
+Las causas por evento sólo pueden filtrarse si se publica el desglose opcional `causas`;
+`efecto` y `descripcion_efecto` se muestran únicamente si llegan informados.
+No se infiere una afectación a partir de la cercanía o del nombre del evento.
+
+En Residuos queda una sola lista de eventos y recorridos, con diez filas por página.
+Los nombres se leen del vínculo publicado o de un catálogo con el mismo evento_id.
+No se fabrican 28 nombres a partir de las 28 intervenciones agregadas por EVENTO_PUBLICO.
+La sección separada Efectos sobre el recorrido fue eliminada.
+
+### Verificación de los Parquet de Residuos suministrados
+
+`intervenciones_resumen.parquet` (corte 17/11/2026) y el corte de semana 46
+contienen únicamente `estado_actual`, `causaTipo`, `cantidadIntervenciones`,
+`cantidadAfectadas` y `fecha_snapshot`. Para EVENTO_PUBLICO, el corte del 17/11
+informa 14 AFECTADA y 12 PROGRAMADA: 26 intervenciones. No son 26 eventos identificados.
+La respuesta del deployment del día 18 informa otro corte agregado (28); no se
+sustituye ese dato más reciente por la suma del archivo anterior.
+
+Los resúmenes de alertas de semanas 38–45 contienen zona, tipo, prioridad, rango
+de llenado, cantidades y promedio de resolución. Ninguno aporta la relación
+entre evento y recorrido. `rangoNivelLlenado = null` representa una medición no informada.
+Estos cortes son acumulados y no se suman entre semanas para obtener el total actual.
+
+Para completar la tabla por evento se necesita un detalle con la relación publicada
+entre `evento_id` y `recorrido_id`, más sus nombres cuando estén disponibles.
+El frontend lo admite en `afectaciones.recorridos_eventos`; no deduce esos vínculos
+usando la zona, el camión ni el total de intervenciones. La inspección y las copias
+JSON quedan en testingDatos, ignorado por Git. Los Parquet originales se conservaron intactos.
+
+## Impacto territorial de eventos públicos
+
+Se incorporó el cálculo en el navegador con coordenadas WGS84, distancia a puntos
+ y al trazado completo de los recorridos, radio por defecto de 500 metros y
+coincidencia temporal. La zona/barrio se utiliza para agrupar y filtrar, no como
+sustituto de coordenadas. El detalle puede incorporarse en el campo opcional
+`contexto_territorial` de la respuesta de Parte 2, sin otro endpoint.
+
+El contrato completo, la propuesta de endpoint separado y un ejemplo de respuesta
+están en [contrato-contexto-territorial.md](contrato-contexto-territorial.md).
+Los agregados Parquet actuales no contienen la geometría y los IDs necesarios.
+Los ejemplos del mock quedan en testingDatos; no se modificó el backend.

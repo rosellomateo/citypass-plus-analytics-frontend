@@ -72,6 +72,8 @@ export interface EmergencyAnalyticsData {
   emergenciesByPriority: { priority: string; count: number }[];
   avgDispatchTimeMinutes: number;
   avgArrivalTimeMinutes?: number;
+  emergenciesByCause?: { etiqueta: string; valor: number }[];
+  resolutionByCategory?: { etiqueta: string; valor: number }[];
   avgDispatchTimeByPriority: { priority: string; minutes: number }[];
   emergenciesByCategoryStacked: CategoryPriorityStackedData[];
   availableCategories: string[];

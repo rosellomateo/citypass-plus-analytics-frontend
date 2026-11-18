@@ -1,5 +1,6 @@
 import { DashboardImpactCards } from '../components/common/DashboardImpactCards';
 import { DashboardImpactCharts } from '../components/common/DashboardImpactCharts';
+import { EmergencyCausesChart } from '../components/emergencies/EmergencyCausesChart';
 import { EmergencyZonePanel } from '../components/common/EmergencyZonePanel';
 import { useDashboardImpact } from '../hooks/useDashboardImpact';
 // src/pages/EmergenciesDashboard.tsx
@@ -29,7 +30,7 @@ const stackedPriorityBars = [
 
 export function EmergenciesDashboard() {
   const impact = useDashboardImpact('emergencies');
-  const { filters, updateFilter, updateDateRange } = useFilters();
+  const { filters } = useFilters();
   const emergencyAsync = useEmergencyData(filters);
   const resolved = useResolvedUiState(emergencyAsync);
 
@@ -46,10 +47,9 @@ export function EmergenciesDashboard() {
       <DashboardHeader
         title="Tablero de Emergencias"
         subtitle="CU-E1: Emergencias por estado y prioridad | CU-E2: Tiempo de despacho"
-        filters={filters}
+
         aiReport={resolved.data?.aiReport}
-        onDateRangeChange={(range) => updateFilter('dateRange', range)}
-        onCustomDateSelect={(from, to) => updateDateRange('custom', from, to)}
+
       />
 
       {resolved.loading ? (
@@ -103,9 +103,11 @@ export function EmergenciesDashboard() {
                 unit: ' min',
                 sublabel: 'Promedio ponderado por cantidad de emergencias con datos',
               }} />}
-              <DashboardImpactCards area="emergencies" data={impact.data} />
+              <DashboardImpactCards area="emergencies" data={impact.data} showMissing />
             </div>
           </div>
+
+          <EmergencyCausesChart data={resolved.data} />
 
           {/* Layout Superior Responsive: Gráficos de Tiempo de Despacho y Distribución por Prioridad */}
           <div className="section">
@@ -150,8 +152,8 @@ export function EmergenciesDashboard() {
           </div>}
         </>
       ) : null}
-      {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="emergencies" data={impact.data} standalone />}
-      <DashboardImpactCharts area="emergencies" {...impact} />
+      {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="emergencies" data={impact.data} standalone showMissing />}
+      <DashboardImpactCharts area="emergencies" {...impact} emergencyData={resolved.data} />
       <EmergencyZonePanel data={impact.data} loading={impact.loading} filters={filters} />
     </div>
   );

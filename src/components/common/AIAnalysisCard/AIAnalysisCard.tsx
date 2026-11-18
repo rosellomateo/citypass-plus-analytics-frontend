@@ -52,7 +52,7 @@ export function AIAnalysisCard({ report, item: directItem, defaultExpanded = tru
 
   const { resumen, metadata } = activeItem;
   const model = metadata?.llm?.modelo_respuesta || metadata?.llm?.deployment;
-  const modelLabel = model?.toLowerCase() === 'gpt-5-mini' ? 'GPT-5 mini' : model;
+  const modelLabel = model && /^gpt-5-mini(?:-\d{4}-\d{2}-\d{2})?$/i.test(model) ? 'GPT-5 mini' : model;
   const casoDeUsoDisplay = metadata?.caso_de_uso || report?.caso_de_uso;
 
   return (

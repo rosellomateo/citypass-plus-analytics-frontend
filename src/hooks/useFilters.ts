@@ -5,7 +5,7 @@ import { useState, useCallback } from 'react';
 import type { DashboardFilters } from '../types';
 
 const DEFAULT_FILTERS: DashboardFilters = {
-  dateRange: '7d',
+  dateRange: 'all',
   zone: 'all',
   status: 'all',
   category: 'all',

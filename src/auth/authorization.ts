@@ -9,7 +9,6 @@ const AREAS = [OVERVIEW, ...DOMAIN_NAV_ITEMS.map(({ domain, path }) => ({ area: 
 
 
 const MODULE_AREAS: Record<string, ProtectedArea> = {
-  eda: 'eda',
   admin: 'login',
   login: 'login',
   identidad: 'login',
