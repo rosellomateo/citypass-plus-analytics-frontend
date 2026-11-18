@@ -1,3 +1,4 @@
+import { DashboardImpactCards } from '../common/DashboardImpactCards';
 import { WasteAffected, WasteAffectedMetric } from './WasteAffected';
 import type { useDashboardImpact } from '../../hooks/useDashboardImpact';
 import { BarChart } from '../charts/BarChart';
@@ -107,6 +108,7 @@ export function WasteAlertsDashboard({
             }}
           />
           <WasteAffectedMetric report={impact.data} />
+          <DashboardImpactCards area="waste" data={impact.data} />
         </div>
       </div>
 

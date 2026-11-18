@@ -1,5 +1,6 @@
 import type {
   ClaimsApiResponse,
+  CrossModuleResponse,
   CultureApiResponse,
   EmergencyApiResponse,
   LoginApiResponse,
@@ -36,3 +37,19 @@ export const embeddedApi = {
   getWaste: () => read<WasteApiResponse>('residuos'),
   getLogin: () => read<LoginApiResponse>('identidad'),
 };
+
+/**
+ * Indicadores de Parte 2 que el backend agrega al paquete embebido (campo
+ * `parte2`). Devuelve null si el tablero es de otro módulo, si el paquete no
+ * los trae (backend anterior) o si no se pudieron calcular.
+ */
+export function readEmbeddedPart2(module: EmbedModule): CrossModuleResponse | null {
+  if (getEmbeddedModule() !== module) return null;
+  try {
+    const payload = JSON.parse(document.getElementById('citypass-datos')?.textContent ?? 'null');
+    const part2 = payload?.parte2;
+    return part2 && Array.isArray(part2.datos) ? part2 as CrossModuleResponse : null;
+  } catch {
+    return null;
+  }
+}

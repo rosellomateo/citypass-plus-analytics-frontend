@@ -1,3 +1,4 @@
+import { DashboardImpactCards } from '../components/common/DashboardImpactCards';
 import { DashboardHeader } from '../components/common/DashboardHeader/DashboardHeader';
 import { EmptyState } from '../components/common/EmptyState/EmptyState';
 import { ErrorCard } from '../components/common/ErrorState/ErrorState';
@@ -28,6 +29,7 @@ export function WasteDashboard() {
       {resolved.loading ? <div className="section"><MetricsGridSkeleton count={4} /><ChartSkeleton /></div>
         : resolved.error ? <ErrorCard message={resolved.error} onRetry={waste.refetch} />
         : <EmptyState description="No hay alertas de residuos para los filtros seleccionados." />}
+      {!resolved.loading && <DashboardImpactCards area="waste" data={impact.data} standalone />}
       <WasteAffected report={impact.data} zones={[]} />
     </>
   );
