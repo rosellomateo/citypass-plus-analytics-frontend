@@ -2,16 +2,19 @@
 import type { AIAnalysisReport } from './ai';
 
 /**
- * Registros estructurados del dataset Parquet de viajes (gold/Movilidad Urbana/viajes_resumen_XX_2026.parquet).
- * DTO exacto enviado por el backend sin atributos inventados.
+ * Una fila de gold de Movilidad (gold/Movilidad Urbana/viajes_resumen.parquet,
+ * estructura nueva): afectaciones de estaciones y viajes agrupados por la causa
+ * que los origino. causaTipo NORMAL son los viajes finalizados sin incidente.
  */
 export interface BackendMobilityRecord {
-  fechaInicio: string;
-  estacionInicio: string;
-  duracionViaje: string; // e.g. '<15min' | '15-30min' | '30-60min' | '>1h'
-  cantidadViajes: number;
-  duracionTotalViajes: number;
-  promDuracion: number;
+  causaTipo: string;
+  cantidadAfectaciones: number;
+  estacionesAfectadasDistintas: number;
+  cantidadBloqueadas: number;
+  estacionesBloqueadasDistintas: number;
+  cantidadPreventivas: number;
+  cantidadRestauradas: number;
+  cantidadViajesInterrumpidos: number;
   fecha_snapshot: string;
 }
 
@@ -73,41 +76,36 @@ export interface MobilityLLMReport {
 /**
  * Métricas agregadas y modelos para componentes de UI (independientes de los DTOs recibidos).
  */
-export interface TripsByStationItem {
-  station: string;
-  cantidadViajes: number;
+export interface MobilityCauseItem {
+  causa: string;
+  etiqueta: string;
+  afectaciones: number;
+  estaciones: number;
+  bloqueadas: number;
+  estacionesBloqueadas: number;
+  preventivas: number;
+  restauradas: number;
 }
 
-export interface TripsByDurationBucketItem {
-  bucket: string;
-  cantidadViajes: number;
-  porcentaje: number;
-}
-
-export interface DailyTripsTrendItem {
-  fecha: string;
-  cantidadViajes: number;
-  duracionTotal: number;
-}
-
-export interface StationAvgDurationItem {
-  station: string;
-  promDuracionPonderada: number; // SUM(duracionTotalViajes) / SUM(cantidadViajes)
-  cantidadViajes: number;
+export interface MobilityTripsItem {
+  causa: string;
+  etiqueta: string;
+  viajes: number;
 }
 
 export interface MobilityAnalyticsData {
-  totalTrips: number;
-  weeklyTrips: number;
-  totalDurationMinutes: number;
-  weightedAvgDurationMinutes: number; // SUM(duracionTotalViajes) / SUM(cantidadViajes)
-  topStationName: string;
-  predominantDurationBucket: string;
-  tripsByStation: TripsByStationItem[];
-  tripsByDurationBucket: TripsByDurationBucketItem[];
-  dailyTripsTrend: DailyTripsTrendItem[];
-  stationAvgDuration: StationAvgDurationItem[];
-  availableStations: string[];
+  totalAffectations: number;
+  totalBlocked: number;
+  totalPreventive: number;
+  totalRestored: number;
+  restoredPct: number;
+  interruptedTrips: number;
+  normalTrips: number;
+  topCause: string;
+  affectationsByCause: MobilityCauseItem[];
+  tripsByCause: MobilityTripsItem[];
+  availableCauses: string[];
+  snapshotDate: string;
   records: BackendMobilityRecord[];
   executiveReport?: MobilityWeeklyAnalysis;
   aiReport?: AIAnalysisReport;
