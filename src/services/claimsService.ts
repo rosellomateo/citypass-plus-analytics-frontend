@@ -11,9 +11,9 @@ export function formatClaimCategory(category: string): string {
 export function mapClaimStatus(status: string): string {
   if (!status) return 'CREADO';
   const s = status.toUpperCase().trim();
-  if (s === 'ASIGNADO' || s === 'EN_CURSO' || s === 'EN CURSO') return 'EN CURSO';
+  if (['ASIGNADO', 'EN_CURSO', 'EN CURSO', 'EN_PROCESO', 'EN_REVISION'].includes(s)) return 'EN CURSO';
   if (s === 'RECHAZADO' || s === 'CANCELADO') return 'CANCELADO';
-  if (s === 'CERRADO' || s === 'RESUELTA') return 'CERRADO';
+  if (s === 'CERRADO' || s === 'RESUELTA' || s === 'RESUELTO') return 'CERRADO';
   return 'CREADO';
 }
 
@@ -124,10 +124,11 @@ export async function getClaimsAnalyticsData(
   const totalClaims = filtered.reduce((acc, r) => acc + (r.row_count ?? 1), 0);
 
   // Time to resolution: weighted average of tiempo_prom_hasta_estado_actual
-  const closedRecords = filtered.filter((r) => {
-    const st = mapClaimStatus(r.estado_actual);
-    return st === 'CERRADO' || r.estado_actual === 'CERRADO' || r.estado_actual === 'ASIGNADO';
-  });
+  const closedRecords = filtered.filter((r): r is BackendAnalyticsRecord & { tiempo_prom_hasta_estado_actual: number } =>
+    mapClaimStatus(r.estado_actual) === 'CERRADO' &&
+    typeof r.tiempo_prom_hasta_estado_actual === 'number' &&
+    Number.isFinite(r.tiempo_prom_hasta_estado_actual) && r.tiempo_prom_hasta_estado_actual >= 0 && r.row_count > 0,
+  );
 
   const totalWeightedResolutionTime = closedRecords.reduce(
     (acc, r) => acc + r.tiempo_prom_hasta_estado_actual * (r.row_count ?? 1),
@@ -141,7 +142,7 @@ export async function getClaimsAnalyticsData(
   // Average resolution by category
   const resolutionByCategoryMap: Record<string, { totalTime: number; count: number }> = {};
 
-  filtered.forEach((r) => {
+  closedRecords.forEach((r) => {
     const cat = formatClaimCategory(r.categoria);
     if (!resolutionByCategoryMap[cat]) {
       resolutionByCategoryMap[cat] = { totalTime: 0, count: 0 };

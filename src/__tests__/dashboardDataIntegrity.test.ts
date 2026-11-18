@@ -1,12 +1,25 @@
 import { afterEach, expect, it, vi } from 'vitest';
 import { analyticsApi } from '../api/analyticsApi';
 import type { CultureActivityApiRecord, EmergencyApiRecord, WasteInterventionEvent } from '../api/types';
-import { getApiCultureAnalyticsData, mapEmergencyApiData } from '../dataSources/apiAnalyticsDataSource';
+import { getApiClaimsAnalyticsData, getApiCultureAnalyticsData, mapEmergencyApiData } from '../dataSources/apiAnalyticsDataSource';
 import { affectedInterventions } from '../utils/wasteInterventions';
 import { getDateRangeBounds, isWithinDateRange } from '../utils/dates';
 
 const filters = { dateRange: 'all' as const };
 afterEach(() => { vi.restoreAllMocks(); vi.unstubAllEnvs(); });
+
+it('preserves absent claim times through the API adapter instead of treating them as zero', async () => {
+  vi.stubEnv('VITE_DATA_SOURCE', 'api');
+  const row = { barrio: 'Flores', categoria: 'TRANSITO', prioridad: 'ALTA', origenClasificacion: 'MANUAL',
+    estado_actual: 'RESUELTO', row_count: 2, tiempo_prom_hasta_estado_actual: 10, fecha_snapshot: '2026-11-18' };
+  vi.spyOn(analyticsApi, 'getClaims').mockResolvedValue({ datos: [row,
+    { ...row, estado_actual: 'CERRADO', row_count: 100, tiempo_prom_hasta_estado_actual: null },
+  ], informe: {} as never });
+  const result = await getApiClaimsAnalyticsData(filters);
+  expect(result.totalClaims).toBe(102);
+  expect(result.avgResolutionTimeHours).toBe(10);
+  expect(result.records[1].tiempo_prom_hasta_estado_actual).toBeNull();
+});
 
 it('unifies repeated and damaged category labels without changing the received records or totals', async () => {
   vi.stubEnv('VITE_DATA_SOURCE', 'api');

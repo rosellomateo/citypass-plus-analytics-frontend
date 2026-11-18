@@ -69,9 +69,7 @@ function mapClaimRecord(row: ClaimApiRecord): BackendAnalyticsRecord {
     origenClasificacion: textOrEmpty(row.origenClasificacion),
     estado_actual: textOrEmpty(row.estado_actual),
     row_count: numberOrZero(row.row_count),
-    tiempo_prom_hasta_estado_actual: numberOrZero(
-      row.tiempo_prom_hasta_estado_actual
-    ),
+    tiempo_prom_hasta_estado_actual: row.tiempo_prom_hasta_estado_actual,
     fecha_snapshot: textOrEmpty(row.fecha_snapshot),
   };
 }

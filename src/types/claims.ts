@@ -28,7 +28,7 @@ export interface BackendAnalyticsRecord {
   origenClasificacion: string;
   estado_actual: string;
   row_count: number;
-  tiempo_prom_hasta_estado_actual: number;
+  tiempo_prom_hasta_estado_actual: number | null;
   fecha_snapshot: string;
 }
 

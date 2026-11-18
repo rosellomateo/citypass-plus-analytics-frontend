@@ -106,6 +106,8 @@ export interface WasteInterventionEvent {
     estadoNuevo: string;
     causaId?: string | null;
     causaTipo?: string | null;
+    causaProgramada?: string | null;
+    causaTipoAfectacion?: string | null;
     correlationId?: string | null;
     updatedAt: string;
   };

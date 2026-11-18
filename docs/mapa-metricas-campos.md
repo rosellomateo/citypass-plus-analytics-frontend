@@ -47,7 +47,7 @@ Endpoint: `GET /analytics/movilidad-urbana`.
 | Duración total | `duracionTotalViajes` | Suma de minutos acumulados. |
 | Duración promedio ponderada | `duracionTotalViajes`, `cantidadViajes` | `SUM(duracionTotalViajes) / SUM(cantidadViajes)`. No se obtiene promediando `promDuracion`. |
 | Duración promedio por estación | Los dos campos anteriores y `estacionInicio` | Mismo cociente, agrupado por estación. |
-| Distribución de duración | `duracionViaje`, `cantidadViajes` | Suma por rango y participación sobre el total. El código define `<15min`, `15-30min`, `30-60min`, `>1h`; las muestras traen `>1hs`, que hoy se conserva como otro texto recibido. |
+| Distribución de duración | `duracionViaje`, `cantidadViajes` | Suma por rango y participación sobre el total. Las etiquetas equivalentes `>1hs` y `>1h` se agrupan como `>1h`, sin modificar las filas recibidas. |
 
 Antes de calcular se deduplica por `fechaInicio + estacionInicio + duracionViaje`, conservando la fila con `fecha_snapshot` más reciente. Para actualizar una fila repetida con esta clave debe venir con un snapshot posterior. La búsqueda ignora mayúsculas y tildes.
 
@@ -95,10 +95,10 @@ Endpoint: `GET /analytics/reclamos`.
 | Total de reclamos | `row_count` | Suma del campo en todas las filas incluidas. |
 | Distribución por estado | `estado_actual`, `row_count` | Suma por el estado normalizado explicado debajo. |
 | Reclamos por categoría | `categoria`, `estado_actual`, `row_count` | Agrupa por categoría, normalizando mayúsculas y reemplazando `_` por espacios. En la vista Todos excluye los estados normalizados como CANCELADO. |
-| Tiempo promedio general de resolución | `tiempo_prom_hasta_estado_actual`, `row_count`, `estado_actual` | Promedio ponderado de las filas normalizadas como CERRADO; el código actual también incluye explícitamente `ASIGNADO`. |
-| Tiempo promedio por categoría | `categoria`, `tiempo_prom_hasta_estado_actual`, `row_count` | Promedio ponderado por categoría de **todos los estados**. La categoría `texto` se oculta en este gráfico. |
+| Tiempo promedio general de resolución | `tiempo_prom_hasta_estado_actual`, `row_count`, `estado_actual` | Promedio ponderado de las filas normalizadas como CERRADO con tiempo finito, no negativo y cantidad positiva. Los tiempos nulos no se convierten en cero. |
+| Tiempo promedio por categoría | `categoria`, `tiempo_prom_hasta_estado_actual`, `row_count`, `estado_actual` | Mismo promedio y población que el general, agrupado por categoría. La categoría `texto` se oculta en este gráfico. |
 
-Mapeo de estados actual: `ASIGNADO`/`EN_CURSO`/`EN CURSO` → EN CURSO; `RECHAZADO`/`CANCELADO` → CANCELADO; `CERRADO`/`RESUELTA` → CERRADO; otros valores → CREADO. En las muestras también existen `RESUELTO` y `EN_PROCESO`, que actualmente caen en CREADO. Esto describe una regla a revisar del código, no una recomendación de cambiar esos datos en origen.
+Mapeo de estados: `ASIGNADO`/`EN_CURSO`/`EN CURSO`/`EN_PROCESO`/`EN_REVISION` → EN CURSO; `RECHAZADO`/`CANCELADO` → CANCELADO; `CERRADO`/`RESUELTA`/`RESUELTO` → CERRADO; otros valores → CREADO.
 
 `barrio`, `prioridad` y `origenClasificacion` participan de la búsqueda. `causaTipo` llega en el JSON de Reclamos pero no se usa en estos cálculos generales; los gráficos de vínculos leen Parte 2.
 
@@ -190,7 +190,7 @@ El frontend toma `resumen_gold[].id` y presenta sus `puntos[].etiqueta`/`puntos[
 
 | Gráfico | ID leído | Campos del resumen de origen / condición del valor |
 |---|---|---|
-| Intervenciones por causa publicada | `waste-cause` | `intervenciones_resumen`: `causaTipo`, `cantidadIntervenciones`. El agregado general incluye los estados publicados. No son nombres ni cantidad de eventos distintos. |
+| Intervenciones por causa publicada | `waste-cause` | Nuevo campo confirmado de `intervenciones_resumen`: `causaProgramada`, sumando `cantidadIntervenciones`. La causa de afectación es independiente (`causaTipoAfectacion`). El frontend recibe los puntos ya calculados; el backend debe adaptar esa agregación. No son nombres ni cantidad de eventos distintos. |
 | Alertas de residuos por zona, si se publica | `waste-alerts` | `alertas_resumen`: `zona`, `cantidadAlertas`. Este agregado es independiente del gráfico principal calculado desde `/analytics/residuos`. |
 | Estaciones afectadas por causa | `mobility-stations` | `movilidad_resumen`: `causaTipo`, `estacionesAfectadasDistintas`. En el frontend Reserva se agrupa visualmente con Evento público y se suman los valores publicados; no se deduplican estaciones entre ambas causas porque faltan IDs. |
 | Viajes afectados, tarjeta superior | `mobility-interruptions` | `movilidad_resumen`: `causaTipo`, `cantidadViajesInterrumpidos`. El frontend suma los puntos **excepto el que tenga exactamente la etiqueta `Operación normal`**. |
@@ -219,14 +219,16 @@ Estos son campos de detalle del JSON que el frontend admite. No están presentes
 
 El evento original `EmergenciaVinculadaAContextoZona` aporta `emergenciaId`, `referenciaExterna`, `radioMetros` y `vinculadaEn`. El backend necesita relacionarlo con el evento público y con los datos de la emergencia. Estar dentro de 500 metros no es por sí solo una confirmación de criticidad elevada: el productor debe informar ese cambio.
 
-## 5. Puntos detectados para revisar, sin cambiar la lógica en esta tarea
+## 5. Validación del 18/11/2026
 
-1. Reclamos incluye ASIGNADO en el promedio general llamado resolución; el gráfico por categoría usa todos los estados. No son exactamente la misma población.
-2. Reclamos recibe RESUELTO y EN_PROCESO, pero el mapeo actual los clasifica como CREADO. Conviene revisar esa equivalencia en el frontend.
-3. Movilidad recibe `>1hs`, mientras que el conjunto base del código utiliza `>1h`.
+1. Se corrigieron los promedios de Reclamos: sólo filas resueltas/cerradas con tiempo informado; misma población en el promedio general y por categoría.
+2. Se corrigió el mapeo de `RESUELTO`, `EN_PROCESO` y `EN_REVISION` en Reclamos.
+3. Movilidad agrupa `>1hs` y `>1h` en una sola categoría visual.
 4. El nombre Reclamos por accidentes viales se acortó visualmente, pero el c5 publicado sigue correspondiendo al caso de accidente de bicicleta.
 5. Los campos `totalVecesEventoClimatico`, `totalVecesReclamo`, `totalVecesIncidenteVial`, `totalVecesAccidenteVial`, `criticidadAfectada` y `cantidadAfectadas` no se leen directamente para recalcular las tarjetas generales del frontend. Su uso en el pipeline/Parte 2 debe comprobarse en el backend.
 6. Analítica Urbana tiene hoy una portada de navegación y contratos documentados; EDA fue retirado. Los informes de IA se presentan desde `informe` y no se regeneran en el navegador por cambiar un contador.
+
+El detalle de respuestas reales, conteos y pendientes del nuevo esquema de Residuos está en [validacion-dashboards-2026-11-18.md](validacion-dashboards-2026-11-18.md).
 
 ## Fuentes del código consultadas
 

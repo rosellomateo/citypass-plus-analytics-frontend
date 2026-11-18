@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Anchor, Badge, Group, Select } from '@mantine/core';
 import type { CrossModuleResponse } from '../../api/types';
 import { PART2_METRICS } from '../../config/crossModuleMetrics';
+import { countRoadAffectedInterventions } from '../../utils/wasteInterventions';
 import { BarChart } from '../charts/BarChart';
 import { CausePie } from '../common/CausePie';
 import { ChartCard } from '../common/ChartCard/ChartCard';
@@ -11,7 +12,7 @@ import { MetricCard } from '../common/MetricCard/MetricCard';
 export function WasteIncidentMetric({ report }: { report: CrossModuleResponse | null }) {
   const metric = report?.datos.find(({ id }) => id === 'c4');
   const rawCount = report?.intervenciones
-    ? new Set(report.intervenciones.filter(({ metadata, data }) => metadata.eventType === 'com.citypass.residuos.IntervencionActualizada' && data.estadoNuevo === 'AFECTADA' && data.causaTipo === 'INCIDENTE_VIAL').map(({ data }) => data.intervencionId).filter(Boolean)).size
+    ? countRoadAffectedInterventions(report.intervenciones)
     : undefined;
   return <MetricCard metric={{
     label: PART2_METRICS.waste[3][0],

@@ -10,9 +10,9 @@ import { LoginDashboard } from '../pages/LoginDashboard';
 vi.mock('../components/charts/BarChart', () => ({ BarChart: () => null }));
 vi.mock('../components/charts/PieChart', () => ({ PieChart: () => null }));
 
-function renderDashboard(page: ReactNode) {
+function renderDashboard(page: ReactNode, response = mockLoginDashboard) {
   vi.stubEnv('VITE_DATA_SOURCE', 'api');
-  vi.spyOn(analyticsApi, 'getLogin').mockResolvedValue(mockLoginDashboard);
+  vi.spyOn(analyticsApi, 'getLogin').mockResolvedValue(response);
   vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
   return render(<MantineProvider env="test"><MemoryRouter>{page}</MemoryRouter></MantineProvider>);
 }
@@ -25,6 +25,12 @@ afterEach(() => {
 });
 
 describe('Tablero de Login Federado', () => {
+  it.each(['2026-11-18', '2026-11-18T00:00:00'])('muestra la fecha del snapshot %s', async (fecha_snapshot) => {
+    renderDashboard(<LoginDashboard />, { ...mockLoginDashboard,
+      datos: mockLoginDashboard.datos.map((row) => ({ ...row, fecha_snapshot })),
+    });
+    expect(await screen.findByText('Actividad de autenticación · Corte del 18/11/2026')).toBeInTheDocument();
+  });
   it('muestra el informe de Login y las métricas del corte de prueba', async () => {
     renderDashboard(<LoginDashboard />);
     expect(await screen.findByRole('heading', { name: 'Reporte de IA — LOGIN FEDERADO' })).toBeInTheDocument();
