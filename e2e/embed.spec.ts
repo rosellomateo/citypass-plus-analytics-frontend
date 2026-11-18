@@ -29,6 +29,15 @@ const cases = [
   { module: 'identidad', title: 'Tablero de Login Federado', metric: 'Inicios de sesión exitosos', row: {
     department: 'Movilidad', event_type: 'com.citypass.auth.LoginExitoso', cantidadEventos: 17,
   } },
+  // Parte 2 inyectado por el backend: el caso 5 se ve en el embed sin pedir nada a la red.
+  { module: 'residuos', title: 'Tablero de Residuos', metric: 'Total de Alertas', row: {
+    zona: 'Centro', tipoAlerta: 'Contenedor lleno', prioridad: 'Alta', rangoNivelLlenado: '80-100%',
+    cantidadAlertas: 17, cantidadResueltas: 12, tiempoPromResolucion: 35,
+  }, parte2: {
+    fecha_snapshot: date.slice(0, 10), datos: [{ id: 'c5', valor: 1, detalle: [] }],
+    resumen_gold: [{ id: 'waste-cause', titulo: 'Intervenciones por causa publicada', fecha_snapshot: date.slice(0, 10),
+      puntos: [{ etiqueta: 'Operación normal', valor: 41 }, { etiqueta: 'Emergencia', valor: 1 }] }],
+  }, expectText: 'Intervenciones por accidentes en bicicleta frente a alertas normales' },
   { module: 'identidad', title: 'Tablero de Login Federado', metric: 'Inicios de sesión exitosos', withoutReport: true, row: {
     department: 'Movilidad', event_type: 'com.citypass.auth.LoginExitoso', cantidadEventos: 17,
   } },
@@ -37,7 +46,8 @@ const cases = [
 for (const scenario of cases) {
   const { module, title, metric, row } = scenario;
   const withoutReport = 'withoutReport' in scenario && scenario.withoutReport;
-  test(`${module}${withoutReport ? ' without AI report' : ''}: renders injected data inside an opaque sandbox without network access`, async ({ page }) => {
+  const parte2 = 'parte2' in scenario ? scenario.parte2 : undefined;
+  test(`${module}${withoutReport ? ' without AI report' : ''}${parte2 ? ' with Parte 2' : ''}: renders injected data inside an opaque sandbox without network access`, async ({ page }) => {
     const errors: string[] = [];
     const unexpectedRequests: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
@@ -53,6 +63,7 @@ for (const scenario of cases) {
           },
         }],
       },
+      ...(parte2 ? { parte2 } : {}),
     };
     const html = template.replace('__CITYPASS_MODULO__', module)
       .replace('__CITYPASS_DATOS__', () => JSON.stringify(payload).replaceAll('<', '\\u003c'));
@@ -89,6 +100,11 @@ for (const scenario of cases) {
     await expect(metricCard).toContainText('17');
     await expect(frame.getByRole('alert')).toHaveCount(0);
     await expect(frame.getByRole('button', { name: 'Iniciar sesión' })).toHaveCount(0);
+    if ('expectText' in scenario) {
+      await expect(frame.getByText(scenario.expectText, { exact: true })).toBeVisible();
+      await expect(frame.getByText('Intervenciones por causa publicada', { exact: true })).toBeVisible();
+      await expect(frame.getByText('No se tienen datos suficientes como para formar el gráfico.')).toHaveCount(0);
+    }
     if (!withoutReport) {
       await expect(frame.getByText('</script><script>throw new Error("injected")</script>', { exact: true })).toBeVisible();
     }
