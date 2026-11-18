@@ -1,6 +1,7 @@
 import { DashboardImpactCards } from '../components/common/DashboardImpactCards';
 import { EventZonePanel } from '../components/common/EventZonePanel';
 import { PublicEventImpact } from '../components/culture/PublicEventImpact';
+import { ActivityOrganizerChart } from '../components/culture/ActivityOrganizerChart';
 import { useDashboardImpact } from '../hooks/useDashboardImpact';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -29,9 +30,11 @@ export function CultureDashboard() {
   const activities = resolved.data?.activities;
   const organizerCards = <>
     <MetricCard metric={{ label: 'Actividades de ciudadanos',
-      value: organizers?.find(({ etiqueta }) => etiqueta === 'CIUDADANO')?.valor ?? activities?.byOrganizer?.find(({ organizer }) => organizer === 'CIUDADANO')?.count ?? 'Sin datos', status: 'info' }} />
+      value: activities?.byOrganizer ? activities.byOrganizer.find(({ organizer }) => organizer === 'CIUDADANO')?.count ?? 0
+        : organizers?.find(({ etiqueta }) => etiqueta === 'CIUDADANO')?.valor ?? 'Sin datos', status: 'info' }} />
     <MetricCard metric={{ label: 'Actividades de la ciudad',
-      value: organizers?.find(({ etiqueta }) => etiqueta === 'CIUDAD')?.valor ?? activities?.byOrganizer?.find(({ organizer }) => organizer === 'CIUDAD')?.count ?? 'Sin datos', status: 'info' }} />
+      value: activities?.byOrganizer ? activities.byOrganizer.find(({ organizer }) => organizer === 'CIUDAD')?.count ?? 0
+        : organizers?.find(({ etiqueta }) => etiqueta === 'CIUDAD')?.valor ?? 'Sin datos', status: 'info' }} />
   </>;
 
   useEffect(() => {
@@ -69,6 +72,7 @@ export function CultureDashboard() {
             {organizerCards}
             <DashboardImpactCards area="culture" data={impact.data} />
           </div></section>
+          <ActivityOrganizerChart activities={activities} />
           <section className="section">
             <ChartCard title="Cantidad de eventos por zona">
               <BarChart data={activities.byZone ?? []} xKey="zone" bars={[{ key: 'count', label: 'Eventos', color: '#4F8A72' }]}

@@ -122,6 +122,13 @@ export async function getClaimsAnalyticsData(
   const claimsByStatus = getClaimsByStatusFiltered(filtered, 'ALL');
 
   const totalClaims = filtered.reduce((acc, r) => acc + (r.row_count ?? 1), 0);
+  const causes = new Map<string, number>();
+  for (const row of filtered) {
+    const cause = row.causaTipo?.trim().toUpperCase() || 'SIN_CAUSA_INFORMADA';
+    causes.set(cause, (causes.get(cause) ?? 0) + row.row_count);
+  }
+  const claimsByCause = filtered.length === 0 || filtered.some((row) => row.causaTipo !== undefined)
+    ? [...causes].map(([cause, count]) => ({ cause, count })) : undefined;
 
   // Time to resolution: weighted average of tiempo_prom_hasta_estado_actual
   const closedRecords = filtered.filter((r): r is BackendAnalyticsRecord & { tiempo_prom_hasta_estado_actual: number } =>
@@ -159,6 +166,7 @@ export async function getClaimsAnalyticsData(
 
   return {
     totalClaims,
+    claimsByCause,
     claimsByCategory,
     claimsByStatus,
     avgResolutionTimeHours,

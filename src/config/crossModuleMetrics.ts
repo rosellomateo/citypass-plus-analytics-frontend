@@ -17,11 +17,11 @@ export const PART2_METRICS = {
   ],
   claims: [
     ['Reclamos vinculados a alertas climáticas'],
-    ['Reclamos que afectaron a otros módulos'],
+    ['Reclamos que afectaron a otros servicios'],
     ['Reclamos vinculados a eventos masivos'],
-    ['Reclamos vinculados a incidentes programados'],
+    ['Reclamos por incidentes viales'],
     ['Reclamos por accidentes viales'],
-    ['Reclamos vinculados a eventos ciudadanos'],
+    ['Reclamos por reservas de espacios públicos'],
   ],
   emergencies: [
     ['Emergencias con criticidad afectada por clima'],
@@ -34,9 +34,9 @@ export const PART2_METRICS = {
   mobility: [
     ['Estaciones bloqueadas por clima'],
     ['Estaciones afectadas por reclamos'],
-    ['Estaciones con afectación prevista por eventos masivos'],
-    ['Estaciones afectadas por incidentes'],
-    ['Viajes interrumpidos por accidentes en bicicleta frente a viajes finalizados normalmente'],
+    ['Estaciones con afectación prevista por eventos públicos'],
+    ['Estaciones afectadas por incidentes viales'],
+    ['Viajes interrumpidos por accidente en bicicleta', 'Viajes finalizados normalmente'],
     ['Estaciones afectadas por eventos ciudadanos'],
   ],
 } as const;

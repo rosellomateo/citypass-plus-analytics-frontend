@@ -105,7 +105,7 @@ export function ClaimsDashboard() {
                   status: 'normal',
                 }}
               />
-              <DashboardImpactCards area="claims" data={impact.data} />
+              <DashboardImpactCards area="claims" data={impact.data} claimCauses={resolved.data.claimsByCause} showMissing />
             </div>
           </div>
 
@@ -167,8 +167,8 @@ export function ClaimsDashboard() {
           </div>
         </>
       ) : null}
-      {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="claims" data={impact.data} standalone />}
-      <DashboardImpactCharts area="claims" {...impact} />
+      {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="claims" data={impact.data} standalone showMissing />}
+      <DashboardImpactCharts area="claims" {...impact} claimCauses={resolved.data?.claimsByCause} />
       <GoldReportCharts title="Causas de reclamos" charts={impact.data?.resumen_gold} />
     </div>
   );

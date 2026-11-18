@@ -27,6 +27,7 @@ export interface BackendAnalyticsRecord {
   prioridad: string;
   origenClasificacion: string;
   estado_actual: string;
+  causaTipo?: string | null;
   row_count: number;
   tiempo_prom_hasta_estado_actual: number | null;
   fecha_snapshot: string;
@@ -52,6 +53,7 @@ export type ClaimCreatedEvent = EventEnvelope<ClaimCreatedData>;
 export type ClaimUpdatedEvent = EventEnvelope<ClaimUpdatedData>;
 
 export interface ClaimsAnalyticsData {
+  claimsByCause?: { cause: string; count: number }[];
   totalClaims: number;
   claimsByCategory: { category: string; count: number }[];
   claimsByStatus: { status: string; count: number }[];

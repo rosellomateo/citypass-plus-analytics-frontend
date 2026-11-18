@@ -1,4 +1,9 @@
 /** Display normalization only; the received records remain unchanged. */
+export function activityOrganizer(value?: string | null): string {
+  const key = value?.trim().toUpperCase() ?? '';
+  return key === 'CIUADANO' ? 'CIUDADANO' : key;
+}
+
 export function activityCategory(value: string | null): string {
   const text = (value ?? '').trim().replace(/\s+/g, ' ').replace(/MÃºsica/gi, 'Música');
   const key = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();

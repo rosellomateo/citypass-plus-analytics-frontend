@@ -53,8 +53,8 @@ it('Movilidad y Espacios muestran su tarjeta del caso 5', () => {
       { etiqueta: 'Viajes finalizados normalmente', valor: 36 }] }] as CrossModuleResponse['datos'])} />
     <DashboardImpactCards area="culture" data={report([{ id: 'c5', valor: 12, detalle: [] }] as CrossModuleResponse['datos'], { version_cultura: 2 })} />
   </>);
-  expect(screen.getByText('Viajes interrumpidos por accidentes en bicicleta frente a viajes finalizados normalmente')).toBeInTheDocument();
-  expect(screen.getByText('Viajes finalizados normalmente: 36')).toBeInTheDocument();
+  expect(screen.getByRole('article', { name: 'KPI: Viajes interrumpidos por accidente en bicicleta' })).toHaveTextContent('2');
+  expect(screen.getByRole('article', { name: 'KPI: Viajes finalizados normalmente' })).toHaveTextContent('36');
   expect(screen.getByText('Actividades modificadas por accidentes viales')).toBeInTheDocument();
 });
 

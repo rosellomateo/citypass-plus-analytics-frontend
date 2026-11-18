@@ -1,18 +1,21 @@
 import type { CausePoint, CrossModuleResponse } from '../../api/types';
-import type { EmergencyAnalyticsData } from '../../types';
+import type { ClaimsAnalyticsData, EmergencyAnalyticsData } from '../../types';
+import { claimCauseMetrics } from '../../utils/impactMetrics';
 import { BarChart } from '../charts/BarChart';
 import { ChartCard } from './ChartCard/ChartCard';
 
-const CLAIM_CAUSES = { c1: 'Alertas climáticas', c2: 'Afectaron a otros módulos', c3: 'Eventos masivos', c4: 'Incidentes viales', c6: 'Eventos ciudadanos' };
+const CLAIM_CAUSES = { c1: 'Alertas climáticas', c2: 'Afectaron a otros módulos', c3: 'Eventos masivos', c4: 'Incidentes viales', c6: 'Reservas de espacios públicos' };
 
-export function DashboardImpactCharts({ area, data, emergencyData }: {
+export function DashboardImpactCharts({ area, data, emergencyData, claimCauses }: {
   area: 'claims' | 'emergencies';
   data: CrossModuleResponse | null;
   emergencyData?: EmergencyAnalyticsData | null;
+  claimCauses?: ClaimsAnalyticsData['claimsByCause'];
 }) {
   const metrics = new Map(data?.datos.map((metric) => [metric.id, metric]) ?? []);
+  if (area === 'claims') for (const metric of claimCauseMetrics(claimCauses)) metrics.set(metric.id, metric);
   const charts: { title: string; unit: string; points: (CausePoint & { color?: string })[] }[] = [];
-  if (area === 'claims' && data) {
+  if (area === 'claims' && (data || claimCauses)) {
     const accident = metrics.get('c5');
     charts.push({
       title: 'Reclamos vinculados a otros servicios', unit: 'Reclamos',
@@ -27,9 +30,6 @@ export function DashboardImpactCharts({ area, data, emergencyData }: {
     });
   }
   if (area === 'emergencies') {
-    if (emergencyData?.emergenciesByCause?.length) {
-      charts.push({ title: 'Emergencias vinculadas a otros servicios', unit: 'Emergencias por causa informada', points: emergencyData.emergenciesByCause });
-    }
     const resources = ['c3', 'c4b'].flatMap((id) => {
       const metric = metrics.get(id);
       return metric ? [{ etiqueta: id === 'c3' ? 'Eventos masivos' : 'Incidentes viales', valor: metric.valor }] : [];

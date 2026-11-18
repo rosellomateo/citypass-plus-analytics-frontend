@@ -61,8 +61,9 @@ Endpoint: `GET /analytics/espacios-cultura`.
 | Actividades masivas | `cantidadMasivas` | Suma del campo. El umbral de capacidad se aplica antes, en el productor/backend; el frontend no recibe ni filtra `capacidad` en este resumen. |
 | Actividades afectadas por clima | `cantidadAfectadasPorClima` | Suma de los valores informados. No es necesario que el frontend vuelva a filtrar `causaTipo`. Si todos están ausentes, muestra «Sin datos». |
 | Actividades por categoría | `categoria`, `cantidadActividades` | Suma por categoría normalizada: `CULTURAL`/`Cultura` se presentan como Cultura; `Música`/`M�sica`/`MUSICA` se agrupan como Música. |
-| Actividades de ciudadanos | `organizadorTipo`, `cantidadActividades` | `organizadorTipo = CIUDADANO`, sumando cantidades. Si llega `resumen_gold[id=culture-organizer]`, su punto `CIUDADANO` tiene prioridad sobre este cálculo. |
-| Actividades de la ciudad | Los dos campos anteriores | `organizadorTipo = CIUDAD`, con la misma prioridad del agregado `culture-organizer` cuando está publicado. |
+| Actividades de ciudadanos | `organizadorTipo`, `cantidadActividades` | `organizadorTipo = CIUDADANO`, sumando cantidades; se acepta también `CIUADANO`. El resumen principal tiene prioridad para conservar el mismo corte que el total; `culture-organizer` queda como respaldo si no existe ese resumen. |
+| Actividades de la ciudad | Los dos campos anteriores | `organizadorTipo = CIUDAD`, con la misma prioridad de fuentes que la tarjeta anterior. |
+| Actividades de ciudadanos vs. eventos totales | Los anteriores y todas las filas de `cantidadActividades` | Tres barras: ciudadanos, ciudad y total de actividades. El total incluye las actividades cuyo organizador no está informado; no se reemplaza por la suma de las dos categorías conocidas. |
 
 Los estados observados son `ACTIVE`, `CANCELADA`, `PROGRAMADA` y `SUSPENDIDA`. Las tarjetas generales anteriores suman las filas recibidas sin filtrar esos estados. Las tarjetas de **cancelados por clima** y **modificadas por accidentes** vienen de Parte 2, explicada más abajo.
 
@@ -100,7 +101,7 @@ Endpoint: `GET /analytics/reclamos`.
 
 Mapeo de estados: `ASIGNADO`/`EN_CURSO`/`EN CURSO`/`EN_PROCESO`/`EN_REVISION` → EN CURSO; `RECHAZADO`/`CANCELADO` → CANCELADO; `CERRADO`/`RESUELTA`/`RESUELTO` → CERRADO; otros valores → CREADO.
 
-`barrio`, `prioridad` y `origenClasificacion` participan de la búsqueda. `causaTipo` llega en el JSON de Reclamos pero no se usa en estos cálculos generales; los gráficos de vínculos leen Parte 2.
+`barrio`, `prioridad` y `origenClasificacion` participan de la búsqueda. Para las tarjetas de incidentes viales y reservas se conserva `causaTipo` y se suma `row_count` por causa. El caso 2 continúa leyendo Parte 2: una causa de origen no acredita por sí sola una intervención en otro servicio.
 
 ### Login — `autenticacion_resumen.parquet`
 
@@ -120,6 +121,8 @@ Los nombres de los eventos deben coincidir completos con esos textos. Otros tipo
 Fuente efectiva del frontend: `GET /analytics/{area}/parte2`, con `area = claims`, `emergencies`, `mobility`, `culture` o `waste`.
 
 Cada tarjeta busca un registro `datos` con `id = c1…c6` o su variante `b` y muestra su `valor`. Para que se actualice, el backend tiene que publicar el nuevo `valor` para ese ID. Los detalles se toman de `detalle[].etiqueta`/`detalle[].valor` y la unidad de `unidad`.
+
+Excepciones para los nuevos pedidos: Reclamos c4/c6 prioriza la suma directa por `causaTipo` cuando ese campo está disponible; Movilidad completa c2/c3/c4/c6 con `mobility-stations` cuando faltan los IDs; c5b de Movilidad presenta en una tarjeta independiente el detalle de viajes finalizados normalmente. Reclamos, Emergencias y Movilidad mantienen las tarjetas faltantes visibles como «Sin datos», no como cero.
 
 Las condiciones de las tablas siguientes resumen **el contrato solicitado de los casos**, no un cálculo adicional implementado en el frontend. No todas pueden reconstruirse a partir de los resúmenes Parquet, porque faltan IDs y vínculos. No se verificó ni modificó aquí la implementación interna del backend.
 
@@ -156,9 +159,9 @@ Excepción implementada en el frontend: si falta `c4` y la fuente entrega los en
 | `c1` | Vínculos a alertas climáticas | Reclamo identificado y relacionado con una alerta climática; v3 utiliza `alertaId`. |
 | `c2` | Reclamos que afectaron a otros módulos | `reclamoId` que aparece como `causaId` en otro módulo, con `causaTipo = RECLAMO`; contar reclamos distintos. No sale de un solo Parquet de Reclamos. |
 | `c3` | Vínculos a eventos masivos | Vínculo `actividadId` a un evento identificado como masivo; no alcanza cualquier evento público. |
-| `c4` | Incidentes programados | `causaTipo = INCIDENTE_VIAL` y vínculo a un incidente cuyo estado sea `PROGRAMADO`. |
+| `c4` | Reclamos por incidentes viales | Suma de `row_count` con `causaTipo = INCIDENTE_VIAL`, sin exigir estado PROGRAMADO del incidente. La suma directa tiene prioridad sobre el ID anterior, cuyo alcance era más restringido. |
 | `c5` | Reclamos por accidentes viales | El valor actualmente mostrado corresponde al caso de accidente en bicicleta; la comparación llega en `detalle` con las otras causas. El título se acortó, pero eso no amplió por sí solo la cobertura del cálculo del backend. |
-| `c6` | Eventos ciudadanos | Vínculo publicado con la reserva/evento ciudadano; no se infiere por barrio o cercanía. |
+| `c6` | Reclamos por reservas de espacios públicos | Suma de `row_count` con `causaTipo = RESERVA`; no se infiere por barrio o cercanía. |
 
 ### Emergencias (`emergencies`)
 
@@ -179,9 +182,10 @@ Excepción implementada en el frontend: si falta `c4` y la fuente entrega los en
 |---|---|---|
 | `c1` | Estaciones bloqueadas por clima | Estación identificada, afectación/bloqueo y causa climática. |
 | `c2` | Estaciones afectadas por reclamos | `EstacionUrbanaAfectada`, `causaTipo = RECLAMO`; estaciones distintas. |
-| `c3` | Afectación prevista por eventos masivos | `causaTipo = EVENTO_PUBLICO`, evento masivo identificado y afectación anunciada antes de su inicio. |
+| `c3` | Afectación prevista por eventos públicos | Según el criterio solicitado: `causaTipo = EVENTO_PUBLICO`. Respaldo: punto Evento público de `mobility-stations`. No se infiere capacidad, horario futuro ni estado PROGRAMADA de ese punto agregado. |
 | `c4` | Estaciones afectadas por incidentes | `causaTipo = INCIDENTE_VIAL`; estaciones distintas. |
 | `c5` | Viajes interrumpidos por accidente de bicicleta | Interrupción vinculada a ese accidente; comparación con viajes finalizados normalmente en `detalle`. |
+| `c5b` (presentación) | Viajes finalizados normalmente | Tarjeta separada a partir del detalle `Viajes finalizados normalmente` de c5. Si no viene ese detalle, se utiliza Operación normal de `mobility-interruptions`. No es el total de viajes acumulados ni las interrupciones por todas las causas. |
 | `c6` | Estaciones afectadas por eventos ciudadanos | `causaTipo = RESERVA`, vinculado al evento ciudadano; estaciones distintas. |
 
 ## 3. Tortas y agregados Gold recibidos en Parte 2

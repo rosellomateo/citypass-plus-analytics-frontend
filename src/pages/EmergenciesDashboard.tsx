@@ -1,5 +1,6 @@
 import { DashboardImpactCards } from '../components/common/DashboardImpactCards';
 import { DashboardImpactCharts } from '../components/common/DashboardImpactCharts';
+import { EmergencyCausesChart } from '../components/emergencies/EmergencyCausesChart';
 import { EmergencyZonePanel } from '../components/common/EmergencyZonePanel';
 import { useDashboardImpact } from '../hooks/useDashboardImpact';
 // src/pages/EmergenciesDashboard.tsx
@@ -102,9 +103,11 @@ export function EmergenciesDashboard() {
                 unit: ' min',
                 sublabel: 'Promedio ponderado por cantidad de emergencias con datos',
               }} />}
-              <DashboardImpactCards area="emergencies" data={impact.data} />
+              <DashboardImpactCards area="emergencies" data={impact.data} showMissing />
             </div>
           </div>
+
+          <EmergencyCausesChart data={resolved.data} />
 
           {/* Layout Superior Responsive: Gráficos de Tiempo de Despacho y Distribución por Prioridad */}
           <div className="section">
@@ -149,7 +152,7 @@ export function EmergenciesDashboard() {
           </div>}
         </>
       ) : null}
-      {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="emergencies" data={impact.data} standalone />}
+      {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="emergencies" data={impact.data} standalone showMissing />}
       <DashboardImpactCharts area="emergencies" {...impact} emergencyData={resolved.data} />
       <EmergencyZonePanel data={impact.data} loading={impact.loading} filters={filters} />
     </div>

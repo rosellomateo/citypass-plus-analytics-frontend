@@ -273,6 +273,8 @@ no como datos de demostración.
 
 La respuesta real de `/analytics/seguridad-emergencias` incluye `causaTipo`.
 El gráfico de vínculos agrupa todas las causas recibidas, incluyendo las no informadas.
+Se presenta como **Emergencias por causa**, inmediatamente después de las tarjetas principales,
+usando `SUM(cantidadEmergencias)` por `causaTipo` del endpoint principal.
 `MOVILIDAD_BICICLETA` se presenta separado de `INCIDENTE_VIAL`; no se infiere la causa a partir de la categoría TRANSITO.
 El corte consultado tiene cinco emergencias de bicicleta y ninguna fila con causa INCIDENTE_VIAL.
 
@@ -299,6 +301,29 @@ Los reintentos con otro `eventId` y las intervenciones CANCELADA no suman.
 
 Los ejemplos y respuestas de comparación permanecen en `testingDatos/`, ignorado por Git
 y excluido del build y del deployment. No se modificó ningún archivo del backend ni Parquet.
+
+### Cobertura visible de los casos de uso
+
+Reclamos presenta tarjetas para `causaTipo = INCIDENTE_VIAL` y `RESERVA`, sumando
+`row_count` del endpoint principal. Esos dos valores prevalecen sobre c4/c6 cuando existe
+el campo. El caso 2 mantiene el agregado `datos[id=c2]` de reclamos distintos vinculados
+a acciones de otros servicios; no se reconstruye a partir de la causa de origen.
+
+Si faltan c2/c3/c4/c6 de Movilidad, se usan respectivamente los puntos Reclamo,
+Evento público, Incidente vial y Reserva de `resumen_gold[id=mobility-stations]`.
+Reserva y Evento público quedan separados en esas tarjetas, aunque la torta agrupe sus etiquetas.
+Los valores explícitos publicados, incluido cero, tienen prioridad sobre el respaldo.
+La tarjeta de afectación prevista utiliza el criterio EVENTO_PUBLICO solicitado; ese agregado
+no acredita por sí solo que el evento sea masivo ni permite calcular cuándo empezará.
+
+Movilidad separa c5 (viajes interrumpidos por accidente en bicicleta) del detalle de viajes
+finalizados normalmente. No utiliza todas las interrupciones viales como sinónimo de bicicletas.
+Espacios Públicos compara los organizadores CIUDADANO/CIUADANO y CIUDAD con el total del
+mismo resumen principal, conservando en el total las actividades sin organizador informado.
+
+Los indicadores pendientes de Reclamos, Emergencias y Movilidad permanecen visibles como
+«Sin datos» cuando no existe un valor verificable. No se agregan endpoints ni datos sintéticos
+al flujo de producción. Ver [cobertura y validación](cobertura-casos-dashboard.md).
 
 
 ### Presentación de tablas, filtros y rangos

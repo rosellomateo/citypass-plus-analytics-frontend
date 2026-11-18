@@ -23,7 +23,7 @@ import type {
   WasteAlertMetrics,
 } from '../types';
 import { isWithinDateRange } from '../utils/dates';
-import { activityCategory, emergencyCause, emergencyPriority } from '../utils/categories';
+import { activityCategory, activityOrganizer, emergencyCause, emergencyPriority } from '../utils/categories';
 
 export type ClaimsDataSourceData = ClaimsAnalyticsData & {
   records: BackendAnalyticsRecord[];
@@ -68,6 +68,7 @@ function mapClaimRecord(row: ClaimApiRecord): BackendAnalyticsRecord {
     prioridad: textOrEmpty(row.prioridad),
     origenClasificacion: textOrEmpty(row.origenClasificacion),
     estado_actual: textOrEmpty(row.estado_actual),
+    causaTipo: row.causaTipo,
     row_count: numberOrZero(row.row_count),
     tiempo_prom_hasta_estado_actual: row.tiempo_prom_hasta_estado_actual,
     fecha_snapshot: textOrEmpty(row.fecha_snapshot),
@@ -310,7 +311,7 @@ export async function getApiCultureAnalyticsData(
       const count = numberOrZero(row.cantidadActividades);
       const category = activityCategory(row.categoria);
       categories.set(category, (categories.get(category) ?? 0) + count);
-      const organizer = row.organizadorTipo?.trim().toUpperCase();
+      const organizer = activityOrganizer(row.organizadorTipo);
       if (organizer) organizers.set(organizer, (organizers.get(organizer) ?? 0) + count);
       const zone = row.zona?.trim() || row.barrio?.trim() || 'Sin zona informada';
       zones.set(zone, (zones.get(zone) ?? 0) + count);

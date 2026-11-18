@@ -163,6 +163,7 @@ export interface ClaimApiRecord {
   prioridad: string | null;
   origenClasificacion: string | null;
   estado_actual: string | null;
+  causaTipo?: string | null;
   row_count: number | null;
   tiempo_prom_hasta_estado_actual: number | null;
   fecha_snapshot: string | null;

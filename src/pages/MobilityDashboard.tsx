@@ -162,7 +162,9 @@ export function MobilityDashboard() {
                 }}
                 action={<Anchor href="#viajes-afectados" size="sm">Ver viajes afectados</Anchor>}
               />
-              <DashboardImpactCards area="mobility" data={impact.data} />
+            </div>
+            <div className="metrics-grid-4">
+              <DashboardImpactCards area="mobility" data={impact.data} showMissing />
             </div>
           </div>
 
@@ -272,7 +274,7 @@ export function MobilityDashboard() {
           </div>
         </>
       ) : null}
-      {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="mobility" data={impact.data} standalone />}
+      {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="mobility" data={impact.data} standalone showMissing />}
       <section className="section" id="viajes-afectados" aria-label="Viajes afectados">
         <h2 className="section-title">Viajes afectados</h2>
         <CausePie title="Estaciones afectadas por causa" date={stationsByCause?.fecha_snapshot}
