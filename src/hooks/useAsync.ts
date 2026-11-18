@@ -14,7 +14,7 @@ export function useAsync<T>(
   fn: () => Promise<T>,
   deps: unknown[],
   { retainDataOnError = false, clearDataOnRequest = false }: { retainDataOnError?: boolean; clearDataOnRequest?: boolean } = {},
-): AsyncState<T> & { refetch: () => void } {
+): AsyncState<T> & { refreshing: boolean; refetch: () => void } {
   const [state, setState] = useState<AsyncState<T>>({
     data: null,
     loading: true,
@@ -65,5 +65,5 @@ export function useAsync<T>(
     setRefetchCount((c) => c + 1);
   }, []);
 
-  return { ...state, refetch };
+  return { ...state, refreshing: state.loading, loading: state.loading && state.data === null, refetch };
 }

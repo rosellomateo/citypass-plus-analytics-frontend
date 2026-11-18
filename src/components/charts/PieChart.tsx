@@ -15,9 +15,10 @@ interface PieChartProps {
   showLegend?: boolean;
   donut?: boolean;
   unit?: string;
+  showSlicePercent?: boolean;
 }
 
-export function PieChart({ data, height = 280, showLegend = true, donut = true, unit }: PieChartProps) {
+export function PieChart({ data, height = 280, showLegend = true, donut = true, unit, showSlicePercent = true }: PieChartProps) {
   const innerRadius = donut ? '55%' : 0;
   // Ocultar elementos con valor 0 para no saturar leyenda o gráfico
   const visibleData = data.filter((d) => d.value > 0);
@@ -43,9 +44,10 @@ export function PieChart({ data, height = 280, showLegend = true, donut = true, 
   }
 
   return (
-    <ResponsiveContainer width="100%" height={height}>
+    <ResponsiveContainer debounce={80} minWidth={0} width="100%" height={height}>
       <RechartsPieChart>
         <Pie
+              isAnimationActive={false}
           data={visibleData}
           cx="50%"
           cy="50%"
@@ -53,7 +55,7 @@ export function PieChart({ data, height = 280, showLegend = true, donut = true, 
           outerRadius="75%"
           dataKey="value"
           paddingAngle={2}
-          label={({ name, percent }) => ((percent ?? 0) >= 0.10 ? `${name} ${((percent ?? 0) * 100).toFixed(0)}%` : '')}
+          label={({ name, percent }) => ((percent ?? 0) >= 0.10 ? showSlicePercent ? `${name} ${((percent ?? 0) * 100).toFixed(0)}%` : name : '')}
           labelLine={false}
         >
           {visibleData.map((entry, i) => (

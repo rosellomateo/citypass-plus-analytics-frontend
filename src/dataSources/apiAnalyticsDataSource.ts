@@ -23,6 +23,7 @@ import type {
   WasteAlertMetrics,
 } from '../types';
 import { isWithinDateRange } from '../utils/dates';
+import { activityCategory, activityOrganizer, emergencyCause, emergencyPriority } from '../utils/categories';
 
 export type ClaimsDataSourceData = ClaimsAnalyticsData & {
   records: BackendAnalyticsRecord[];
@@ -67,10 +68,9 @@ function mapClaimRecord(row: ClaimApiRecord): BackendAnalyticsRecord {
     prioridad: textOrEmpty(row.prioridad),
     origenClasificacion: textOrEmpty(row.origenClasificacion),
     estado_actual: textOrEmpty(row.estado_actual),
+    causaTipo: row.causaTipo,
     row_count: numberOrZero(row.row_count),
-    tiempo_prom_hasta_estado_actual: numberOrZero(
-      row.tiempo_prom_hasta_estado_actual
-    ),
+    tiempo_prom_hasta_estado_actual: row.tiempo_prom_hasta_estado_actual,
     fecha_snapshot: textOrEmpty(row.fecha_snapshot),
   };
 }
@@ -101,12 +101,13 @@ export function mapEmergencyApiData(
   filtered.forEach((row) => {
     const count = numberOrZero(row.cantidadEmergencias);
     const state = textOrEmpty(row.estado_actual) || 'SIN ESTADO';
-    const priority = textOrEmpty(row.prioridad).toUpperCase() || 'SIN PRIORIDAD';
+    const priority = emergencyPriority(row.prioridad);
     stateCounts.set(state, (stateCounts.get(state) ?? 0) + count);
     priorityCounts.set(priority, (priorityCounts.get(priority) ?? 0) + count);
   });
 
   const closedStates = new Set([
+    'cancelada',
     'cerrada',
     'cerrado',
     'resuelta',
@@ -123,7 +124,7 @@ export function mapEmergencyApiData(
   const categories = new Map<string, EmergencyAnalyticsData['emergenciesByCategoryStacked'][number]>();
   for (const row of filtered) {
     const category = textOrEmpty(row.categoria ?? null);
-    const priority = textOrEmpty(row.prioridad).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+    const priority = emergencyPriority(row.prioridad);
     if (!category || (priority !== 'BAJA' && priority !== 'MEDIA' && priority !== 'ALTA' && priority !== 'CRITICA')) continue;
     const counts = categories.get(category) ?? { category, BAJA: 0, MEDIA: 0, ALTA: 0, CRITICA: 0, total: 0 };
     const count = numberOrZero(row.cantidadEmergencias);
@@ -132,7 +133,7 @@ export function mapEmergencyApiData(
     categories.set(category, counts);
   }
   const dispatchRows = filtered.filter(({ tiempoPromRespuestaDespacho }) => tiempoPromRespuestaDespacho != null).map((row) => ({
-    priority: textOrEmpty(row.prioridad).toUpperCase() || 'SIN PRIORIDAD',
+    priority: emergencyPriority(row.prioridad),
     value: numberOrZero(row.tiempoPromRespuestaDespacho),
     weight: numberOrZero(row.cantidadEmergencias),
   }));
@@ -147,6 +148,20 @@ export function mapEmergencyApiData(
       ? [{ value: tiempoPromRespuestaLugar, weight: cantidadEmergencias }]
       : [],
   );
+
+  const causes = new Map<string, number>([[emergencyCause('INCIDENTE_VIAL'), 0]]);
+  const resolutions = new Map<string, Array<{ value: number; weight: number }>>();
+  for (const row of filtered) {
+    const label = emergencyCause(row.causaTipo);
+    causes.set(label, (causes.get(label) ?? 0) + numberOrZero(row.cantidadEmergencias));
+    if (row.tiempoPromResolucion != null && Number.isFinite(row.tiempoPromResolucion) &&
+        row.tiempoPromResolucion >= 0 && (row.cantidadEmergencias ?? 0) > 0) {
+      const category = row.categoria?.trim() || 'Sin tipo informado';
+      const values = resolutions.get(category) ?? [];
+      values.push({ value: row.tiempoPromResolucion, weight: row.cantidadEmergencias! });
+      resolutions.set(category, values);
+    }
+  }
 
   return {
     totalEmergencies: activeCount + closedCount,
@@ -165,6 +180,8 @@ export function mapEmergencyApiData(
     ),
     emergenciesByCategoryStacked: [...categories.values()],
     availableCategories: [...categories.keys()],
+    emergenciesByCause: [...causes].map(([etiqueta, valor]) => ({ etiqueta, valor })),
+    resolutionByCategory: [...resolutions].map(([etiqueta, values]) => ({ etiqueta, valor: weightedAverage(values) })),
   };
 }
 
@@ -288,17 +305,26 @@ export async function getApiCultureAnalyticsData(
     let total = 0;
     let massive = 0;
     let affectedByClimate: number | null = null;
+    const organizers = new Map<string, number>();
+    const zones = new Map<string, number>();
     for (const row of rows) {
       const count = numberOrZero(row.cantidadActividades);
-      const category = textOrEmpty(row.categoria) || 'SIN CATEGORÍA';
+      const category = activityCategory(row.categoria);
       categories.set(category, (categories.get(category) ?? 0) + count);
+      const organizer = activityOrganizer(row.organizadorTipo);
+      if (organizer) organizers.set(organizer, (organizers.get(organizer) ?? 0) + count);
+      const zone = row.zona?.trim() || row.barrio?.trim() || 'Sin zona informada';
+      zones.set(zone, (zones.get(zone) ?? 0) + count);
       total += count;
       massive += numberOrZero(row.cantidadMasivas);
       if (row.cantidadAfectadasPorClima != null) affectedByClimate = (affectedByClimate ?? 0) + row.cantidadAfectadasPorClima;
     }
     return {
       ...mapCultureApiData([], filters),
-      activities: { total, massive, affectedByClimate, byCategory: [...categories].map(([category, count]) => ({ category, count })) },
+      activities: { total, massive, affectedByClimate,
+        byOrganizer: [...organizers].map(([organizer, count]) => ({ organizer, count })),
+        byZone: [...zones].map(([zone, count]) => ({ zone, count })),
+        byCategory: [...categories].map(([category, count]) => ({ category, count })) },
       aiReport: informe,
     };
   }

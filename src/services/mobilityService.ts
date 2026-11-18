@@ -147,10 +147,11 @@ export function getTripsByDurationBucket(
   filtered.forEach((r) => {
     const count = r.cantidadViajes || 0;
     totalTrips += count;
-    if (bucketCounts[r.duracionViaje] !== undefined) {
-      bucketCounts[r.duracionViaje] += count;
+    const bucket = r.duracionViaje.trim() === '>1hs' ? '>1h' : r.duracionViaje;
+    if (bucketCounts[bucket] !== undefined) {
+      bucketCounts[bucket] += count;
     } else {
-      bucketCounts[r.duracionViaje] = (bucketCounts[r.duracionViaje] || 0) + count;
+      bucketCounts[bucket] = (bucketCounts[bucket] || 0) + count;
     }
   });
 

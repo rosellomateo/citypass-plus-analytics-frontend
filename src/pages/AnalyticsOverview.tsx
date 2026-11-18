@@ -35,7 +35,6 @@ const DOMAIN_OPTIONS = [
   { value: 'Cultura', label: 'Cultura' },
   { value: 'Residuos', label: 'Residuos' },
   { value: 'login', label: 'Login' },
-  { value: 'eda', label: 'EDA' },
 ];
 
 export function AnalyticsOverview() {
@@ -92,13 +91,7 @@ export function AnalyticsOverview() {
       <DashboardHeader
         title="Analítica Urbana"
         subtitle="Módulo analítico basado en arquitectura orientada a eventos (EDA)."
-        filters={filters}
-        onDateRangeChange={(range) => updateFilter('dateRange', range)}
-        onCustomDateSelect={(from, to) => {
-          updateFilter('from', from);
-          updateFilter('to', to);
-          updateFilter('dateRange', 'custom');
-        }}
+
         filters_extra={
           <FilterBar
             filters={[
