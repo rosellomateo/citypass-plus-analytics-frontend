@@ -206,13 +206,16 @@ export interface EmergencyApiRecord {
   fecha_snapshot: string | null;
 }
 
+/** Una fila de gold de Movilidad por causa (viajes_resumen / movilidad_resumen). */
 export interface MobilityApiRecord {
-  fechaInicio: string | null;
-  estacionInicio: string | null;
-  duracionViaje: string | null;
-  cantidadViajes: number | null;
-  duracionTotalViajes: number | null;
-  promDuracion: number | null;
+  causaTipo: string | null;
+  cantidadAfectaciones: number | null;
+  estacionesAfectadasDistintas: number | null;
+  cantidadBloqueadas: number | null;
+  estacionesBloqueadasDistintas: number | null;
+  cantidadPreventivas: number | null;
+  cantidadRestauradas: number | null;
+  cantidadViajesInterrumpidos: number | null;
   fecha_snapshot: string | null;
 }
 

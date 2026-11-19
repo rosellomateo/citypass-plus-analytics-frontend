@@ -13,9 +13,10 @@ const cases = [
     estado_actual: 'Cerrado', prioridad: 'Alta', cantidadEmergencias: 17,
     tiempoPromRespuestaDespacho: 5, tiempoPromRespuestaLugar: 9,
   } },
-  { module: 'movilidad', title: 'Tablero de Movilidad Urbana', metric: 'Viajes Acumulados', row: {
-    fechaInicio: date, estacionInicio: 'Central', duracionViaje: '12 minutos',
-    cantidadViajes: 17, duracionTotalViajes: 204, promDuracion: 12,
+  { module: 'movilidad', title: 'Tablero de Movilidad Urbana', metric: 'Afectaciones de estaciones', row: {
+    causaTipo: 'EVENTO_CLIMATICO', cantidadAfectaciones: 17, estacionesAfectadasDistintas: 13,
+    cantidadBloqueadas: 14, estacionesBloqueadasDistintas: 12, cantidadPreventivas: 0,
+    cantidadRestauradas: 10, cantidadViajesInterrumpidos: 1,
   } },
   { module: 'espacios', title: 'Espacios Públicos y Cultura', metric: 'Reservas Confirmadas', row: {
     recursoId: 'REC-1', tipoReserva: 'Presencial', categoria: 'Cultural', zona: 'Centro',

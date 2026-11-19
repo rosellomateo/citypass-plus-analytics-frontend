@@ -1,46 +1,35 @@
 import { DashboardImpactCards } from '../components/common/DashboardImpactCards';
-import { Anchor, TextInput } from '@mantine/core';
-import { visibleStationTrips } from '../utils/dashboardPresentation';
+import { Anchor } from '@mantine/core';
 import { CausePie } from '../components/common/CausePie';
 import { PublicEventStations } from '../components/mobility/PublicEventStations';
 import { useDashboardImpact } from '../hooks/useDashboardImpact';
 // src/pages/MobilityDashboard.tsx
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { DashboardHeader } from '../components/common/DashboardHeader/DashboardHeader';
 import { MetricCard } from '../components/common/MetricCard/MetricCard';
 import { ChartCard } from '../components/common/ChartCard/ChartCard';
 import { BarChart } from '../components/charts/BarChart';
 import { PieChart } from '../components/charts/PieChart';
-import { CategorySearchFilter } from '../components/common/CategorySearchFilter/CategorySearchFilter';
 import { DataTable } from '../components/common/DataTable/DataTable';
 import { ErrorCard } from '../components/common/ErrorState/ErrorState';
 import { MetricsGridSkeleton, ChartSkeleton } from '../components/common/LoadingState/LoadingState';
 import { useFilters } from '../hooks/useFilters';
 import { useMobilityData } from '../hooks/useMobilityData';
 import { useResolvedUiState } from '../hooks/useUiState';
-import {
-  getTripsByStation,
-  getTripsByDurationBucket,
-  getStationAvgDuration,
-  formatStationName,
-} from '../services/mobilityService';
+import { CAUSA_NORMAL, causeLabel } from '../services/mobilityService';
 
-const DURATION_COLORS: Record<string, string> = {
-  '<15min': '#10B981',
-  '15-30min': '#2563A6',
-  '30-60min': '#F59E0B',
-  '>1h': '#EF4444',
+// Colores por causa (los mismos tonos que usa el resto de los tableros).
+const CAUSE_COLORS: Record<string, string> = {
+  EVENTO_CLIMATICO: '#2563A6',
+  RECLAMO: '#D99838',
+  EVENTO_PUBLICO: '#7C3AED',
+  INCIDENTE_VIAL: '#EF4444',
+  EMERGENCIA: '#DC2626',
+  RESERVA: '#10B981',
+  NORMAL: '#6B7280',
 };
 
-const minutesFormatter = new Intl.NumberFormat('es-AR', { maximumFractionDigits: 2 });
-
-const DATE_RANGE_LABELS: Record<string, string> = {
-  all: 'Datos publicados',
-  today: 'Hoy',
-  '7d': 'Semana (7d)',
-  '30d': 'Mes (30d)',
-  custom: 'Personalizado',
-};
+const integerFormatter = new Intl.NumberFormat('es-AR');
 
 export function MobilityDashboard() {
   const impact = useDashboardImpact('mobility');
@@ -48,52 +37,36 @@ export function MobilityDashboard() {
   const mobilityAsync = useMobilityData(filters);
   const resolved = useResolvedUiState(mobilityAsync);
 
-  // Filtros locales independientes por gráfico
-  const [selectedStationChart2, setSelectedStationChart2] = useState<string>('ALL');
-  const [stationSearch, setStationSearch] = useState('');
+  const data = resolved.data;
+  const records = useMemo(() => data?.records ?? [], [data]);
 
-  // Registros planos filtrados
-  const records = useMemo(() => resolved.data?.records || [], [resolved.data]);
+  // Gráfico 1: afectaciones, bloqueos y restauraciones por causa.
+  const affectationsByCause = data?.affectationsByCause ?? [];
 
-  // Gráfico 1: Viajes por Estación de Inicio (con nombres formateados)
-  const tripsByStationData = useMemo(() => {
-    return getTripsByStation(records);
-  }, [records]);
-  const visibleTripsByStation = visibleStationTrips(tripsByStationData, stationSearch);
-
-  // Gráfico 2: Distribución por Duración de Viaje (PieChart sin solapamiento de etiquetas)
-  const tripsByDurationData = useMemo(() => {
-    const raw = getTripsByDurationBucket(records, selectedStationChart2);
-    return raw.map((item) => ({
-      name: `${item.bucket} (${item.porcentaje}%)`,
-      value: item.cantidadViajes,
-      color: DURATION_COLORS[item.bucket] || '#6B7280',
+  // Gráfico 2: viajes interrumpidos por causa vs. finalizados normalmente (caso 5).
+  const tripsByCauseData = useMemo(() => {
+    // El PieChart ya muestra el porcentaje de cada porción.
+    return (data?.tripsByCause ?? []).map((item) => ({
+      name: item.etiqueta,
+      value: item.viajes,
+      color: CAUSE_COLORS[item.causa] || '#6B7280',
     }));
-  }, [records, selectedStationChart2]);
+  }, [data]);
 
-  // Gráfico 3: Duración Promedio Ponderada por Estación (sin filtro por estación)
-  const stationAvgDurationData = useMemo(() => {
-    return getStationAvgDuration(records);
-  }, [records]);
-
-  const activeRangeLabel = DATE_RANGE_LABELS[filters.dateRange || '7d'] || 'Período seleccionado';
+  const snapshotLabel = data?.snapshotDate ? `Corte ${data.snapshotDate.slice(0, 10)}` : 'Último corte publicado';
   const gold = impact.data?.resumen_gold;
-  const interruptions = gold?.find(({ id }) => id === 'mobility-interruptions');
-  const affectedTrips = interruptions?.puntos.reduce((total, { etiqueta, valor }) => (
-    etiqueta === 'Operación normal' ? total : total + valor
-  ), 0);
   const stationsByCause = gold?.find(({ id }) => id === 'mobility-stations');
   const causes = new Map<string, number>();
   for (const { etiqueta, valor } of stationsByCause?.puntos ?? []) {
-    const cause = etiqueta === 'Reserva' ? 'Evento público' : etiqueta;
-    causes.set(cause, (causes.get(cause) ?? 0) + valor);
+    // Reserva (caso 6) y Evento público (caso 3) son casos distintos: no se suman.
+    causes.set(etiqueta, (causes.get(etiqueta) ?? 0) + valor);
   }
 
   return (
     <div>
       <DashboardHeader
         title="Tablero de Movilidad Urbana"
-        subtitle="Analítica de Viajes, Demanda Estacional y Trazabilidad por Estación"
+        subtitle="Afectaciones de estaciones y viajes por causa (casos de uso de la Parte 2)"
 
         aiReport={resolved.data?.aiReport}
 
@@ -108,56 +81,54 @@ export function MobilityDashboard() {
         <ErrorCard message={resolved.error} onRetry={mobilityAsync.refetch} />
       ) : resolved.data ? (
         <>
-          {/* KPIs Principales (Calculados 100% dinámicamente según el filtro activo) */}
+          {/* KPIs principales: totales del resumen por causa de gold */}
           <div className="section">
             <div className="metrics-grid-6">
               <MetricCard
                 metric={{
-                  label: 'Viajes Acumulados',
-                  value: resolved.data.totalTrips,
-                  sublabel: `Total del período (${activeRangeLabel})`,
+                  label: 'Afectaciones de estaciones',
+                  value: resolved.data.totalAffectations,
+                  sublabel: snapshotLabel,
                   status: 'info',
                 }}
               />
               <MetricCard
                 metric={{
-                  label: 'Altas del Período',
-                  value: resolved.data.weeklyTrips,
-                  sublabel: `Filtro: ${activeRangeLabel}`,
-                  status: 'normal',
-                }}
-              />
-              <MetricCard
-                metric={{
-                  label: 'Duración Total',
-                  value: resolved.data.totalDurationMinutes,
-                  unit: ' min',
-                  sublabel: `≈ ${(resolved.data.totalDurationMinutes / 60).toFixed(0)} horas en período`,
-                  status: 'normal',
-                }}
-              />
-              <MetricCard
-                metric={{
-                  label: 'Duración Prom. Ponderada',
-                  value: resolved.data.weightedAvgDurationMinutes,
-                  unit: ' min',
-                  sublabel: 'SUM(minutos) / SUM(viajes)',
+                  label: 'Bloqueos',
+                  value: resolved.data.totalBlocked,
+                  sublabel: 'Afectaciones que bloquearon la estación',
                   status: 'warning',
                 }}
               />
               <MetricCard
                 metric={{
-                  label: 'Estación Top Inicios',
-                  value: resolved.data.topStationName,
-                  sublabel: 'Mayor concentrador de viajes',
+                  label: 'Afectaciones preventivas',
+                  value: resolved.data.totalPreventive,
+                  sublabel: 'Anunciadas antes de empezar (eventos masivos)',
+                  status: 'normal',
+                }}
+              />
+              <MetricCard
+                metric={{
+                  label: 'Estaciones restauradas',
+                  value: resolved.data.totalRestored,
+                  sublabel: `${resolved.data.restoredPct}% de las afectaciones`,
+                  status: 'normal',
+                }}
+              />
+              <MetricCard
+                metric={{
+                  label: 'Causa principal',
+                  value: resolved.data.topCause,
+                  sublabel: 'Causa con más afectaciones',
                   status: 'info',
                 }}
               />
               <MetricCard
                 metric={{
-                  label: 'Viajes afectados',
-                  value: affectedTrips ?? 'Sin datos',
-                  sublabel: 'Interrupciones por causas externas',
+                  label: 'Viajes interrumpidos',
+                  value: resolved.data.interruptedTrips,
+                  sublabel: `Frente a ${integerFormatter.format(resolved.data.normalTrips)} finalizados normalmente`,
                   status: 'warning',
                 }}
                 action={<Anchor href="#viajes-afectados" size="sm">Ver viajes afectados</Anchor>}
@@ -171,56 +142,45 @@ export function MobilityDashboard() {
           {/* Sección de Visualizaciones */}
           <div className="section">
             <div className="charts-grid-2">
-              {/* Gráfico 1: Cantidad de Viajes por Estación de Inicio */}
               <ChartCard
-                title="Cantidad de Viajes por Estación de Inicio"
-                subtitle="SUM(cantidadViajes) agrupado por estación"
-                actions={<TextInput size="xs" w={200} aria-label="Buscar estación de inicio" placeholder="Buscar estación..."
-                  value={stationSearch} onChange={(event) => setStationSearch(event.currentTarget.value)} />}
+                title="Afectaciones de estaciones por causa"
+                subtitle="Afectaciones, bloqueos y restauraciones por causa"
               >
-                <div style={{ maxHeight: 420, overflowY: 'auto', minWidth: 0 }}>
                 <BarChart
-                  data={visibleTripsByStation}
-                  xKey="station"
-                  bars={[{ key: 'cantidadViajes', label: 'Viajes Iniciados', color: '#2563A6' }]}
-                  horizontal={true}
-                  height={Math.max(320, visibleTripsByStation.length * 34 + 35)}
+                  data={affectationsByCause}
+                  xKey="etiqueta"
+                  bars={[
+                    { key: 'afectaciones', label: 'Afectaciones', color: '#2563A6' },
+                    { key: 'bloqueadas', label: 'Bloqueos', color: '#EF4444' },
+                    { key: 'restauradas', label: 'Restauradas', color: '#10B981' },
+                  ]}
+                  height={320}
                 />
-                </div>
               </ChartCard>
 
-              {/* Gráfico 2: Distribución por Duración de Viaje */}
               <ChartCard
-                title="Distribución por Duración de Viaje"
-                subtitle="Participación por rango (<15min, 15-30min, 30-60min, >1h)"
-                actions={
-                  <CategorySearchFilter
-                    categories={resolved.data.availableStations}
-                    selectedCategory={selectedStationChart2}
-                    onSelectCategory={setSelectedStationChart2}
-                    placeholder="Todas las estaciones"
-                  />
-                }
+                title="Viajes por causa de interrupción"
+                subtitle="Interrumpidos por causa frente a finalizados normalmente"
               >
-                <PieChart data={tripsByDurationData} height={280} />
+                <PieChart data={tripsByCauseData} height={280} />
               </ChartCard>
             </div>
           </div>
 
           <div className="section">
-            {/* Gráfico 3: Duración Promedio Ponderada por Estación (sin filtro por estación) */}
             <ChartCard
-              title="Duración Promedio Ponderada por Estación"
-              subtitle="SUM(duracionTotalViajes) / SUM(cantidadViajes)"
+              title="Estaciones distintas afectadas por causa"
+              subtitle="Una estación afectada varias veces por la misma causa cuenta una vez"
             >
               <BarChart
-                data={stationAvgDurationData}
-                xKey="station"
-                bars={[{ key: 'promDuracionPonderada', label: 'Minutos Promedio', color: '#F59E0B' }]}
-                height={360}
-                scrollable
-                minWidth={Math.max(700, stationAvgDurationData.length * 145)}
-                xAxisTickAngle={-30}
+                data={affectationsByCause}
+                xKey="etiqueta"
+                bars={[
+                  { key: 'estaciones', label: 'Estaciones afectadas', color: '#7C3AED' },
+                  { key: 'estacionesBloqueadas', label: 'Estaciones bloqueadas', color: '#EF4444' },
+                  { key: 'preventivas', label: 'Afectaciones preventivas', color: '#F59E0B' },
+                ]}
+                height={320}
               />
             </ChartCard>
           </div>
@@ -244,29 +204,21 @@ export function MobilityDashboard() {
                   marginTop: 0,
                 }}
               >
-                Registros
+                Detalle por causa
               </h3>
 
               <DataTable
                 columns={[
-                  { key: 'fechaInicio', label: 'Fecha Viaje', width: '130px', render: (row) => row.fechaInicio.slice(0, 10) },
-                  {
-                    key: 'estacionInicioFormatted',
-                    label: 'Estación Inicio',
-                    render: (r: any) => r.estacionInicioFormatted,
-                  },
-                  { key: 'duracionViaje', label: 'Rango Duración', width: '140px' },
-                  { key: 'cantidadViajes', label: 'Cantidad Viajes', width: '140px' },
-                  { key: 'duracionTotalViajes', label: 'Duración Total (min)', width: '170px',
-                    render: (row) => minutesFormatter.format(row.duracionTotalViajes) },
-                  { key: 'promDuracion', label: 'Promedio por viaje (min)', width: '175px',
-                    render: (row) => <span title="Duración total de esta fila dividida por su cantidad de viajes">{minutesFormatter.format(row.promDuracion)}</span> },
+                  { key: 'causa', label: 'Causa', render: (row: any) => row.causa },
+                  { key: 'cantidadAfectaciones', label: 'Afectaciones', width: '120px' },
+                  { key: 'estacionesAfectadasDistintas', label: 'Estaciones distintas', width: '150px' },
+                  { key: 'cantidadBloqueadas', label: 'Bloqueos', width: '100px' },
+                  { key: 'cantidadPreventivas', label: 'Preventivas', width: '110px' },
+                  { key: 'cantidadRestauradas', label: 'Restauradas', width: '110px' },
+                  { key: 'cantidadViajesInterrumpidos', label: 'Viajes', width: '90px',
+                    render: (row: any) => <span title={row.causaTipo === CAUSA_NORMAL ? 'Viajes finalizados normalmente' : 'Viajes interrumpidos por esta causa'}>{row.cantidadViajesInterrumpidos}</span> },
                 ]}
-                data={records.map((r, idx) => ({
-                  ...r,
-                  estacionInicioFormatted: formatStationName(r.estacionInicio),
-                  _id: `${r.fechaInicio}-${r.estacionInicio}-${r.duracionViaje}-${idx}`,
-                }))}
+                data={records.map((r) => ({ ...r, causa: causeLabel(r.causaTipo), _id: r.causaTipo || 'SIN_CAUSA' }))}
                 keyField="_id"
                 pageSize={10}
               />
@@ -282,7 +234,7 @@ export function MobilityDashboard() {
             points={[...causes.entries()].map(([etiqueta, valor]) => ({ etiqueta, valor }))}
             filters={{
               scope: 'estación',
-              options: resolved.data?.availableStations ?? [],
+              options: [],
               groups: impact.data?.afectaciones?.estaciones ?? [],
             }} />
         <PublicEventStations report={impact.data} />

@@ -4,233 +4,81 @@ import type {
   BackendMobilityRecord,
   MobilityLLMReport,
   MobilityAnalyticsData,
-  TripsByStationItem,
-  TripsByDurationBucketItem,
-  DailyTripsTrendItem,
-  StationAvgDurationItem,
+  MobilityCauseItem,
+  MobilityTripsItem,
   MobilityWeeklyAnalysis,
 } from '../types';
 import { delay } from '../utils';
-import { isWithinDateRange } from '../utils/dates';
 
-export const STANDARD_DURATION_BUCKETS = ['<15min', '15-30min', '30-60min', '>1h'];
+/** causaTipo de los viajes finalizados sin incidente (base del caso 5). */
+export const CAUSA_NORMAL = 'NORMAL';
 
-export const STATION_NAME_MAP: Record<string, string> = {
-  'belgrano-03': 'Belgrano',
-  'est-almagro-01': 'Almagro',
-  'est-alagro-033': 'Almagro',
-  'est-boedo-01': 'Boedo',
-  'est-chacarita-02': 'Chacarita',
-  'est-devoto-03': 'Devoto',
-  'est-flores-01': 'Flores',
-  'liniers-02': 'Liniers',
-  'palermo-05': 'Palermo',
-  'recoleta-04': 'Recoleta',
+/** Mismas etiquetas que usa el backend en la Parte 2 (ETIQUETAS_CAUSA). */
+export const CAUSE_LABELS: Record<string, string> = {
+  EVENTO_CLIMATICO: 'Clima',
+  RECLAMO: 'Reclamo',
+  EVENTO_PUBLICO: 'Evento público',
+  INCIDENTE_VIAL: 'Incidente vial',
+  ACCIDENTE_VIAL: 'Accidente vial',
+  EMERGENCIA: 'Emergencia',
+  RESERVA: 'Reserva',
+  NORMAL: 'Operación normal',
 };
 
-/**
- * Traduce y formaliza los nombres de estaciones para la UI (e.g. belgrano-03 -> Belgrano).
- */
-export function formatStationName(rawName: string): string {
-  if (!rawName) return 'Sin Estación';
-  const lower = rawName.toLowerCase().trim();
-  if (STATION_NAME_MAP[lower]) return STATION_NAME_MAP[lower];
-
-  let cleaned = rawName.replace(/^est-?/i, '').replace(/-\d+$/i, '');
-  if (!cleaned) cleaned = rawName;
-  return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+export function causeLabel(causa: string | null | undefined): string {
+  const key = (causa ?? '').trim().toUpperCase();
+  if (!key) return 'Sin causa informada';
+  return CAUSE_LABELS[key] ?? key.replaceAll('_', ' ').toLowerCase();
 }
 
 /**
- * Compara si un nombre de estación (crudo o formateado) coincide con el filtro seleccionado.
- */
-export function isStationMatch(rawStation: string, stationFilter?: string): boolean {
-  if (!stationFilter || stationFilter === 'ALL' || stationFilter === 'Todas las estaciones') {
-    return true;
-  }
-  const formatted = formatStationName(rawStation);
-  return rawStation === stationFilter || formatted === stationFilter;
-}
-
-/**
- * Deduplica registros analíticos reteniendo únicamente el registro con la fecha_snapshot más reciente
- * para cada clave única (fechaInicio + estacionInicio + duracionViaje).
- */
-export function deduplicateMobilityRecords(records: BackendMobilityRecord[]): BackendMobilityRecord[] {
-  if (!records || records.length === 0) return [];
-
-  const mapKeyToRecord = new Map<string, BackendMobilityRecord>();
-
-  records.forEach((record) => {
-    const key = `${record.fechaInicio}|${record.estacionInicio}|${record.duracionViaje}`;
-    const existing = mapKeyToRecord.get(key);
-
-    if (!existing) {
-      mapKeyToRecord.set(key, record);
-    } else {
-      const existingDate = new Date(existing.fecha_snapshot).getTime();
-      const currentDate = new Date(record.fecha_snapshot).getTime();
-      if (currentDate > existingDate) {
-        mapKeyToRecord.set(key, record);
-      }
-    }
-  });
-
-  return Array.from(mapKeyToRecord.values());
-}
-
-/**
- * Filtra registros deduplicados según filtros globales de fecha (aplicados a fechaInicio) y búsqueda.
+ * Gold publica una sola foto acumulada por causa: si llegan filas de mas de
+ * un snapshot, se usa el mas reciente. La busqueda filtra por causa.
  */
 export function getFilteredMobilityRecords(
   filters: DashboardFilters,
   records: BackendMobilityRecord[]
 ): BackendMobilityRecord[] {
-  const deduplicated = deduplicateMobilityRecords(records);
-
-  let filtered = deduplicated.filter((r) => isWithinDateRange(r.fechaInicio, filters));
+  const latest = records.reduce((max, r) => (r.fecha_snapshot > max ? r.fecha_snapshot : max), '');
+  let filtered = latest ? records.filter((r) => r.fecha_snapshot === latest) : [...records];
 
   if (filters.search) {
     const q = filters.search.toLowerCase();
     filtered = filtered.filter(
-      (r) =>
-        r.estacionInicio.toLowerCase().includes(q) ||
-        formatStationName(r.estacionInicio).toLowerCase().includes(q) ||
-        r.duracionViaje.toLowerCase().includes(q) ||
-        r.fechaInicio.toLowerCase().includes(q)
+      (r) => r.causaTipo.toLowerCase().includes(q) || causeLabel(r.causaTipo).toLowerCase().includes(q)
     );
   }
-
   return filtered;
 }
 
-/**
- * Calcula SUM(cantidadViajes) por estación de inicio (con nombres traducidos).
- */
-export function getTripsByStation(
-  records: BackendMobilityRecord[],
-  stationFilter?: string
-): TripsByStationItem[] {
-  const filtered = records.filter((r) => isStationMatch(r.estacionInicio, stationFilter));
-
-  const counts: Record<string, number> = {};
-
-  filtered.forEach((r) => {
-    const formattedName = formatStationName(r.estacionInicio);
-    counts[formattedName] = (counts[formattedName] || 0) + (r.cantidadViajes || 0);
-  });
-
-  return Object.entries(counts)
-    .map(([station, count]) => ({ station, cantidadViajes: count }))
-    .sort((a, b) => b.cantidadViajes - a.cantidadViajes);
-}
-
-/**
- * Agrupa SUM(cantidadViajes) por rango de duración manteniendo el orden estricto:
- * [<15min, 15-30min, 30-60min, >1h]
- */
-export function getTripsByDurationBucket(
-  records: BackendMobilityRecord[],
-  stationFilter?: string
-): TripsByDurationBucketItem[] {
-  const filtered = records.filter((r) => isStationMatch(r.estacionInicio, stationFilter));
-
-  const bucketCounts: Record<string, number> = {
-    '<15min': 0,
-    '15-30min': 0,
-    '30-60min': 0,
-    '>1h': 0,
-  };
-
-  let totalTrips = 0;
-
-  filtered.forEach((r) => {
-    const count = r.cantidadViajes || 0;
-    totalTrips += count;
-    const bucket = r.duracionViaje.trim() === '>1hs' ? '>1h' : r.duracionViaje;
-    if (bucketCounts[bucket] !== undefined) {
-      bucketCounts[bucket] += count;
-    } else {
-      bucketCounts[bucket] = (bucketCounts[bucket] || 0) + count;
-    }
-  });
-
-  const allBucketKeys = Array.from(
-    new Set([...STANDARD_DURATION_BUCKETS, ...Object.keys(bucketCounts)])
-  );
-
-  return allBucketKeys.map((bucket) => {
-    const count = bucketCounts[bucket] || 0;
-    const porcentaje = totalTrips > 0 ? Number(((count / totalTrips) * 100).toFixed(1)) : 0;
-    return {
-      bucket,
-      cantidadViajes: count,
-      porcentaje,
-    };
-  });
-}
-
-/**
- * Calcula la evolución diaria de SUM(cantidadViajes) y SUM(duracionTotalViajes) por fechaInicio.
- */
-export function getDailyTripsTrend(
-  records: BackendMobilityRecord[],
-  stationFilter?: string
-): DailyTripsTrendItem[] {
-  const filtered = records.filter((r) => isStationMatch(r.estacionInicio, stationFilter));
-
-  const dateMap: Record<string, { count: number; totalDuration: number }> = {};
-
-  filtered.forEach((r) => {
-    if (!dateMap[r.fechaInicio]) {
-      dateMap[r.fechaInicio] = { count: 0, totalDuration: 0 };
-    }
-    dateMap[r.fechaInicio].count += r.cantidadViajes || 0;
-    dateMap[r.fechaInicio].totalDuration += r.duracionTotalViajes || 0;
-  });
-
-  return Object.entries(dateMap)
-    .map(([fecha, data]) => ({
-      fecha,
-      cantidadViajes: data.count,
-      duracionTotal: Number(data.totalDuration.toFixed(1)),
+/** Afectaciones de estaciones por causa (sin la fila NORMAL, que no es una afectacion). */
+export function getAffectationsByCause(records: BackendMobilityRecord[]): MobilityCauseItem[] {
+  return records
+    .filter((r) => r.causaTipo !== CAUSA_NORMAL && r.cantidadAfectaciones > 0)
+    .map((r) => ({
+      causa: r.causaTipo,
+      etiqueta: causeLabel(r.causaTipo),
+      afectaciones: r.cantidadAfectaciones,
+      estaciones: r.estacionesAfectadasDistintas,
+      bloqueadas: r.cantidadBloqueadas,
+      estacionesBloqueadas: r.estacionesBloqueadasDistintas,
+      preventivas: r.cantidadPreventivas,
+      restauradas: r.cantidadRestauradas,
     }))
-    .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
+    .sort((a, b) => b.afectaciones - a.afectaciones);
+}
+
+/** Viajes por causa de interrupcion, incluida la fila NORMAL (finalizados sin incidente). */
+export function getTripsByCause(records: BackendMobilityRecord[]): MobilityTripsItem[] {
+  return records
+    .filter((r) => r.cantidadViajesInterrumpidos > 0)
+    .map((r) => ({ causa: r.causaTipo, etiqueta: causeLabel(r.causaTipo), viajes: r.cantidadViajesInterrumpidos }))
+    .sort((a, b) => b.viajes - a.viajes);
 }
 
 /**
- * Calcula la Duración Promedio Ponderada por Estación:
- * SUM(duracionTotalViajes) / SUM(cantidadViajes) (con nombres traducidos).
- */
-export function getStationAvgDuration(
-  records: BackendMobilityRecord[],
-  stationFilter?: string
-): StationAvgDurationItem[] {
-  const filtered = records.filter((r) => isStationMatch(r.estacionInicio, stationFilter));
-
-  const stationTotals: Record<string, { totalDuration: number; totalTrips: number }> = {};
-
-  filtered.forEach((r) => {
-    const formattedName = formatStationName(r.estacionInicio);
-    if (!stationTotals[formattedName]) {
-      stationTotals[formattedName] = { totalDuration: 0, totalTrips: 0 };
-    }
-    stationTotals[formattedName].totalDuration += r.duracionTotalViajes || 0;
-    stationTotals[formattedName].totalTrips += r.cantidadViajes || 0;
-  });
-
-  return Object.entries(stationTotals)
-    .map(([station, { totalDuration, totalTrips }]) => ({
-      station,
-      promDuracionPonderada:
-        totalTrips > 0 ? Number((totalDuration / totalTrips).toFixed(1)) : 0,
-      cantidadViajes: totalTrips,
-    }))
-    .sort((a, b) => b.promDuracionPonderada - a.promDuracionPonderada);
-}
-
-/**
- * Servicio analítico principal que compone los KPIs calculados dinámicamente según los filtros activos.
+ * Servicio analítico principal: KPIs y series del tablero de Movilidad a partir
+ * del resumen por causa de gold.
  */
 export async function getMobilityAnalyticsData(
   filters: DashboardFilters,
@@ -239,52 +87,35 @@ export async function getMobilityAnalyticsData(
 ): Promise<MobilityAnalyticsData> {
   await delay();
 
-  const filteredRecords = getFilteredMobilityRecords(filters, records);
+  const filtered = getFilteredMobilityRecords(filters, records);
+  const affectationsByCause = getAffectationsByCause(filtered);
+  const tripsByCause = getTripsByCause(filtered);
+  const sum = (key: keyof BackendMobilityRecord) =>
+    filtered.reduce((total, r) => total + (r.causaTipo === CAUSA_NORMAL ? 0 : Number(r[key]) || 0), 0);
 
-  // Extraer lista única de estaciones formateadas/traducidas
-  const availableStations = Array.from(
-    new Set(records.map((r) => formatStationName(r.estacionInicio)))
-  ).sort();
-
-  // Todos los KPIs calculados 100% dinámicamente sobre los registros del período filtrado
-  const totalDurationSum = filteredRecords.reduce((acc, r) => acc + (r.duracionTotalViajes || 0), 0);
-  const totalTripsSum = filteredRecords.reduce((acc, r) => acc + (r.cantidadViajes || 0), 0);
-
-  const weightedAvgDurationMinutes =
-    totalTripsSum > 0 ? Number((totalDurationSum / totalTripsSum).toFixed(1)) : 0;
-
-  const tripsByStation = getTripsByStation(filteredRecords);
-  const tripsByDurationBucket = getTripsByDurationBucket(filteredRecords);
-  const dailyTripsTrend = getDailyTripsTrend(filteredRecords);
-  const stationAvgDuration = getStationAvgDuration(filteredRecords);
-
-  const topStationName =
-    tripsByStation.length > 0 && totalTripsSum > 0 ? tripsByStation[0].station : 'N/A';
-
-  const predominantBucketObj =
-    totalTripsSum > 0
-      ? [...tripsByDurationBucket].sort((a, b) => b.cantidadViajes - a.cantidadViajes)[0]
-      : undefined;
-  const predominantDurationBucket = predominantBucketObj ? predominantBucketObj.bucket : 'N/A';
+  const totalAffectations = sum('cantidadAfectaciones');
+  const totalRestored = sum('cantidadRestauradas');
+  const normalTrips = filtered
+    .filter((r) => r.causaTipo === CAUSA_NORMAL)
+    .reduce((total, r) => total + r.cantidadViajesInterrumpidos, 0);
 
   const executiveReport: MobilityWeeklyAnalysis | undefined =
-    llmReport && llmReport.analisis && llmReport.analisis.length > 0
-      ? llmReport.analisis[0]
-      : undefined;
+    llmReport && llmReport.analisis && llmReport.analisis.length > 0 ? llmReport.analisis[0] : undefined;
 
   return {
-    totalTrips: totalTripsSum,
-    weeklyTrips: totalTripsSum,
-    totalDurationMinutes: Number(totalDurationSum.toFixed(1)),
-    weightedAvgDurationMinutes,
-    topStationName,
-    predominantDurationBucket,
-    tripsByStation,
-    tripsByDurationBucket,
-    dailyTripsTrend,
-    stationAvgDuration,
-    availableStations,
-    records: filteredRecords,
+    totalAffectations,
+    totalBlocked: sum('cantidadBloqueadas'),
+    totalPreventive: sum('cantidadPreventivas'),
+    totalRestored,
+    restoredPct: totalAffectations > 0 ? Number(((totalRestored / totalAffectations) * 100).toFixed(1)) : 0,
+    interruptedTrips: sum('cantidadViajesInterrumpidos'),
+    normalTrips,
+    topCause: affectationsByCause[0]?.etiqueta ?? 'N/A',
+    affectationsByCause,
+    tripsByCause,
+    availableCauses: Array.from(new Set(records.map((r) => causeLabel(r.causaTipo)))).sort(),
+    snapshotDate: filtered[0]?.fecha_snapshot ?? '',
+    records: filtered,
     executiveReport,
     aiReport: llmReport,
   };
