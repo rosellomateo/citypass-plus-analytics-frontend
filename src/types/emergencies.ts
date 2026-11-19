@@ -67,6 +67,7 @@ export interface CategoryPriorityStackedData {
 
 export interface EmergencyAnalyticsData {
   affectedCriticalityCount?: number;
+  affectedCriticalityByCause?: { etiqueta: string; valor: number }[];
   circulationAffectedCount?: number;
   circulationUnknownCount?: number;
   totalEmergencies: number;

@@ -63,7 +63,8 @@ it('calculates the six culture cases from activity counts and retains the full d
     ['Actividades modificadas por accidentes viales', '12'], ['Actividades organizadas por ciudadanos frente al total', '19']]) {
     expect(screen.getByRole('article', { name: `KPI: ${label}` })).toHaveTextContent(value);
   }
-  expect(screen.getByText('Causas de afecto')).toBeInTheDocument();
+  expect(screen.getByText('Cantidad de actividades afectadas por causa')).toBeInTheDocument();
+  expect(screen.queryByText('Afectaciones acumuladas en actividades por causa')).not.toBeInTheDocument();
   expect(screen.queryByText('Eventos públicos y sus afectaciones')).not.toBeInTheDocument();
   expect(screen.queryByText('Impacto por evento público')).not.toBeInTheDocument();
   expect(screen.queryByText('Reservas Confirmadas')).not.toBeInTheDocument();
@@ -78,7 +79,8 @@ it('separates missing emergency states, counts preventive public events and show
     { ...base, estado_actual: null, cantidadEmergencias: 1 }];
   const result = mapEmergencyApiData(rows, filters);
   expect(result).toMatchObject({ totalEmergencies: 179, closedCount: 167, activeCount: 11, unknownStateCount: 1 });
-  expect(result.caseMetrics).toEqual(expect.arrayContaining([{ id: 'c3', valor: 28 }, { id: 'c4', valor: 0 }, { id: 'c4b', valor: 0 }]));
+  expect(result.caseMetrics).toEqual(expect.arrayContaining([{ id: 'c3', valor: 28 }, { id: 'c4', valor: 0 }]));
+  expect(result.caseMetrics?.find(({ id }) => id === 'c4b')).toBeUndefined();
   render(<DashboardImpactCards area="emergencies" data={report} fallbackMetrics={result.caseMetrics} showMissing />);
   expect(screen.getByRole('article', { name: 'KPI: Emergencias preventivas por eventos públicos' })).toHaveTextContent('28');
   expect(screen.getByRole('article', { name: 'KPI: Emergencias por incidentes viales' })).toHaveTextContent('0');

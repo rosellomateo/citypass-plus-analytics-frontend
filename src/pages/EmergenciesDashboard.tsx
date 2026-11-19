@@ -1,6 +1,6 @@
-import { DashboardImpactCards } from '../components/common/DashboardImpactCards';
 import { DashboardImpactCharts } from '../components/common/DashboardImpactCharts';
 import { EmergencyCausesChart } from '../components/emergencies/EmergencyCausesChart';
+import { EmergencyCriticalityChart } from '../components/emergencies/EmergencyCriticalityChart';
 import { EmergencyZonePanel } from '../components/common/EmergencyZonePanel';
 import { useDashboardImpact } from '../hooks/useDashboardImpact';
 // src/pages/EmergenciesDashboard.tsx
@@ -42,6 +42,9 @@ export function EmergenciesDashboard() {
     name: priority, value: count, color: priorityColors[priority],
   }));
   const categoryStackedChartData = resolved.data?.emergenciesByCategoryStacked ?? [];
+  const resources = impact.data?.datos.find(({ id, valor }) => id === 'c4b' && Number.isFinite(valor));
+  const bicycleResolution = impact.data?.datos.find(({ id, valor }) => id === 'c5b' && Number.isFinite(valor));
+  const hasGeneralResolution = Boolean(resolved.data?.resolutionByCause?.length);
 
   return (
     <div>
@@ -89,10 +92,6 @@ export function EmergenciesDashboard() {
                   status: 'normal',
                 }}
               />
-              {!!resolved.data.unknownStateCount && <MetricCard metric={{ label: 'Emergencias sin estado',
-                value: resolved.data.unknownStateCount, status: 'warning' }} />}
-              <MetricCard metric={{ label: 'Emergencias con criticidad afectada',
-                value: resolved.data.affectedCriticalityCount ?? 'Sin datos', status: 'warning' }} />
               <MetricCard metric={{ label: 'Emergencias con circulación afectada',
                 value: resolved.data.circulationAffectedCount ?? 'Sin datos', status: 'info',
                 sublabel: resolved.data.circulationUnknownCount ? `${resolved.data.circulationUnknownCount} sin confirmación` : undefined }} />
@@ -111,7 +110,12 @@ export function EmergenciesDashboard() {
                 unit: ' min',
                 sublabel: 'Promedio ponderado por cantidad de emergencias con datos',
               }} />}
-              <DashboardImpactCards area="emergencies" data={impact.data} fallbackMetrics={resolved.data.caseMetrics} showMissing />
+              {resources && <MetricCard metric={{ label: 'Recursos enviados por incidentes viales',
+                value: resources.valor, unit: resources.unidad ?? undefined, status: 'info' }} />}
+              {!hasGeneralResolution && bicycleResolution && <MetricCard metric={{
+                label: 'Tiempo promedio de resolución de emergencias durante viajes en bicicleta',
+                value: bicycleResolution.valor, unit: bicycleResolution.unidad ?? 'min', status: 'info',
+              }} />}
             </div>
           </div>
 
@@ -164,9 +168,9 @@ export function EmergenciesDashboard() {
           </div>}
         </>
       ) : null}
-      {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="emergencies" data={impact.data} standalone showMissing />}
       <DashboardImpactCharts area="emergencies" {...impact} emergencyData={resolved.data} />
       <EmergencyZonePanel data={impact.data} loading={impact.loading} filters={filters} />
+      {resolved.data && <EmergencyCriticalityChart data={resolved.data} />}
     </div>
   );
 }
