@@ -2,7 +2,7 @@ import { expect, it } from 'vitest';
 import type { BackendAnalyticsRecord, BackendMobilityRecord } from '../types';
 import type { WasteInterventionEvent } from '../api/types';
 import { getClaimsAnalyticsData } from '../services/claimsService';
-import { getTripsByDurationBucket } from '../services/mobilityService';
+import { getAffectationsByCause, getTripsByCause } from '../services/mobilityService';
 import { countRoadAffectedInterventions } from '../utils/wasteInterventions';
 
 it('classifies actual claim states and weights resolution times only over resolved or closed claims', async () => {
@@ -30,15 +30,22 @@ it('classifies actual claim states and weights resolution times only over resolv
   expect(records).toEqual(original);
 });
 
-it('groups equivalent hour labels without losing trips or modifying source rows', () => {
-  const base: BackendMobilityRecord = { fechaInicio: '2026-11-16', estacionInicio: 'Flores',
-    duracionViaje: '>1hs', cantidadViajes: 3, duracionTotalViajes: 210, promDuracion: 70,
-    fecha_snapshot: '2026-11-18' };
-  const records = [base, { ...base, duracionViaje: '>1h', cantidadViajes: 1 }];
-  const result = getTripsByDurationBucket(records);
-  expect(result).toHaveLength(4);
-  expect(result.find(({ bucket }) => bucket === '>1h')).toEqual({ bucket: '>1h', cantidadViajes: 4, porcentaje: 100 });
-  expect(records[0].duracionViaje).toBe('>1hs');
+it('keeps NORMAL out of station affectations but counts it as finished trips, without modifying rows', () => {
+  const base: BackendMobilityRecord = { causaTipo: 'INCIDENTE_VIAL', cantidadAfectaciones: 12,
+    estacionesAfectadasDistintas: 12, cantidadBloqueadas: 1, estacionesBloqueadasDistintas: 1,
+    cantidadPreventivas: 0, cantidadRestauradas: 8, cantidadViajesInterrumpidos: 12, fecha_snapshot: '2026-11-18' };
+  const normal: BackendMobilityRecord = { ...base, causaTipo: 'NORMAL', cantidadAfectaciones: 0,
+    estacionesAfectadasDistintas: 0, cantidadBloqueadas: 0, estacionesBloqueadasDistintas: 0,
+    cantidadRestauradas: 0, cantidadViajesInterrumpidos: 36 };
+  const records = [base, normal];
+  const original = structuredClone(records);
+
+  expect(getAffectationsByCause(records).map(({ causa }) => causa)).toEqual(['INCIDENTE_VIAL']);
+  expect(getTripsByCause(records)).toEqual([
+    { causa: 'NORMAL', etiqueta: 'Operación normal', viajes: 36 },
+    { causa: 'INCIDENTE_VIAL', etiqueta: 'Incidente vial', viajes: 12 },
+  ]);
+  expect(records).toEqual(original);
 });
 
 it('separates waste programming causes from affection causes and counts stops rather than trucks or retries', () => {

@@ -13,12 +13,10 @@ import {
 } from '../services/emergencyService';
 import {
   getMobilityAnalyticsData,
-  deduplicateMobilityRecords,
   getFilteredMobilityRecords,
-  getTripsByStation,
-  getTripsByDurationBucket,
-  getDailyTripsTrend,
-  getStationAvgDuration,
+  getAffectationsByCause,
+  getTripsByCause,
+  causeLabel,
 } from '../services/mobilityService';
 import { getCultureAnalyticsData } from '../services/cultureService';
 import { mockClaimRecords } from '../data/mocks/claims.mock';
@@ -27,7 +25,7 @@ import {
   mockEmergenciaPriorizadaEvents,
 } from '../data/mocks/emergencies.mock';
 import { mockMobilityRecords, mockMobilityLLMReport } from '../data/mocks/mobility.mock';
-import type { EmergencyPriority, EmergencyState, BackendMobilityRecord } from '../types';
+import type { EmergencyPriority, EmergencyState } from '../types';
 
 const defaultFilters = { dateRange: '7d' as const };
 
@@ -132,160 +130,50 @@ describe('Domain Services Aggregations', () => {
 
   /* ---------------------- MOVILIDAD TESTS ---------------------- */
 
-  it('Mobility service deduplicates records by selecting the latest fecha_snapshot', () => {
-    const duplicateRecords: BackendMobilityRecord[] = [
-      {
-        fechaInicio: '2026-07-27',
-        estacionInicio: 'est-almagro-01',
-        duracionViaje: '<15min',
-        cantidadViajes: 1,
-        duracionTotalViajes: 12.0,
-        promDuracion: 12.0,
-        fecha_snapshot: '2026-08-02',
-      },
-      {
-        fechaInicio: '2026-07-27',
-        estacionInicio: 'est-almagro-01',
-        duracionViaje: '<15min',
-        cantidadViajes: 1,
-        duracionTotalViajes: 12.0,
-        promDuracion: 12.0,
-        fecha_snapshot: '2026-09-22', // más reciente
-      },
-    ];
+  it('Mobility service keeps only the latest snapshot and filters by cause', () => {
+    const viejo = { ...mockMobilityRecords[0], fecha_snapshot: '2026-11-10', cantidadAfectaciones: 999 };
+    const records = getFilteredMobilityRecords(defaultFilters, [...mockMobilityRecords, viejo]);
+    expect(records).toHaveLength(mockMobilityRecords.length);
+    expect(records.every((r) => r.fecha_snapshot === '2026-11-18')).toBe(true);
 
-    const deduplicated = deduplicateMobilityRecords(duplicateRecords);
-    expect(deduplicated.length).toBe(1);
-    expect(deduplicated[0].fecha_snapshot).toBe('2026-09-22');
+    const reclamos = getFilteredMobilityRecords({ ...defaultFilters, search: 'reclamo' }, mockMobilityRecords);
+    expect(reclamos.map((r) => r.causaTipo)).toEqual(['RECLAMO']);
   });
 
-  it('Mobility service calculates exact weighted average for trip duration SUM(totalMinutes)/SUM(trips)', () => {
-    const records: BackendMobilityRecord[] = [
-      {
-        fechaInicio: '2026-09-18',
-        estacionInicio: 'estacion-A',
-        duracionViaje: '15-30min',
-        cantidadViajes: 10,
-        duracionTotalViajes: 200,
-        promDuracion: 20,
-        fecha_snapshot: '2026-09-20',
-      },
-      {
-        fechaInicio: '2026-09-18',
-        estacionInicio: 'estacion-A',
-        duracionViaje: '30-60min',
-        cantidadViajes: 2,
-        duracionTotalViajes: 100,
-        promDuracion: 50,
-        fecha_snapshot: '2026-09-20',
-      },
-    ];
-
-    // Weighted average: (200 + 100) / (10 + 2) = 300 / 12 = 25 min.
-    // Simple average would be (20 + 50) / 2 = 35 min. We verify it's 25!
-    const avgDurationItems = getStationAvgDuration(records);
-    expect(avgDurationItems.length).toBe(1);
-    expect(avgDurationItems[0].promDuracionPonderada).toBe(25);
+  it('Mobility service orders station affectations by cause and leaves NORMAL out', () => {
+    const items = getAffectationsByCause(mockMobilityRecords);
+    expect(items[0]).toMatchObject({ causa: 'EVENTO_CLIMATICO', etiqueta: 'Clima', afectaciones: 159, bloqueadas: 156 });
+    expect(items.some((item) => item.causa === 'NORMAL')).toBe(false);
   });
 
-  it('Mobility service respects strict duration bucket ordering', () => {
-    const records: BackendMobilityRecord[] = [
-      {
-        fechaInicio: '2026-09-18',
-        estacionInicio: 'liniers-02',
-        duracionViaje: '>1h',
-        cantidadViajes: 5,
-        duracionTotalViajes: 350,
-        promDuracion: 70,
-        fecha_snapshot: '2026-09-20',
-      },
-      {
-        fechaInicio: '2026-09-18',
-        estacionInicio: 'liniers-02',
-        duracionViaje: '<15min',
-        cantidadViajes: 10,
-        duracionTotalViajes: 100,
-        promDuracion: 10,
-        fecha_snapshot: '2026-09-20',
-      },
-    ];
-
-    const buckets = getTripsByDurationBucket(records);
-    expect(buckets.map((b) => b.bucket)).toEqual(['<15min', '15-30min', '30-60min', '>1h']);
-    expect(buckets.find((b) => b.bucket === '<15min')?.cantidadViajes).toBe(10);
-    expect(buckets.find((b) => b.bucket === '>1h')?.cantidadViajes).toBe(5);
+  it('Mobility service lists trips by interruption cause including normal trips', () => {
+    const trips = getTripsByCause(mockMobilityRecords);
+    expect(trips[0]).toEqual({ causa: 'NORMAL', etiqueta: 'Operación normal', viajes: 36 });
+    expect(trips.find((t) => t.causa === 'INCIDENTE_VIAL')?.viajes).toBe(12);
   });
 
-  it('Mobility service supports station filtering dynamically without hardcoded stations', () => {
-    const stations = getTripsByStation(mockMobilityRecords);
-    expect(stations.length).toBeGreaterThan(0);
-
-    const firstStation = stations[0].station;
-    const filteredTrips = getTripsByStation(mockMobilityRecords, firstStation);
-    expect(filteredTrips.length).toBe(1);
-    expect(filteredTrips[0].station).toBe(firstStation);
-  });
-
-  it('Mobility service filters records by date and search text', () => {
-    const records = getFilteredMobilityRecords(
-      {
-        dateRange: 'custom',
-        from: '2026-09-01',
-        to: '2026-09-30',
-        search: 'palermo',
-      },
-      mockMobilityRecords
-    );
-
-    expect(records.length).toBeGreaterThan(0);
-    expect(records.every((record) => record.estacionInicio.toLowerCase().includes('palermo'))).toBe(
-      true
-    );
-  });
-
-  it('Mobility service calculates and sorts the daily trips trend', () => {
-    const trend = getDailyTripsTrend([
-      {
-        fechaInicio: '2026-09-19',
-        estacionInicio: 'palermo-05',
-        duracionViaje: '15-30min',
-        cantidadViajes: 2,
-        duracionTotalViajes: 40,
-        promDuracion: 20,
-        fecha_snapshot: '2026-09-20',
-      },
-      {
-        fechaInicio: '2026-09-18',
-        estacionInicio: 'palermo-05',
-        duracionViaje: '<15min',
-        cantidadViajes: 3,
-        duracionTotalViajes: 30,
-        promDuracion: 10,
-        fecha_snapshot: '2026-09-20',
-      },
-    ]);
-
-    expect(trend).toEqual([
-      { fecha: '2026-09-18', cantidadViajes: 3, duracionTotal: 30 },
-      { fecha: '2026-09-19', cantidadViajes: 2, duracionTotal: 40 },
-    ]);
+  it('Mobility service labels causes like the backend', () => {
+    expect(causeLabel('EVENTO_PUBLICO')).toBe('Evento público');
+    expect(causeLabel(null)).toBe('Sin causa informada');
+    expect(causeLabel('OTRA_CAUSA')).toBe('otra causa');
   });
 
   it('Mobility service handles empty records gracefully avoiding NaN or division by zero', async () => {
     const emptyData = await getMobilityAnalyticsData(defaultFilters, [], mockMobilityLLMReport);
-    expect(emptyData.weightedAvgDurationMinutes).toBe(0);
-    expect(emptyData.tripsByStation.length).toBe(0);
-    expect(emptyData.topStationName).toBe('N/A');
-    expect(emptyData.predominantDurationBucket).toBe('N/A');
+    expect(emptyData.totalAffectations).toBe(0);
+    expect(emptyData.restoredPct).toBe(0);
+    expect(emptyData.affectationsByCause).toEqual([]);
+    expect(emptyData.topCause).toBe('N/A');
   });
 
-  it('Mobility service composes analytics data dynamically from filtered records', async () => {
+  it('Mobility service composes analytics data from the cause summary', async () => {
     const data = await getMobilityAnalyticsData(defaultFilters, mockMobilityRecords, mockMobilityLLMReport);
-    expect(data.totalTrips).toBeGreaterThan(0);
-    expect(data.weeklyTrips).toBeGreaterThan(0);
-    expect(data.totalDurationMinutes).toBeGreaterThan(0);
-    expect(data.weightedAvgDurationMinutes).toBeGreaterThan(0);
-    expect(data.availableStations.length).toBeGreaterThan(0);
+    expect(data.totalAffectations).toBe(300);
+    expect(data.totalBlocked).toBe(166);
+    expect(data.totalPreventive).toBe(14);
+    expect(data.interruptedTrips).toBe(15);
+    expect(data.normalTrips).toBe(36);
+    expect(data.topCause).toBe('Clima');
     expect(data.executiveReport).toEqual(mockMobilityLLMReport.analisis[0]);
     expect(data.aiReport).toBe(mockMobilityLLMReport);
   });

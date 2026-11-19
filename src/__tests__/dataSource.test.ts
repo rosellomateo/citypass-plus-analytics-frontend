@@ -114,25 +114,29 @@ describe('API analytics adapters', () => {
     });
   });
 
-  it('uses backend counts for mobility totals and averages', async () => {
+  it('maps the mobility cause summary to totals and cause series', async () => {
+    const fila = (causaTipo: string, afectaciones: number, viajes: number) => ({
+      causaTipo,
+      cantidadAfectaciones: afectaciones,
+      estacionesAfectadasDistintas: afectaciones,
+      cantidadBloqueadas: 1,
+      estacionesBloqueadasDistintas: 1,
+      cantidadPreventivas: 0,
+      cantidadRestauradas: afectaciones - 1,
+      cantidadViajesInterrumpidos: viajes,
+      fecha_snapshot: '2026-11-18',
+    });
     const result = await mapMobilityApiData(
-      [
-        {
-          fechaInicio: new Date().toISOString(),
-          estacionInicio: 'Central',
-          duracionViaje: '12 minutos',
-          cantidadViajes: 3,
-          duracionTotalViajes: 36,
-          promDuracion: 12,
-          fecha_snapshot: new Date().toISOString(),
-        },
-      ],
+      [fila('EVENTO_CLIMATICO', 17, 1), fila('RECLAMO', 21, 0), { ...fila('NORMAL', 0, 36), cantidadBloqueadas: 0, cantidadRestauradas: 0 }],
       filters
     );
 
-    expect(result.totalTrips).toBe(3);
-    expect(result.weightedAvgDurationMinutes).toBe(12);
-    expect(result.tripsByStation).toEqual([{ station: 'Central', cantidadViajes: 3 }]);
+    expect(result.totalAffectations).toBe(38);
+    expect(result.totalBlocked).toBe(2);
+    expect(result.interruptedTrips).toBe(1);
+    expect(result.normalTrips).toBe(36);
+    expect(result.topCause).toBe('Reclamo');
+    expect(result.affectationsByCause.map(({ causa }) => causa)).toEqual(['RECLAMO', 'EVENTO_CLIMATICO']);
   });
 
   it('maps culture aggregates to the existing view contract', () => {

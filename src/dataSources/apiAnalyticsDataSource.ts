@@ -202,12 +202,14 @@ export async function mapMobilityApiData(
   filters: DashboardFilters
 ): Promise<MobilityAnalyticsData> {
   const records: BackendMobilityRecord[] = rows.map((row) => ({
-    fechaInicio: textOrEmpty(row.fechaInicio),
-    estacionInicio: textOrEmpty(row.estacionInicio),
-    duracionViaje: textOrEmpty(row.duracionViaje),
-    cantidadViajes: numberOrZero(row.cantidadViajes),
-    duracionTotalViajes: numberOrZero(row.duracionTotalViajes),
-    promDuracion: numberOrZero(row.promDuracion),
+    causaTipo: textOrEmpty(row.causaTipo),
+    cantidadAfectaciones: numberOrZero(row.cantidadAfectaciones),
+    estacionesAfectadasDistintas: numberOrZero(row.estacionesAfectadasDistintas),
+    cantidadBloqueadas: numberOrZero(row.cantidadBloqueadas),
+    estacionesBloqueadasDistintas: numberOrZero(row.estacionesBloqueadasDistintas),
+    cantidadPreventivas: numberOrZero(row.cantidadPreventivas),
+    cantidadRestauradas: numberOrZero(row.cantidadRestauradas),
+    cantidadViajesInterrumpidos: numberOrZero(row.cantidadViajesInterrumpidos),
     fecha_snapshot: textOrEmpty(row.fecha_snapshot),
   }));
   const emptyLlmReport: MobilityLLMReport = {
