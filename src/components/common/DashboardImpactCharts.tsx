@@ -38,9 +38,9 @@ export function DashboardImpactCharts({ area, data, emergencyData, claimCauses }
     // Gold repeats the same resolution mean within each cause; it is not a category-specific mean.
     // The bicycle-only c5b remains in its own card and cannot fill the other causes.
     const resolutionPoints = emergencyData?.resolutionByCause ?? [];
-    charts.push({ title: 'Tiempo de resolución promedio por emergencia', unit: 'Minutos por causa con promedio publicado', points: resolutionPoints });
+    if (resolutionPoints.length) charts.push({ title: 'Tiempo de resolución promedio por emergencia', unit: 'Minutos por causa con promedio publicado', points: resolutionPoints });
   }
-  const visible = charts.filter(({ points, title }) => points.length || title === 'Tiempo de resolución promedio por emergencia');
+  const visible = charts.filter(({ points }) => points.length);
   if (!visible.length) return null;
   const snapshot = data?.fecha_snapshot ?? data?.actualizado_en?.slice(0, 10);
   const period = snapshot ? `Corte del ${snapshot.split('-').reverse().join('/')}` : '';

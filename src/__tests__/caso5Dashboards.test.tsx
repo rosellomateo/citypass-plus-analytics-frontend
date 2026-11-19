@@ -37,9 +37,9 @@ it('Emergencias muestra las emergencias en bici y su tiempo de resolución', () 
   expect(screen.getByText('Emergencias durante viajes en bicicleta')).toBeInTheDocument();
   expect(screen.getByText('Tiempo promedio de resolución de emergencias durante viajes en bicicleta')).toBeInTheDocument();
   expect(screen.getByRole('article', { name: 'KPI: Tiempo promedio de resolución de emergencias durante viajes en bicicleta' })).toHaveTextContent('866');
-  expect(screen.getByText('Sin tiempos de resolución publicados.')).toBeInTheDocument();
+  expect(screen.queryByText('Sin tiempos de resolución publicados.')).not.toBeInTheDocument();
   expect(screen.queryByText(/Sólo se informa el promedio de viajes en bicicleta/)).not.toBeInTheDocument();
-  expect(screen.getByText('Tiempo de resolución promedio por emergencia')).toBeInTheDocument();
+  expect(screen.queryByText('Tiempo de resolución promedio por emergencia')).not.toBeInTheDocument();
 });
 
 it('Reclamos compara los vínculos de bicicleta verificados con los demás reclamos viales', () => {

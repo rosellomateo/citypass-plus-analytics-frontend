@@ -1,6 +1,5 @@
 import { DashboardImpactCards } from '../components/common/DashboardImpactCards';
 import { ActivityOrganizerChart } from '../components/culture/ActivityOrganizerChart';
-import { CausePie } from '../components/common/CausePie';
 import { DashboardHeader } from '../components/common/DashboardHeader/DashboardHeader';
 import { MetricCard } from '../components/common/MetricCard/MetricCard';
 import { ChartCard } from '../components/common/ChartCard/ChartCard';
@@ -19,7 +18,8 @@ export function CultureDashboard() {
   const cultureAsync = useCultureData(filters);
   const resolved = useResolvedUiState(cultureAsync);
   const activities = resolved.data?.activities;
-  const causes = impact.data?.resumen_gold?.find(({ id }) => id === 'culture-cause')?.puntos ?? activities?.byCause ?? [];
+  const causes = activities?.byCause ?? impact.data?.resumen_gold?.find(({ id }) => id === 'culture-cause')?.puntos ?? [];
+  const causeColors: Record<string, string> = { Clima: '#57A9DB', Reclamo: '#D99838', 'Accidente vial': '#794CAC', 'Incidente vial': '#C83E4D' };
 
   return <div>
     <DashboardHeader title="Espacios Públicos y Cultura" subtitle="Actividades y afectaciones en espacios públicos"
@@ -56,12 +56,9 @@ export function CultureDashboard() {
       </section>
     </>}
     {(activities || causes.length > 0) && <section className="section">
-      <CausePie title="Causas de afecto" points={causes} description="Cantidad de actividades por causa informada" />
-    </section>}
-    {!!activities?.cumulativeCauseChanges?.length && <section className="section">
-      <ChartCard title="Afectaciones acumuladas en actividades por causa" subtitle="Una actividad puede registrar varias afectaciones">
-        <BarChart data={activities.cumulativeCauseChanges} xKey="etiqueta" bars={[{ key: 'valor', label: 'Afectaciones acumuladas', color: '#D99838' }]}
-          horizontal height={280} />
+      <ChartCard title="Cantidad de actividades afectadas por causa">
+        <BarChart data={causes.map((point) => ({ ...point, color: causeColors[point.etiqueta] ?? '#2563A6' }))}
+          xKey="etiqueta" bars={[{ key: 'valor', label: 'Actividades' }]} colorField="color" horizontal height={300} />
       </ChartCard>
     </section>}
   </div>;
