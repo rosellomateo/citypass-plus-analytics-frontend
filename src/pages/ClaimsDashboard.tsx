@@ -16,6 +16,7 @@ import { MetricsGridSkeleton, ChartSkeleton } from '../components/common/Loading
 import { useFilters } from '../hooks/useFilters';
 import { useClaimsData } from '../hooks/useClaimsData';
 import { useResolvedUiState } from '../hooks/useUiState';
+import { auditedClaimsImpact } from '../utils/impactMetrics';
 import {
   getFilteredClaimRecords,
   getClaimsByStatusFiltered,
@@ -34,6 +35,8 @@ export function ClaimsDashboard() {
   const { filters } = useFilters();
   const claimsAsync = useClaimsData(filters);
   const resolved = useResolvedUiState(claimsAsync);
+  const auditedImpact = useMemo(() => auditedClaimsImpact(impact.data, resolved.data?.bicycleComparison),
+    [impact.data, resolved.data?.bicycleComparison]);
 
   // Independent local filters per chart
   const [selectedCategoryStatusDist, setSelectedCategoryStatusDist] = useState<string>('ALL');
@@ -105,7 +108,7 @@ export function ClaimsDashboard() {
                   status: 'normal',
                 }}
               />
-              <DashboardImpactCards area="claims" data={impact.data} claimCauses={resolved.data.claimsByCause} showMissing />
+              <DashboardImpactCards area="claims" data={auditedImpact} claimCauses={resolved.data.claimsByCause} showMissing />
             </div>
           </div>
 
@@ -167,9 +170,9 @@ export function ClaimsDashboard() {
           </div>
         </>
       ) : null}
-      {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="claims" data={impact.data} standalone showMissing />}
-      <DashboardImpactCharts area="claims" {...impact} claimCauses={resolved.data?.claimsByCause} />
-      <GoldReportCharts title="Causas de reclamos" charts={impact.data?.resumen_gold} />
+      {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="claims" data={auditedImpact} standalone showMissing />}
+      <DashboardImpactCharts area="claims" data={auditedImpact} claimCauses={resolved.data?.claimsByCause} />
+      <GoldReportCharts title="Causas de reclamos" charts={auditedImpact?.resumen_gold} />
     </div>
   );
 }

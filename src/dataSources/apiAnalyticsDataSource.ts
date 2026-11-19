@@ -20,10 +20,11 @@ import type {
   EmergencyAnalyticsData,
   MobilityAnalyticsData,
   MobilityLLMReport,
-  WasteAlertMetrics,
+  WasteDashboardData,
 } from '../types';
 import { isWithinDateRange } from '../utils/dates';
 import { activityCategory, activityOrganizer, emergencyCause, emergencyPriority } from '../utils/categories';
+import { isInterventionResponse, mapWasteInterventions } from '../services/wasteInterventionService';
 
 export type ClaimsDataSourceData = ClaimsAnalyticsData & {
   records: BackendAnalyticsRecord[];
@@ -69,6 +70,8 @@ function mapClaimRecord(row: ClaimApiRecord): BackendAnalyticsRecord {
     origenClasificacion: textOrEmpty(row.origenClasificacion),
     estado_actual: textOrEmpty(row.estado_actual),
     causaTipo: row.causaTipo,
+    vinculadoEmergenciaBici: row.vinculadoEmergenciaBici,
+    afectaOtrosModulos: row.afectaOtrosModulos,
     row_count: numberOrZero(row.row_count),
     tiempo_prom_hasta_estado_actual: row.tiempo_prom_hasta_estado_actual,
     fecha_snapshot: textOrEmpty(row.fecha_snapshot),
@@ -100,7 +103,7 @@ export function mapEmergencyApiData(
 
   filtered.forEach((row) => {
     const count = numberOrZero(row.cantidadEmergencias);
-    const state = textOrEmpty(row.estado_actual) || 'SIN ESTADO';
+    const state = textOrEmpty(row.estado_actual).trim() || 'SIN ESTADO';
     const priority = emergencyPriority(row.prioridad);
     stateCounts.set(state, (stateCounts.get(state) ?? 0) + count);
     priorityCounts.set(priority, (priorityCounts.get(priority) ?? 0) + count);
@@ -116,23 +119,38 @@ export function mapEmergencyApiData(
   ]);
   let closedCount = 0;
   let activeCount = 0;
+  let unknownStateCount = 0;
   stateCounts.forEach((count, state) => {
-    if (closedStates.has(state.toLowerCase())) closedCount += count;
+    if (state.trim().replaceAll('_', ' ').toUpperCase() === 'SIN ESTADO') unknownStateCount += count;
+    else if (closedStates.has(state.toLowerCase())) closedCount += count;
     else activeCount += count;
   });
+  const caseMetrics: NonNullable<EmergencyAnalyticsData['caseMetrics']> = [];
+  if (filtered.every((row) => row.causaTipo !== undefined)) {
+    const incidents = filtered.filter((row) => row.causaTipo?.trim().toUpperCase() === 'INCIDENTE_VIAL');
+    const count = incidents.reduce((total, row) => total + numberOrZero(row.cantidadEmergencias), 0);
+    caseMetrics.push({ id: 'c4', valor: count });
+    // No linked emergencies implies no incident-linked dispatches. With incidents present,
+    // current state alone cannot establish how many distinct resources were sent.
+    if (count === 0) caseMetrics.push({ id: 'c4b', valor: 0 });
+    if (filtered.every((row) => row.categoria !== undefined)) caseMetrics.push({ id: 'c3', valor: filtered
+      .filter((row) => row.categoria?.trim().toUpperCase() === 'PREVENTIVA' && row.causaTipo?.trim().toUpperCase() === 'EVENTO_PUBLICO')
+      .reduce((total, row) => total + numberOrZero(row.cantidadEmergencias), 0) });
+  }
 
   const categories = new Map<string, EmergencyAnalyticsData['emergenciesByCategoryStacked'][number]>();
   for (const row of filtered) {
-    const category = textOrEmpty(row.categoria ?? null);
+    const category = textOrEmpty(row.categoria ?? null).trim() || 'Sin categoría informada';
     const priority = emergencyPriority(row.prioridad);
-    if (!category || (priority !== 'BAJA' && priority !== 'MEDIA' && priority !== 'ALTA' && priority !== 'CRITICA')) continue;
     const counts = categories.get(category) ?? { category, BAJA: 0, MEDIA: 0, ALTA: 0, CRITICA: 0, total: 0 };
     const count = numberOrZero(row.cantidadEmergencias);
-    counts[priority] += count;
+    if (priority === 'BAJA' || priority === 'MEDIA' || priority === 'ALTA' || priority === 'CRITICA') counts[priority] += count;
+    else counts.SIN_PRIORIDAD = (counts.SIN_PRIORIDAD ?? 0) + count;
     counts.total += count;
     categories.set(category, counts);
   }
-  const dispatchRows = filtered.filter(({ tiempoPromRespuestaDespacho }) => tiempoPromRespuestaDespacho != null).map((row) => ({
+  const dispatchRows = filtered.filter(({ tiempoPromRespuestaDespacho, cantidadEmergencias }) =>
+    tiempoPromRespuestaDespacho != null && Number.isFinite(tiempoPromRespuestaDespacho) && tiempoPromRespuestaDespacho >= 0 && (cantidadEmergencias ?? 0) > 0).map((row) => ({
     priority: emergencyPriority(row.prioridad),
     value: numberOrZero(row.tiempoPromRespuestaDespacho),
     weight: numberOrZero(row.cantidadEmergencias),
@@ -144,7 +162,7 @@ export function mapEmergencyApiData(
     dispatchByPriority.set(priority, values);
   });
   const arrivalRows = filtered.flatMap(({ tiempoPromRespuestaLugar, cantidadEmergencias }) =>
-    tiempoPromRespuestaLugar != null && cantidadEmergencias != null && cantidadEmergencias > 0
+    tiempoPromRespuestaLugar != null && Number.isFinite(tiempoPromRespuestaLugar) && tiempoPromRespuestaLugar >= 0 && cantidadEmergencias != null && cantidadEmergencias > 0
       ? [{ value: tiempoPromRespuestaLugar, weight: cantidadEmergencias }]
       : [],
   );
@@ -156,23 +174,29 @@ export function mapEmergencyApiData(
     causes.set(label, (causes.get(label) ?? 0) + numberOrZero(row.cantidadEmergencias));
     if (row.tiempoPromResolucion != null && Number.isFinite(row.tiempoPromResolucion) &&
         row.tiempoPromResolucion >= 0 && (row.cantidadEmergencias ?? 0) > 0) {
-      const category = row.categoria?.trim() || 'Sin tipo informado';
-      const values = resolutions.get(category) ?? [];
+      const values = resolutions.get(label) ?? [];
       values.push({ value: row.tiempoPromResolucion, weight: row.cantidadEmergencias! });
-      resolutions.set(category, values);
+      resolutions.set(label, values);
     }
   }
 
   return {
-    totalEmergencies: activeCount + closedCount,
+    affectedCriticalityCount: filtered.every((row) => typeof row.criticidadAfectada === 'number' && Number.isFinite(row.criticidadAfectada) && row.criticidadAfectada >= 0)
+      ? filtered.reduce((sum, row) => sum + row.criticidadAfectada!, 0) : undefined,
+    circulationAffectedCount: filtered.some((row) => typeof row.afectaCirculacion === 'boolean') || filtered.length === 0
+      ? filtered.filter((row) => row.afectaCirculacion === true).reduce((sum, row) => sum + numberOrZero(row.cantidadEmergencias), 0) : undefined,
+    circulationUnknownCount: filtered.filter((row) => typeof row.afectaCirculacion !== 'boolean').reduce((sum, row) => sum + numberOrZero(row.cantidadEmergencias), 0),
+    totalEmergencies: activeCount + closedCount + unknownStateCount,
     activeCount,
+    unknownStateCount,
+    caseMetrics,
     closedCount,
     emergenciesByState: Array.from(stateCounts, ([state, count]) => ({ state, count })),
     emergenciesByPriority: Array.from(priorityCounts, ([priority, count]) => ({
       priority,
       count,
     })),
-    avgDispatchTimeMinutes: weightedAverage(dispatchRows),
+    avgDispatchTimeMinutes: dispatchRows.length ? weightedAverage(dispatchRows) : undefined,
     avgArrivalTimeMinutes: arrivalRows.length > 0 ? weightedAverage(arrivalRows) : undefined,
     avgDispatchTimeByPriority: Array.from(
       dispatchByPriority,
@@ -181,7 +205,7 @@ export function mapEmergencyApiData(
     emergenciesByCategoryStacked: [...categories.values()],
     availableCategories: [...categories.keys()],
     emergenciesByCause: [...causes].map(([etiqueta, valor]) => ({ etiqueta, valor })),
-    resolutionByCategory: [...resolutions].map(([etiqueta, values]) => ({ etiqueta, valor: weightedAverage(values) })),
+    resolutionByCause: [...resolutions].map(([etiqueta, values]) => ({ etiqueta, valor: weightedAverage(values) })),
   };
 }
 
@@ -309,6 +333,7 @@ export async function getApiCultureAnalyticsData(
     let affectedByClimate: number | null = null;
     const organizers = new Map<string, number>();
     const zones = new Map<string, number>();
+    const causes = new Map<string, number>();
     for (const row of rows) {
       const count = numberOrZero(row.cantidadActividades);
       const category = activityCategory(row.categoria);
@@ -318,12 +343,37 @@ export async function getApiCultureAnalyticsData(
       const zone = row.zona?.trim() || row.barrio?.trim() || 'Sin zona informada';
       zones.set(zone, (zones.get(zone) ?? 0) + count);
       total += count;
+      const cause = row.causaTipo?.trim().toUpperCase();
+      if (cause) causes.set(cause, (causes.get(cause) ?? 0) + count);
       massive += numberOrZero(row.cantidadMasivas);
       if (row.cantidadAfectadasPorClima != null) affectedByClimate = (affectedByClimate ?? 0) + row.cantidadAfectadasPorClima;
     }
+    const citizens = organizers.get('CIUDADANO') ?? 0;
+    const city = organizers.get('CIUDAD') ?? 0;
+    const caseMetrics: NonNullable<NonNullable<CultureAnalyticsData['activities']>['caseMetrics']> = [
+      { id: 'c3', valor: massive },
+      { id: 'c6', valor: citizens, detalle: [{ etiqueta: 'Total de actividades', valor: total },
+        { etiqueta: 'Organizadas por la ciudad', valor: city },
+        { etiqueta: 'Sin organizador informado', valor: total - [...organizers.values()].reduce((sum, value) => sum + value, 0) }] },
+    ];
+    if (rows.every((row) => row.causaTipo !== undefined)) {
+      for (const [id, cause] of [['c2', 'RECLAMO'], ['c4', 'INCIDENTE_VIAL'], ['c5', 'ACCIDENTE_VIAL']]) {
+        caseMetrics.push({ id, valor: causes.get(cause) ?? 0 });
+      }
+      if (rows.every((row) => row.estado_actual !== undefined)) caseMetrics.push({ id: 'c1', valor: rows
+        .filter((row) => row.categoria?.trim().toUpperCase() === 'CULTURAL' && row.causaTipo?.trim().toUpperCase() === 'EVENTO_CLIMATICO'
+          && ['CANCELADA', 'SUSPENDIDA'].includes(row.estado_actual?.trim().toUpperCase() ?? ''))
+        .reduce((sum, row) => sum + numberOrZero(row.cantidadActividades), 0) });
+    }
+    const causeLabels: Record<string, string> = { EVENTO_CLIMATICO: 'Clima', RECLAMO: 'Reclamo', INCIDENTE_VIAL: 'Incidente vial', ACCIDENTE_VIAL: 'Accidente vial' };
+    const cumulativeCauseChanges = ([['totalVecesEventoClimatico', 'Clima'], ['totalVecesReclamo', 'Reclamo'],
+      ['totalVecesIncidenteVial', 'Incidente vial'], ['totalVecesAccidenteVial', 'Accidente vial']] as const).flatMap(([field, etiqueta]) =>
+      rows.every((row) => typeof row[field] === 'number' && Number.isFinite(row[field]) && row[field]! >= 0)
+        ? [{ etiqueta, valor: rows.reduce((sum, row) => sum + row[field]!, 0) }] : []);
     return {
       ...mapCultureApiData([], filters),
-      activities: { total, massive, affectedByClimate,
+      activities: { total, massive, affectedByClimate, caseMetrics, cumulativeCauseChanges,
+        byCause: rows.every((row) => row.causaTipo !== undefined) ? [...causes].map(([cause, valor]) => ({ etiqueta: causeLabels[cause] ?? cause, valor })) : undefined,
         byOrganizer: [...organizers].map(([organizer, count]) => ({ organizer, count })),
         byZone: [...zones].map(([zone, count]) => ({ zone, count })),
         byCategory: [...categories].map(([category, count]) => ({ category, count })) },
@@ -336,7 +386,8 @@ export async function getApiCultureAnalyticsData(
 export function mapWasteApiData(
   rows: WasteApiRecord[],
   filters: DashboardFilters
-): WasteAlertMetrics {
+): WasteDashboardData {
+  if (isInterventionResponse(rows)) return mapWasteInterventions(rows, filters);
   const rowsForPeriod = rowsInRange(rows, filters);
   let filtered = [...rowsForPeriod];
 
@@ -452,7 +503,7 @@ export function mapWasteApiData(
 
 export async function getApiWasteAnalyticsData(
   filters: DashboardFilters
-): Promise<WasteAlertMetrics> {
+): Promise<WasteDashboardData> {
   const respuesta = await getAnalyticsApi().getWaste();
   const analytics = mapWasteApiData(respuesta.datos, filters);
 

@@ -25,17 +25,17 @@ const mobilityReport = (): CrossModuleResponse => report({
       { etiqueta: 'Incidente vial', valor: 12 }, { etiqueta: 'Reserva', valor: 12 }] }],
 });
 
-it('shows the missing mobility cards from published causes and splits the two case-five populations', () => {
+it('does not use affectation chart totals as distinct stations or preventive counts', () => {
   const data = mobilityReport();
   const original = structuredClone(data);
   render(<DashboardImpactCards area="mobility" data={data} showMissing />);
-  expect(card('Estaciones afectadas por reclamos')).toHaveTextContent('30');
-  expect(card('Estaciones con afectación prevista por eventos públicos')).toHaveTextContent('20');
-  expect(card('Estaciones afectadas por incidentes viales')).toHaveTextContent('12');
-  expect(card('Estaciones afectadas por eventos ciudadanos')).toHaveTextContent('12');
-  expect(card('Viajes interrumpidos por accidente en bicicleta')).toHaveTextContent('2');
+  expect(card('Estaciones afectadas por reclamos')).toHaveTextContent('Sin datos');
+  expect(card('Afectaciones preventivas por eventos públicos')).toHaveTextContent('Sin datos');
+  expect(card('Estaciones afectadas por incidentes viales')).toHaveTextContent('Sin datos');
+  expect(card('Estaciones afectadas por reservas')).toHaveTextContent('Sin datos');
+  expect(card('Viajes interrumpidos por emergencias')).toHaveTextContent('2');
   expect(card('Viajes finalizados normalmente')).toHaveTextContent('36');
-  expect(card('Viajes interrumpidos por accidente en bicicleta')).not.toHaveTextContent('36');
+  expect(card('Viajes interrumpidos por emergencias')).not.toHaveTextContent('36');
   expect(data).toEqual(original);
 });
 
@@ -45,7 +45,7 @@ it('preserves explicit zeroes and does not turn a missing metric into zero', () 
   data.resumen_gold![0].puntos = data.resumen_gold![0].puntos.filter(({ etiqueta }) => etiqueta !== 'Reserva');
   render(<DashboardImpactCards area="mobility" data={data} showMissing />);
   expect(card('Estaciones afectadas por reclamos')).toHaveTextContent('0');
-  expect(card('Estaciones afectadas por eventos ciudadanos')).toHaveTextContent('Sin datos');
+  expect(card('Estaciones afectadas por reservas')).toHaveTextContent('Sin datos');
 });
 
 it('accepts cause codes and the normal-operations total without inferring bicycle accidents from other incidents', () => {
@@ -55,9 +55,9 @@ it('accepts cause codes and the normal-operations total without inferring bicycl
       { etiqueta: 'Operación normal', valor: 15 }, { etiqueta: 'Incidente vial', valor: 8 },
     ] },
   ] });
-  expect(mobilityMetricFallbacks(data)).toEqual([{ id: 'c3', valor: 9 }, { id: 'c5b', valor: 15 }]);
+  expect(mobilityMetricFallbacks(data)).toEqual([{ id: 'c5b', valor: 15 }]);
   render(<DashboardImpactCards area="mobility" data={data} showMissing />);
-  expect(card('Viajes interrumpidos por accidente en bicicleta')).toHaveTextContent('Sin datos');
+  expect(card('Viajes interrumpidos por emergencias')).toHaveTextContent('Sin datos');
 });
 
 it('counts claim causes using row_count, preserves case two, and shares the values with the chart', async () => {
@@ -116,5 +116,5 @@ it('shows every emergency cause without interpreting cause counts as increased c
   }
   expect(emergencyData.emergenciesByCause?.reduce((total, point) => total + point.valor, 0)).toBe(16);
   expect(card('Emergencias con criticidad afectada por clima')).toHaveTextContent('0');
-  expect(card('Servicios públicos enviados de forma preventiva a eventos masivos')).toHaveTextContent('Sin datos');
+  expect(card('Emergencias preventivas por eventos públicos')).toHaveTextContent('Sin datos');
 });

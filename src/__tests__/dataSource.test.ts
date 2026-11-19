@@ -91,7 +91,7 @@ describe('data source selection', () => {
 });
 
 describe('API analytics adapters', () => {
-  it('maps aggregated emergency records without inventing categories', () => {
+  it('preserves emergencies with no category in an explicit unclassified group', () => {
     const result = mapEmergencyApiData(
       [
         {
@@ -110,7 +110,7 @@ describe('API analytics adapters', () => {
       totalEmergencies: 4,
       closedCount: 4,
       avgDispatchTimeMinutes: 5,
-      availableCategories: [],
+      availableCategories: ['Sin categoría informada'],
     });
   });
 
@@ -191,6 +191,7 @@ describe('API analytics adapters', () => {
       resolutionRatePct: 75,
       avgResolutionTime: 35.5,
     });
+    if (result.mode !== 'alerts') throw new Error('Expected the alert contract');
     expect(result.alertsByFillRange).toEqual([{ range: '80-100%', count: 20 }]);
     expect(result.details).toHaveLength(1);
   });

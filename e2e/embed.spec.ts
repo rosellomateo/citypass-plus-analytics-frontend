@@ -18,10 +18,9 @@ const cases = [
     cantidadBloqueadas: 14, estacionesBloqueadasDistintas: 12, cantidadPreventivas: 0,
     cantidadRestauradas: 10, cantidadViajesInterrumpidos: 1,
   } },
-  { module: 'espacios', title: 'Espacios Públicos y Cultura', metric: 'Reservas Confirmadas', row: {
-    recursoId: 'REC-1', tipoReserva: 'Presencial', categoria: 'Cultural', zona: 'Centro',
-    cupoMaximo: 100, cantidadTotal: 20, cantidadConfirmadas: 17, cantidadCanceladas: 3,
-    inscriptos: 17, pctOcupacion: 17,
+  { module: 'espacios', title: 'Espacios Públicos y Cultura', metric: 'Actividades', row: {
+    estado_actual: 'PROGRAMADA', categoria: 'CULTURAL', barrio: 'Centro', causaTipo: null,
+    organizadorTipo: 'CIUDADANO', cantidadActividades: 17, cantidadMasivas: 0, cantidadAfectadasPorClima: 0,
   } },
   { module: 'residuos', title: 'Tablero de Residuos', metric: 'Total de Alertas', row: {
     zona: 'Centro', tipoAlerta: 'Contenedor lleno', prioridad: 'Alta', rangoNivelLlenado: '80-100%',
@@ -38,7 +37,11 @@ const cases = [
     fecha_snapshot: date.slice(0, 10), datos: [{ id: 'c5', valor: 1, detalle: [] }],
     resumen_gold: [{ id: 'waste-cause', titulo: 'Intervenciones por causa publicada', fecha_snapshot: date.slice(0, 10),
       puntos: [{ etiqueta: 'Operación normal', valor: 41 }, { etiqueta: 'Emergencia', valor: 1 }] }],
-  }, expectText: 'Intervenciones por accidentes en bicicleta frente a alertas normales' },
+  }, expectText: 'Intervenciones originadas en emergencias' },
+  { module: 'residuos', title: 'Tablero de Residuos', metric: 'Total de intervenciones', row: {
+    zona: 'Caballito', tipoAlerta: 'EVENTO_PUBLICO', prioridad: 'AFECTADA', rangoNivelLlenado: 'INCIDENTE_VIAL',
+    cantidadAlertas: 17, cantidadResueltas: 0, tiempoPromResolucion: null,
+  }, interventionContract: true },
   { module: 'identidad', title: 'Tablero de Login Federado', metric: 'Inicios de sesión exitosos', withoutReport: true, row: {
     department: 'Movilidad', event_type: 'com.citypass.auth.LoginExitoso', cantidadEventos: 17,
   } },
@@ -48,7 +51,7 @@ for (const scenario of cases) {
   const { module, title, metric, row } = scenario;
   const withoutReport = 'withoutReport' in scenario && scenario.withoutReport;
   const parte2 = 'parte2' in scenario ? scenario.parte2 : undefined;
-  test(`${module}${withoutReport ? ' without AI report' : ''}${parte2 ? ' with Parte 2' : ''}: renders injected data inside an opaque sandbox without network access`, async ({ page }) => {
+  test(`${module}${'interventionContract' in scenario ? ' interventions' : ''}${withoutReport ? ' without AI report' : ''}${parte2 ? ' with Parte 2' : ''}: renders injected data inside an opaque sandbox without network access`, async ({ page }) => {
     const errors: string[] = [];
     const unexpectedRequests: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
@@ -101,6 +104,12 @@ for (const scenario of cases) {
     await expect(metricCard).toContainText('17');
     await expect(frame.getByRole('alert')).toHaveCount(0);
     await expect(frame.getByRole('button', { name: 'Iniciar sesión' })).toHaveCount(0);
+    if ('interventionContract' in scenario) {
+      await expect(frame.getByRole('article', { name: 'KPI: Intervenciones afectadas por incidentes viales', exact: true })).toContainText('17');
+      await expect(frame.getByRole('columnheader', { name: 'Causa de afectación', exact: true })).toBeVisible();
+      await expect(frame.getByText('Alertas por Nivel de Llenado', { exact: true })).toHaveCount(0);
+      await expect(frame.getByText('Tiempo Prom. de Resolución', { exact: true })).toHaveCount(0);
+    }
     if ('expectText' in scenario) {
       await expect(frame.getByText(scenario.expectText, { exact: true })).toBeVisible();
       await expect(frame.getByText('Intervenciones por causa publicada', { exact: true })).toBeVisible();

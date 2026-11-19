@@ -22,6 +22,8 @@ export type ClaimStatus =
   | string;
 
 export interface BackendAnalyticsRecord {
+  vinculadoEmergenciaBici?: boolean | null;
+  afectaOtrosModulos?: boolean | null;
   barrio: string;
   categoria: string;
   prioridad: string;
@@ -53,6 +55,7 @@ export type ClaimCreatedEvent = EventEnvelope<ClaimCreatedData>;
 export type ClaimUpdatedEvent = EventEnvelope<ClaimUpdatedData>;
 
 export interface ClaimsAnalyticsData {
+  bicycleComparison?: { linked: number; otherRoad: number };
   claimsByCause?: { cause: string; count: number }[];
   totalClaims: number;
   claimsByCategory: { category: string; count: number }[];

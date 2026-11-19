@@ -92,4 +92,38 @@ export interface WasteAlertMetrics {
 }
 
 export type WasteMockMetrics = WasteMetrics & { mode: 'mock' };
-export type WasteDashboardData = WasteAlertMetrics | WasteMockMetrics;
+export interface WasteInterventionDetail {
+  id: string;
+  zone: string;
+  state: string;
+  schedulingCause: string;
+  affectionCause: string;
+  interventions: number;
+  completed: number;
+}
+
+/** Intervention data translated by /analytics/residuos into its legacy DTO. */
+export interface WasteInterventionMetrics {
+  mode: 'interventions';
+  aiReport?: AIAnalysisReport;
+  snapshotDate: string;
+  total: number;
+  affected: number;
+  scheduled: number;
+  cancelled: number;
+  completed: number;
+  completionRatePct: number;
+  byState: { state: string; count: number }[];
+  bySchedulingCause: { etiqueta: string; valor: number }[];
+  byAffectionCause: { etiqueta: string; valor: number }[];
+  byZone: { zone: string; total: number; affected: number; cancelled: number }[];
+  caseMetrics: import('../api/types').CrossModuleMetric[];
+  details: WasteInterventionDetail[];
+  availableZones: string[];
+  availableSchedulingCauses: string[];
+  availableAffectionCauses: string[];
+  availableStates: string[];
+  filtered: boolean;
+}
+
+export type WasteDashboardData = WasteAlertMetrics | WasteInterventionMetrics;

@@ -5,6 +5,7 @@ import type { CrossModuleResponse } from '../api/types';
 import { DashboardImpactCards } from '../components/common/DashboardImpactCards';
 import { DashboardImpactCharts } from '../components/common/DashboardImpactCharts';
 import { WasteAffected } from '../components/waste/WasteAffected';
+import { auditedClaimsImpact } from '../utils/impactMetrics';
 
 vi.mock('../components/charts/PieChart', () => ({
   PieChart: ({ data }: { data: { name: string; value: number }[] }) => (
@@ -35,16 +36,18 @@ it('Emergencias muestra las emergencias en bici y su tiempo de resolución', () 
   render(<><DashboardImpactCards area="emergencies" data={data} /><DashboardImpactCharts area="emergencies" data={data} /></>);
   expect(screen.getByText('Emergencias durante viajes en bicicleta')).toBeInTheDocument();
   expect(screen.getByText('Tiempo promedio de resolución de emergencias durante viajes en bicicleta')).toBeInTheDocument();
-  expect(screen.getByText('Viajes en bicicleta 866')).toBeInTheDocument();
+  expect(screen.getByRole('article', { name: 'KPI: Tiempo promedio de resolución de emergencias durante viajes en bicicleta' })).toHaveTextContent('866');
+  expect(screen.getByText('Sin tiempos de resolución publicados.')).toBeInTheDocument();
   expect(screen.queryByText(/Sólo se informa el promedio de viajes en bicicleta/)).not.toBeInTheDocument();
   expect(screen.getByText('Tiempo de resolución promedio por emergencia')).toBeInTheDocument();
 });
 
-it('Reclamos compara los originados por emergencias contra otras causas', () => {
-  const data = report([{ id: 'c5', valor: 1, detalle: [{ etiqueta: 'Otras causas', valor: 41 }] }] as CrossModuleResponse['datos']);
+it('Reclamos compara los vínculos de bicicleta verificados con los demás reclamos viales', () => {
+  const data = auditedClaimsImpact(report([{ id: 'c5', valor: 1, detalle: [{ etiqueta: 'Otras causas', valor: 41 }] }]), { linked: 2, otherRoad: 18 });
   render(<><DashboardImpactCards area="claims" data={data} /><DashboardImpactCharts area="claims" data={data} /></>);
-  expect(screen.getByText('Reclamos por accidentes viales')).toBeInTheDocument();
-  expect(screen.getByText('Otros reclamos viales 41')).toBeInTheDocument();
+  expect(screen.getByText('Reclamos vinculados a emergencias en bicicleta')).toBeInTheDocument();
+  expect(screen.getByText('Otros reclamos viales 18')).toBeInTheDocument();
+  expect(screen.queryByText('Otros reclamos viales 41')).not.toBeInTheDocument();
 });
 
 it('Movilidad y Espacios muestran su tarjeta del caso 5', () => {
@@ -53,7 +56,7 @@ it('Movilidad y Espacios muestran su tarjeta del caso 5', () => {
       { etiqueta: 'Viajes finalizados normalmente', valor: 36 }] }] as CrossModuleResponse['datos'])} />
     <DashboardImpactCards area="culture" data={report([{ id: 'c5', valor: 12, detalle: [] }] as CrossModuleResponse['datos'], { version_cultura: 2 })} />
   </>);
-  expect(screen.getByRole('article', { name: 'KPI: Viajes interrumpidos por accidente en bicicleta' })).toHaveTextContent('2');
+  expect(screen.getByRole('article', { name: 'KPI: Viajes interrumpidos por emergencias' })).toHaveTextContent('2');
   expect(screen.getByRole('article', { name: 'KPI: Viajes finalizados normalmente' })).toHaveTextContent('36');
   expect(screen.getByText('Actividades modificadas por accidentes viales')).toBeInTheDocument();
 });
@@ -66,7 +69,7 @@ it('Residuos muestra su tarjeta y el gráfico por causa con las emergencias', ()
   vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
   vi.stubGlobal('ResizeObserver', class { observe() {} unobserve() {} disconnect() {} });
   render(<MantineProvider env="test"><DashboardImpactCards area="waste" data={data} /><WasteAffected report={data} zones={[]} /></MantineProvider>);
-  expect(screen.getByText('Intervenciones por accidentes en bicicleta frente a alertas normales')).toBeInTheDocument();
+  expect(screen.getByText('Intervenciones originadas en emergencias')).toBeInTheDocument();
   expect(screen.getByText('Emergencia 1')).toBeInTheDocument();
   expect(screen.queryByText('No se tienen datos suficientes como para formar el gráfico.')).not.toBeInTheDocument();
 });

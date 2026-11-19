@@ -158,6 +158,8 @@ export interface EmergencyZoneLink {
 }
 
 export interface ClaimApiRecord {
+  vinculadoEmergenciaBici?: boolean | null;
+  afectaOtrosModulos?: boolean | null;
   barrio: string | null;
   categoria: string | null;
   prioridad: string | null;
@@ -195,6 +197,8 @@ export interface EmergencyApiResponse {
 }
 
 export interface EmergencyApiRecord {
+  afectaCirculacion?: boolean | null;
+  criticidadAfectada?: number | null;
   estado_actual: string | null;
   prioridad: string | null;
   categoria?: string | null;
@@ -234,6 +238,12 @@ export interface CultureApiRecord {
 }
 
 export interface CultureActivityApiRecord {
+  totalVecesEventoClimatico?: number | null;
+  totalVecesReclamo?: number | null;
+  totalVecesIncidenteVial?: number | null;
+  totalVecesAccidenteVial?: number | null;
+  estado_actual?: string | null;
+  causaTipo?: string | null;
   categoria: string | null;
   organizadorTipo?: string | null;
   barrio?: string | null;
@@ -244,6 +254,9 @@ export interface CultureActivityApiRecord {
   fecha_snapshot: string | null;
 }
 
+/** /analytics/residuos currently translates intervention data into this legacy
+ * DTO: prioridad=state, tipoAlerta=scheduling cause, rangoNivelLlenado=affection
+ * cause, cantidadAlertas=interventions, cantidadResueltas=completed. */
 export interface WasteApiRecord {
   zona: string | null;
   tipoAlerta: string | null;

@@ -30,16 +30,15 @@ export function DashboardImpactCharts({ area, data, emergencyData, claimCauses }
     });
   }
   if (area === 'emergencies') {
-    const resources = ['c3', 'c4b'].flatMap((id) => {
+    const resources = ['c4b'].flatMap((id) => {
       const metric = metrics.get(id);
-      return metric ? [{ etiqueta: id === 'c3' ? 'Eventos masivos' : 'Incidentes viales', valor: metric.valor }] : [];
+      return metric ? [{ etiqueta: 'Incidentes viales', valor: metric.valor }] : [];
     });
     if (resources.length) charts.push({ title: 'Recursos enviados por tipo de evento', unit: 'Recursos o servicios enviados', points: resources });
-    // c5b is a bicycle-only mean. Keep its scope visible while other means are unavailable.
-    const bicycleResolution = metrics.get('c5b');
-    const resolutionPoints = emergencyData?.resolutionByCategory?.length ? emergencyData.resolutionByCategory
-      : bicycleResolution ? [{ etiqueta: 'Viajes en bicicleta', valor: bicycleResolution.valor }] : [];
-    charts.push({ title: 'Tiempo de resolución promedio por emergencia', unit: 'Minutos por tipo con promedio publicado', points: resolutionPoints });
+    // Gold repeats the same resolution mean within each cause; it is not a category-specific mean.
+    // The bicycle-only c5b remains in its own card and cannot fill the other causes.
+    const resolutionPoints = emergencyData?.resolutionByCause ?? [];
+    charts.push({ title: 'Tiempo de resolución promedio por emergencia', unit: 'Minutos por causa con promedio publicado', points: resolutionPoints });
   }
   const visible = charts.filter(({ points, title }) => points.length || title === 'Tiempo de resolución promedio por emergencia');
   if (!visible.length) return null;
