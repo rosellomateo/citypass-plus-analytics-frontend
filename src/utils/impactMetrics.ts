@@ -5,14 +5,10 @@ function labelKey(value: string) {
   return value.trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[_\s]+/g, ' ');
 }
 
-/** These published points are counts per cause, not a list of stations to deduplicate again. */
+/** Only the normal-trips detail has a known matching unit. The legacy
+ * mobility-stations chart counts affectations, not distinct stations. */
 export function mobilityMetricFallbacks(report: CrossModuleResponse | null): CrossModuleMetric[] {
-  const points = report?.resumen_gold?.find(({ id }) => id === 'mobility-stations')?.puntos;
   const metrics: CrossModuleMetric[] = [];
-  for (const [id, label] of [['c2', 'RECLAMO'], ['c3', 'EVENTO PUBLICO'], ['c4', 'INCIDENTE VIAL'], ['c6', 'RESERVA']]) {
-    const point = points?.find(({ etiqueta }) => labelKey(etiqueta) === label);
-    if (point) metrics.push({ id, valor: point.valor });
-  }
   const completed = report?.datos.find(({ id }) => id === 'c5')?.detalle
     ?.find(({ etiqueta }) => labelKey(etiqueta) === 'VIAJES FINALIZADOS NORMALMENTE');
   const normal = report?.resumen_gold?.find(({ id }) => id === 'mobility-interruptions')?.puntos
@@ -27,4 +23,15 @@ export function claimCauseMetrics(causes: ClaimsAnalyticsData['claimsByCause']):
   return [['c4', 'INCIDENTE_VIAL'], ['c6', 'RESERVA']].map(([id, cause]) => ({
     id, valor: causes.find((row) => row.cause === cause)?.count ?? 0,
   }));
+}
+
+/** The old c5 used EMERGENCIA as a proxy and compared it with all claims.
+ * Only an explicit bicycle link can establish the audited population. */
+export function auditedClaimsImpact(report: CrossModuleResponse | null, comparison: ClaimsAnalyticsData['bicycleComparison']): CrossModuleResponse | null {
+  if (!report && !comparison) return null;
+  const datos = (report?.datos ?? []).filter(({ id }) => id !== 'c5');
+  if (comparison) datos.push({ id: 'c5', valor: comparison.linked,
+    detalle: [{ etiqueta: 'Otros reclamos viales', valor: comparison.otherRoad }] });
+  return { ...report, fecha_snapshot: report?.fecha_snapshot ?? null, datos,
+    resumen_gold: report?.resumen_gold?.map((chart) => ({ ...chart, puntos: chart.puntos.filter(({ etiqueta }) => labelKey(etiqueta) !== 'TEXTO') })) };
 }

@@ -46,12 +46,12 @@ it('separates bicycle and road incidents and weights resolution means using only
     { ...row, causaTipo: 'INCIDENTE_VIAL', cantidadEmergencias: 6, tiempoPromResolucion: 30 },
     { ...row, causaTipo: 'RECLAMO', cantidadEmergencias: 100, tiempoPromResolucion: null },
   ], filters);
-  expect(result.resolutionByCategory).toEqual([{ etiqueta: 'MEDICA', valor: 25 }]);
+  expect(result.resolutionByCause).toEqual([{ etiqueta: 'Viajes en bicicleta', valor: 10 }, { etiqueta: 'Incidente vial', valor: 30 }]);
   expect(result.emergenciesByCause).toEqual(expect.arrayContaining([
     { etiqueta: 'Viajes en bicicleta', valor: 2 }, { etiqueta: 'Incidente vial', valor: 6 },
     { etiqueta: 'Reclamos', valor: 100 },
   ]));
-  expect(mapEmergencyApiData([{ ...row, tiempoPromResolucion: undefined }], filters).resolutionByCategory).toEqual([]);
+  expect(mapEmergencyApiData([{ ...row, tiempoPromResolucion: undefined }], filters).resolutionByCause).toEqual([]);
 });
 
 it('deduplicates affected stops, ignores cancelled stops and never turns trucks into routes', () => {

@@ -94,6 +94,7 @@ export interface MobilityTripsItem {
 }
 
 export interface MobilityAnalyticsData {
+  caseMetrics: import('../api/types').CrossModuleMetric[];
   totalAffectations: number;
   totalBlocked: number;
   totalPreventive: number;

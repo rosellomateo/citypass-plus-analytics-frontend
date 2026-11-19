@@ -54,13 +54,7 @@ export function MobilityDashboard() {
   }, [data]);
 
   const snapshotLabel = data?.snapshotDate ? `Corte ${data.snapshotDate.slice(0, 10)}` : 'Último corte publicado';
-  const gold = impact.data?.resumen_gold;
-  const stationsByCause = gold?.find(({ id }) => id === 'mobility-stations');
-  const causes = new Map<string, number>();
-  for (const { etiqueta, valor } of stationsByCause?.puntos ?? []) {
-    // Reserva (caso 6) y Evento público (caso 3) son casos distintos: no se suman.
-    causes.set(etiqueta, (causes.get(etiqueta) ?? 0) + valor);
-  }
+  const caseReport = data ? { fecha_snapshot: data.snapshotDate, datos: data.caseMetrics } : impact.data;
 
   return (
     <div>
@@ -104,13 +98,13 @@ export function MobilityDashboard() {
                 metric={{
                   label: 'Afectaciones preventivas',
                   value: resolved.data.totalPreventive,
-                  sublabel: 'Anunciadas antes de empezar (eventos masivos)',
+                  sublabel: 'Afectaciones registradas como preventivas',
                   status: 'normal',
                 }}
               />
               <MetricCard
                 metric={{
-                  label: 'Estaciones restauradas',
+                  label: 'Restauraciones de afectaciones',
                   value: resolved.data.totalRestored,
                   sublabel: `${resolved.data.restoredPct}% de las afectaciones`,
                   status: 'normal',
@@ -135,7 +129,7 @@ export function MobilityDashboard() {
               />
             </div>
             <div className="metrics-grid-4">
-              <DashboardImpactCards area="mobility" data={impact.data} showMissing />
+              <DashboardImpactCards area="mobility" data={caseReport} showMissing />
             </div>
           </div>
 
@@ -153,13 +147,14 @@ export function MobilityDashboard() {
                     { key: 'afectaciones', label: 'Afectaciones', color: '#2563A6' },
                     { key: 'bloqueadas', label: 'Bloqueos', color: '#EF4444' },
                     { key: 'restauradas', label: 'Restauradas', color: '#10B981' },
+                    { key: 'preventivas', label: 'Preventivas', color: '#F59E0B' },
                   ]}
-                  height={320}
+                  height={350} showLegend scrollable minWidth={Math.max(600, affectationsByCause.length * 130)}
                 />
               </ChartCard>
 
               <ChartCard
-                title="Viajes por causa de interrupción"
+                title="Viajes interrumpidos y finalizados normalmente"
                 subtitle="Interrumpidos por causa frente a finalizados normalmente"
               >
                 <PieChart data={tripsByCauseData} height={280} />
@@ -178,9 +173,8 @@ export function MobilityDashboard() {
                 bars={[
                   { key: 'estaciones', label: 'Estaciones afectadas', color: '#7C3AED' },
                   { key: 'estacionesBloqueadas', label: 'Estaciones bloqueadas', color: '#EF4444' },
-                  { key: 'preventivas', label: 'Afectaciones preventivas', color: '#F59E0B' },
                 ]}
-                height={320}
+                height={350} showLegend scrollable minWidth={Math.max(600, affectationsByCause.length * 130)}
               />
             </ChartCard>
           </div>
@@ -213,6 +207,7 @@ export function MobilityDashboard() {
                   { key: 'cantidadAfectaciones', label: 'Afectaciones', width: '120px' },
                   { key: 'estacionesAfectadasDistintas', label: 'Estaciones distintas', width: '150px' },
                   { key: 'cantidadBloqueadas', label: 'Bloqueos', width: '100px' },
+                  { key: 'estacionesBloqueadasDistintas', label: 'Estaciones distintas bloqueadas', width: '150px' },
                   { key: 'cantidadPreventivas', label: 'Preventivas', width: '110px' },
                   { key: 'cantidadRestauradas', label: 'Restauradas', width: '110px' },
                   { key: 'cantidadViajesInterrumpidos', label: 'Viajes', width: '90px',
@@ -227,18 +222,13 @@ export function MobilityDashboard() {
         </>
       ) : null}
       {!resolved.loading && (resolved.error || !resolved.data) && <DashboardImpactCards area="mobility" data={impact.data} standalone showMissing />}
-      <section className="section" id="viajes-afectados" aria-label="Viajes afectados">
+      {data && <section className="section" id="viajes-afectados" aria-label="Viajes afectados">
         <h2 className="section-title">Viajes afectados</h2>
-        <CausePie title="Estaciones afectadas por causa" date={stationsByCause?.fecha_snapshot}
-            description="Conteos por causa"
-            points={[...causes.entries()].map(([etiqueta, valor]) => ({ etiqueta, valor }))}
-            filters={{
-              scope: 'estación',
-              options: [],
-              groups: impact.data?.afectaciones?.estaciones ?? [],
-            }} />
+        <CausePie title="Estaciones afectadas por causa" date={data.snapshotDate.slice(0, 10)}
+            description="Estaciones distintas dentro de cada causa" unit=" estaciones"
+            points={affectationsByCause.map(({ etiqueta, estaciones }) => ({ etiqueta, valor: estaciones }))} />
         <PublicEventStations report={impact.data} />
-      </section>
+      </section>}
     </div>
   );
 }

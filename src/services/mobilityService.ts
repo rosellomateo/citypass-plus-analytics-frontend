@@ -9,6 +9,7 @@ import type {
   MobilityWeeklyAnalysis,
 } from '../types';
 import { delay } from '../utils';
+import type { CrossModuleMetric } from '../api/types';
 
 /** causaTipo de los viajes finalizados sin incidente (base del caso 5). */
 export const CAUSA_NORMAL = 'NORMAL';
@@ -72,7 +73,7 @@ export function getAffectationsByCause(records: BackendMobilityRecord[]): Mobili
 export function getTripsByCause(records: BackendMobilityRecord[]): MobilityTripsItem[] {
   return records
     .filter((r) => r.cantidadViajesInterrumpidos > 0)
-    .map((r) => ({ causa: r.causaTipo, etiqueta: causeLabel(r.causaTipo), viajes: r.cantidadViajesInterrumpidos }))
+    .map((r) => ({ causa: r.causaTipo, etiqueta: r.causaTipo === CAUSA_NORMAL ? 'Finalizados normalmente' : causeLabel(r.causaTipo), viajes: r.cantidadViajesInterrumpidos }))
     .sort((a, b) => b.viajes - a.viajes);
 }
 
@@ -102,7 +103,23 @@ export async function getMobilityAnalyticsData(
   const executiveReport: MobilityWeeklyAnalysis | undefined =
     llmReport && llmReport.analisis && llmReport.analisis.length > 0 ? llmReport.analisis[0] : undefined;
 
+  // Use the delivered count for each unit: preventive affectations are not
+  // distinct stations, and EMERGENCIA does not certify a bicycle accident.
+  const definitions = [
+    ['c1', 'EVENTO_CLIMATICO', 'estacionesBloqueadasDistintas'],
+    ['c2', 'RECLAMO', 'estacionesAfectadasDistintas'],
+    ['c3', 'EVENTO_PUBLICO', 'cantidadPreventivas'],
+    ['c4', 'INCIDENTE_VIAL', 'estacionesAfectadasDistintas'],
+    ['c5', 'EMERGENCIA', 'cantidadViajesInterrumpidos'],
+    ['c5b', 'NORMAL', 'cantidadViajesInterrumpidos'],
+    ['c6', 'RESERVA', 'estacionesAfectadasDistintas'],
+  ] as const;
+  const caseMetrics: CrossModuleMetric[] = definitions.flatMap(([id, cause, field]) => {
+    const matching = filtered.filter((row) => row.causaTipo === cause);
+    return matching.length ? [{ id, valor: matching.reduce((sum, row) => sum + row[field], 0) }] : [];
+  });
   return {
+    caseMetrics,
     totalAffectations,
     totalBlocked: sum('cantidadBloqueadas'),
     totalPreventive: sum('cantidadPreventivas'),

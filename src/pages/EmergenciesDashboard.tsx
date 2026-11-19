@@ -19,6 +19,7 @@ const priorityColors: Record<string, string> = {
   MEDIA: '#D99838',
   ALTA: '#C83E4D',
   CRITICA: '#800020',
+  'SIN PRIORIDAD': '#64748B',
 };
 
 const stackedPriorityBars = [
@@ -88,10 +89,17 @@ export function EmergenciesDashboard() {
                   status: 'normal',
                 }}
               />
+              {!!resolved.data.unknownStateCount && <MetricCard metric={{ label: 'Emergencias sin estado',
+                value: resolved.data.unknownStateCount, status: 'warning' }} />}
+              <MetricCard metric={{ label: 'Emergencias con criticidad afectada',
+                value: resolved.data.affectedCriticalityCount ?? 'Sin datos', status: 'warning' }} />
+              <MetricCard metric={{ label: 'Emergencias con circulación afectada',
+                value: resolved.data.circulationAffectedCount ?? 'Sin datos', status: 'info',
+                sublabel: resolved.data.circulationUnknownCount ? `${resolved.data.circulationUnknownCount} sin confirmación` : undefined }} />
               <MetricCard
                 metric={{
                   label: 'Tiempo Prom. de Despacho',
-                  value: resolved.data.avgDispatchTimeMinutes,
+                  value: resolved.data.avgDispatchTimeMinutes ?? 'Sin datos',
                   unit: ' min',
                   sublabel: 'CU-E2: EmergenciaDespachada - Creada',
                   status: 'critical',
@@ -103,7 +111,7 @@ export function EmergenciesDashboard() {
                 unit: ' min',
                 sublabel: 'Promedio ponderado por cantidad de emergencias con datos',
               }} />}
-              <DashboardImpactCards area="emergencies" data={impact.data} showMissing />
+              <DashboardImpactCards area="emergencies" data={impact.data} fallbackMetrics={resolved.data.caseMetrics} showMissing />
             </div>
           </div>
 
@@ -143,10 +151,14 @@ export function EmergenciesDashboard() {
               <BarChart
                 data={categoryStackedChartData}
                 xKey="category"
-                bars={stackedPriorityBars}
+                bars={[...stackedPriorityBars, ...(categoryStackedChartData.some((row) => row.SIN_PRIORIDAD) ? [
+                  { key: 'SIN_PRIORIDAD', label: 'Sin prioridad clasificada', color: '#64748B', stackId: 'a' },
+                ] : [])]}
                 height={320}
                 showLegend={true}
                 scrollable={true}
+                minWidth={Math.max(720, categoryStackedChartData.length * 150)}
+                xAxisTickAngle={-25}
               />
             </ChartCard>
           </div>}

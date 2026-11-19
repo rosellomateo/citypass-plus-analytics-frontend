@@ -56,6 +56,7 @@ export type EmergenciaDespachadaEvent = EventEnvelope<EmergenciaDespachadaData>;
 export type EmergenciaCerradaEvent = EventEnvelope<EmergenciaCerradaData>;
 
 export interface CategoryPriorityStackedData {
+  SIN_PRIORIDAD?: number;
   category: string;
   BAJA: number;
   MEDIA: number;
@@ -65,15 +66,20 @@ export interface CategoryPriorityStackedData {
 }
 
 export interface EmergencyAnalyticsData {
+  affectedCriticalityCount?: number;
+  circulationAffectedCount?: number;
+  circulationUnknownCount?: number;
   totalEmergencies: number;
   activeCount: number;
+  unknownStateCount?: number;
+  caseMetrics?: { id: string; valor: number }[];
   closedCount: number;
   emergenciesByState: { state: string; count: number }[];
   emergenciesByPriority: { priority: string; count: number }[];
-  avgDispatchTimeMinutes: number;
+  avgDispatchTimeMinutes?: number;
   avgArrivalTimeMinutes?: number;
   emergenciesByCause?: { etiqueta: string; valor: number }[];
-  resolutionByCategory?: { etiqueta: string; valor: number }[];
+  resolutionByCause?: { etiqueta: string; valor: number }[];
   avgDispatchTimeByPriority: { priority: string; minutes: number }[];
   emergenciesByCategoryStacked: CategoryPriorityStackedData[];
   availableCategories: string[];

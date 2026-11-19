@@ -1,5 +1,7 @@
 # Integración con el backend
 
+La respuesta actual de Residuos contiene **intervenciones traducidas al DTO antiguo de alertas**. Movilidad entrega afectaciones por causa. El contrato vigente y los cálculos verificados están en [Residuos y Movilidad: JSON real](contrato-residuos-movilidad-api.md); esa revisión reemplaza las descripciones históricas de alertas, viajes por estación y recorridos que siguen debajo.
+
 ## Requisitos para una prueba local
 
 1. Backend disponible en `http://localhost:8000`.
@@ -278,10 +280,11 @@ usando `SUM(cantidadEmergencias)` por `causaTipo` del endpoint principal.
 `MOVILIDAD_BICICLETA` se presenta separado de `INCIDENTE_VIAL`; no se infiere la causa a partir de la categoría TRANSITO.
 El corte consultado tiene cinco emergencias de bicicleta y ninguna fila con causa INCIDENTE_VIAL.
 
-Si llega `tiempoPromResolucion`, se calcula el promedio por categoría ponderando por
+Si llega `tiempoPromResolucion`, se calcula el promedio por causa ponderando por
 `cantidadEmergencias`, excluyendo los valores ausentes. El endpoint actual no trae ese campo.
-La métrica `c5b = 866 min` corresponde solamente a bicicletas y se mantiene identificada como tal;
-no permite calcular el promedio de todas las emergencias ni reemplazarlo por el tiempo de despacho.
+La métrica c5b corresponde solamente a bicicletas y se mantiene en su tarjeta específica;
+no llena el gráfico general de resolución ni se utiliza como tiempo de despacho. El valor de 866 min
+correspondía al corte anterior; no se conserva como constante en el frontend.
 
 ### Residuos: paradas y recorridos
 

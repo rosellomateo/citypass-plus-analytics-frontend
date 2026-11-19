@@ -1,22 +1,25 @@
 import type { ClaimsAnalyticsData, Metric } from '../../types';
-import type { CrossModuleResponse } from '../../api/types';
+import type { CrossModuleMetric, CrossModuleResponse } from '../../api/types';
 import { PART2_METRICS } from '../../config/crossModuleMetrics';
 import { MetricCard } from './MetricCard/MetricCard';
 import { claimCauseMetrics, mobilityMetricFallbacks } from '../../utils/impactMetrics';
 
-export function DashboardImpactCards({ area, data, standalone = false, excludeIds = [], claimCauses, showMissing = false }: {
+export function DashboardImpactCards({ area, data, standalone = false, excludeIds = [], claimCauses, showMissing = false, fallbackMetrics = [], calculatedMetrics = [] }: {
   area: keyof typeof PART2_METRICS;
   data: CrossModuleResponse | null;
   standalone?: boolean;
   excludeIds?: readonly string[];
   claimCauses?: ClaimsAnalyticsData['claimsByCause'];
   showMissing?: boolean;
+  fallbackMetrics?: CrossModuleMetric[];
+  calculatedMetrics?: CrossModuleMetric[];
 }) {
-  if (!data && !showMissing && !claimCauses) return null;
+  if (!data && !showMissing && !claimCauses && !fallbackMetrics.length && !calculatedMetrics.length) return null;
   const compatible = area !== 'culture' || data?.version_cultura === 2;
-  const metrics = new Map((area === 'mobility' ? mobilityMetricFallbacks(data) : []).map((metric) => [metric.id, metric]));
+  const metrics = new Map([...(area === 'mobility' ? mobilityMetricFallbacks(data) : []), ...fallbackMetrics].map((metric) => [metric.id, metric]));
   for (const metric of compatible ? data?.datos ?? [] : []) metrics.set(metric.id, metric);
   if (area === 'claims') for (const metric of claimCauseMetrics(claimCauses)) metrics.set(metric.id, metric);
+  for (const metric of calculatedMetrics) metrics.set(metric.id, metric);
   const cards: Metric[] = PART2_METRICS[area].flatMap((labels, index) =>
     labels.flatMap((label, metricIndex) => {
       const id = `c${index + 1}${metricIndex === 0 ? '' : 'b'}`;
@@ -29,7 +32,7 @@ export function DashboardImpactCards({ area, data, standalone = false, excludeId
         sublabel: area === 'mobility' && id === 'c5' ? undefined : detail || undefined, status: 'info' }];
     }),
   );
-  if (data?.eventos_publicos && (area === 'culture' || area === 'emergencies')) {
+  if (data?.eventos_publicos && area === 'emergencies') {
     cards.push({
       label: 'Eventos públicos con emergencias vinculadas',
       value: data.eventos_publicos.length,
