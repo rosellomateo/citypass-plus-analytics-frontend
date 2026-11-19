@@ -2,6 +2,10 @@
 
 Revisión del frontend local: 18/11/2026. Describe el código actual, los contratos entregados y las muestras inspeccionadas. No implica cambios en el backend ni en los Parquet.
 
+La comprobación completa de Emergencias y Espacios, incluyendo endpoints remotos y nuevos Parquet, está en [contrato Gold → API → frontend](contrato-emergencias-espacios-gold.md).
+
+**Actualización de Residuos y Movilidad, 18/11 a las 22:43 ART:** el backend cambió el significado de los campos de Residuos y entrega intervenciones en el DTO antiguo. El [contrato vigente con fórmulas por caso](contrato-residuos-movilidad-api.md) reemplaza las secciones anteriores de esos dos módulos. `mobility-stations` cuenta afectaciones: ya no completa tarjetas de estaciones distintas. No se utilizan columnas de Parquet que la API omita ni se muestran los paneles de recorridos eliminados.
+
 ## Cómo llega una actualización
 
 Los Parquet se procesan en el backend y el frontend consume el JSON de sus endpoints. Para ver un cambio debe actualizarse el agregado que devuelve la API y volver a consultarse la pantalla.
@@ -77,15 +81,15 @@ Endpoint: `GET /analytics/seguridad-emergencias`.
 |---|---|---|
 | Total de emergencias | `cantidadEmergencias` | Suma de cantidades. |
 | Emergencias cerradas | `estado_actual`, `cantidadEmergencias` | Suma para `CANCELADA`, `CERRADA`, `CERRADO`, `RESUELTA`, `DESCARTADA`, `RECHAZADO`, comparados sin distinguir mayúsculas. |
-| Emergencias activas | Los dos campos anteriores | Suma del resto de los estados. Actualmente un estado ausente también queda en este grupo. |
+| Emergencias activas | Los dos campos anteriores | Suma del resto de los estados informados. Un estado ausente se cuenta por separado como «Emergencias sin estado» y se conserva en el total. |
 | Distribución por prioridad | `prioridad`, `cantidadEmergencias` | Suma por prioridad normalizada: `CRITICA`, `ALTA`, `MEDIA`, `BAJA`; `Medio` se agrupa en `MEDIA`. |
-| Distribución por categoría | `categoria`, `prioridad`, `cantidadEmergencias` | Suma por categoría y prioridad. Requiere categoría no vacía y una de las cuatro prioridades anteriores. |
+| Distribución por categoría | `categoria`, `prioridad`, `cantidadEmergencias` | Suma por categoría y prioridad; incorpora categorías ausentes y una serie de prioridad no clasificada para conservar el total completo. |
 | Tiempo de despacho, general y por prioridad | `tiempoPromRespuestaDespacho`, `cantidadEmergencias`, `prioridad` | Promedio ponderado por cantidad. Se omiten los tiempos nulos. |
 | Tiempo promedio de llegada | `tiempoPromRespuestaLugar`, `cantidadEmergencias` | Promedio ponderado de las filas con tiempo informado y cantidad mayor que cero. |
 | Emergencias vinculadas a otros servicios | `causaTipo`, `cantidadEmergencias` | Suma por causa. `MOVILIDAD_BICICLETA` se muestra separado de `INCIDENTE_VIAL`. `EVENTO_CLIMATICO`, `RECLAMO`, `EVENTO_PUBLICO`, `RESERVA` y las demás causas recibidas se agrupan por su valor. Nulos/vacíos se muestran como causa no informada. |
-| Tiempo de resolución promedio por emergencia | `categoria`, `tiempoPromResolucion`, `cantidadEmergencias` | Si el tiempo existe, es finito y no negativo y la cantidad es mayor que cero: promedio ponderado por categoría. El endpoint inspeccionado no trae `tiempoPromResolucion`; en ese caso se muestra el valor publicado en `c5b`, identificado solamente como viajes en bicicleta. |
+| Tiempo de resolución promedio por emergencia | `causaTipo`, `tiempoPromResolucion`, `cantidadEmergencias` | Promedio por causa, nivel al que Gold repite esa medida. Se exigen tiempos finitos, no negativos y cantidades positivas. El endpoint actual omite el campo: el gráfico general no se completa con c5b, cuyo promedio de bicicleta permanece en su tarjeta propia. |
 
-Cambiar `afectaCirculacion` por sí solo no actualiza el gráfico por causa: éste lee `causaTipo`. El campo `criticidadAfectada` tampoco se recalcula directamente en el frontend; los indicadores de criticidad de Parte 2 llegan separados.
+Cambiar `afectaCirculacion` por sí solo no actualiza el gráfico por causa: éste lee `causaTipo`. Ese booleano se utiliza en la tarjeta de circulación, sumando cantidades con true y manteniendo los desconocidos separados. `criticidadAfectada` se suma para la tarjeta global de criticidad; c1 de Parte 2 sigue siendo el indicador específico de clima.
 
 ### Reclamos — `reclamos_resumen.parquet`
 
@@ -133,9 +137,9 @@ En Cultura se requiere además `version_cultura = 2` para las tarjetas de casos 
 | ID | Métrica | Dato o condición del caso que debe producir el agregado |
 |---|---|---|
 | `c1` | Eventos culturales cancelados por clima | Cancelación con `causaTipo = EVENTO_CLIMATICO`; no basta que una actividad cualquiera esté afectada por clima. El frontend usa el `valor` de c1, no vuelve a aplicar filtros de categoría/estado al Parquet. |
-| `c2` | Espacios afectados por reclamos | `EspacioPublicoAfectado`, `causaTipo = RECLAMO`; contar `espacioId` distintos. |
+| `c2` | Actividades afectadas por reclamos | En la pantalla actual: suma de `cantidadActividades` con `causaTipo = RECLAMO`. El JSON de espacios afectados aún no se entrega; esta tarjeta no afirma contar `espacioId` distintos. |
 | `c3` | Actividades masivas creadas | `ActividadCreada`, `capacidad >= 500`; publicar la cantidad correspondiente. El resumen principal muestra por separado la suma ya agregada de `cantidadMasivas`. |
-| `c4` | Espacios afectados por incidentes | `EspacioPublicoAfectado`, `causaTipo = INCIDENTE_VIAL`; contar espacios distintos. |
+| `c4` | Actividades afectadas por incidentes viales | Suma de `cantidadActividades` con `causaTipo = INCIDENTE_VIAL`; no se usa como cardinalidad de espacios distintos. |
 | `c5` | Actividades modificadas por accidentes | `ActividadModificada`, `causaTipo = ACCIDENTE_VIAL`; publicar el conteo de actividades. |
 | `c6` | Actividades de ciudadanos frente al total | `organizadorTipo = CIUDADANO` frente al total de actividades; el contrato anterior también admite `CIUADANO`. El cálculo directo de las tarjetas superiores usa el valor canónico `CIUDADANO`. |
 
@@ -229,7 +233,7 @@ El evento original `EmergenciaVinculadaAContextoZona` aporta `emergenciaId`, `re
 2. Se corrigió el mapeo de `RESUELTO`, `EN_PROCESO` y `EN_REVISION` en Reclamos.
 3. Movilidad agrupa `>1hs` y `>1h` en una sola categoría visual.
 4. El nombre Reclamos por accidentes viales se acortó visualmente, pero el c5 publicado sigue correspondiendo al caso de accidente de bicicleta.
-5. Los campos `totalVecesEventoClimatico`, `totalVecesReclamo`, `totalVecesIncidenteVial`, `totalVecesAccidenteVial`, `criticidadAfectada` y `cantidadAfectadas` no se leen directamente para recalcular las tarjetas generales del frontend. Su uso en el pipeline/Parte 2 debe comprobarse en el backend.
+5. Los cuatro contadores `totalVeces...` ahora se suman en un gráfico histórico separado de los conteos de actividades. `criticidadAfectada` se utiliza en la tarjeta global de Emergencias. Esas unidades no se sustituyen por eventos, espacios o recursos distintos.
 6. Analítica Urbana tiene hoy una portada de navegación y contratos documentados; EDA fue retirado. Los informes de IA se presentan desde `informe` y no se regeneran en el navegador por cambiar un contador.
 
 El detalle de respuestas reales, conteos y pendientes del nuevo esquema de Residuos está en [validacion-dashboards-2026-11-18.md](validacion-dashboards-2026-11-18.md).

@@ -58,6 +58,8 @@ export type {
   WasteAlertMetrics,
   WasteMockMetrics,
   WasteDashboardData,
+  WasteInterventionMetrics,
+  WasteInterventionDetail,
 } from './waste';
 
 export type * from './ai';

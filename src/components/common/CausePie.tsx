@@ -14,6 +14,8 @@ const COLORS: Record<string, string> = {
   Emergencia: '#D77A64',
   Reserva: '#4F8A72',
   'Operación normal': '#64748B',
+  'Sin causa externa': '#64748B',
+  'No informada': '#94A3B8',
 };
 
 export function CausePie({ title, points, date, description, note, filters, actions, unit }: {

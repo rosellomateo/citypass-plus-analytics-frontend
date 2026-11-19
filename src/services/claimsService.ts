@@ -5,7 +5,7 @@ import { isWithinDateRange } from '../utils/dates';
 
 export function formatClaimCategory(category: string): string {
   if (!category) return 'OTROS';
-  return category.replace(/_/g, ' ').toUpperCase();
+  return category.replace(/_/g, ' ').toUpperCase().trim();
 }
 
 export function mapClaimStatus(status: string): string {
@@ -72,7 +72,10 @@ export function getClaimsByCategoryFiltered(
   statusPillFilter?: string
 ): { category: string; count: number }[] {
   const categoriesSet = new Set<string>();
-  records.forEach((r) => categoriesSet.add(formatClaimCategory(r.categoria)));
+  records.forEach((r) => {
+    const category = formatClaimCategory(r.categoria);
+    if (category !== 'TEXTO') categoriesSet.add(category);
+  });
 
   const categoryCounts: Record<string, number> = {};
   categoriesSet.forEach((cat) => {
@@ -80,6 +83,7 @@ export function getClaimsByCategoryFiltered(
   });
 
   records.forEach((r) => {
+    if (formatClaimCategory(r.categoria) === 'TEXTO') return;
     const mappedStatus = mapClaimStatus(r.estado_actual);
     // Canceled / Rejected claims are excluded from category breakdown unless specifically selected
     if (mappedStatus === 'CANCELADO' && (!statusPillFilter || statusPillFilter === 'Todos' || statusPillFilter === 'ALL')) {
@@ -115,13 +119,18 @@ export async function getClaimsAnalyticsData(
   const filtered = getFilteredClaimRecords(filters, records);
 
   const availableCategories = Array.from(
-    new Set(filtered.map((r) => formatClaimCategory(r.categoria)))
+    new Set(filtered.map((r) => formatClaimCategory(r.categoria)).filter((category) => category !== 'TEXTO'))
   ).sort();
 
   const claimsByCategory = getClaimsByCategoryFiltered(filtered, 'Todos');
   const claimsByStatus = getClaimsByStatusFiltered(filtered, 'ALL');
 
   const totalClaims = filtered.reduce((acc, r) => acc + (r.row_count ?? 1), 0);
+  const bicycleComparison = filtered.every((row) => typeof row.vinculadoEmergenciaBici === 'boolean') ? {
+    linked: filtered.filter((row) => row.vinculadoEmergenciaBici === true).reduce((sum, row) => sum + row.row_count, 0),
+    otherRoad: filtered.filter((row) => row.vinculadoEmergenciaBici === false && ['BACHES', 'TRANSITO'].includes(formatClaimCategory(row.categoria)))
+      .reduce((sum, row) => sum + row.row_count, 0),
+  } : undefined;
   const causes = new Map<string, number>();
   for (const row of filtered) {
     const cause = row.causaTipo?.trim().toUpperCase() || 'SIN_CAUSA_INFORMADA';
@@ -166,6 +175,7 @@ export async function getClaimsAnalyticsData(
 
   return {
     totalClaims,
+    bicycleComparison,
     claimsByCause,
     claimsByCategory,
     claimsByStatus,

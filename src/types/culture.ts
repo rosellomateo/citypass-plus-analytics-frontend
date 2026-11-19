@@ -58,6 +58,9 @@ export type EventoCanceladoEvent = EventEnvelope<EventoCanceladoData>;
 
 export interface CultureAnalyticsData {
   activities?: {
+    caseMetrics?: { id: string; valor: number; unidad?: string; detalle?: { etiqueta: string; valor: number }[] }[];
+    byCause?: { etiqueta: string; valor: number }[];
+    cumulativeCauseChanges?: { etiqueta: string; valor: number }[];
     total: number;
     massive: number;
     affectedByClimate: number | null;

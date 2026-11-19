@@ -148,7 +148,7 @@ describe('Domain Services Aggregations', () => {
 
   it('Mobility service lists trips by interruption cause including normal trips', () => {
     const trips = getTripsByCause(mockMobilityRecords);
-    expect(trips[0]).toEqual({ causa: 'NORMAL', etiqueta: 'Operación normal', viajes: 36 });
+    expect(trips[0]).toEqual({ causa: 'NORMAL', etiqueta: 'Finalizados normalmente', viajes: 36 });
     expect(trips.find((t) => t.causa === 'INCIDENTE_VIAL')?.viajes).toBe(12);
   });
 

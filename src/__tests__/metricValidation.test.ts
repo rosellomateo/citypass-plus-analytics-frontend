@@ -42,7 +42,7 @@ it('keeps NORMAL out of station affectations but counts it as finished trips, wi
 
   expect(getAffectationsByCause(records).map(({ causa }) => causa)).toEqual(['INCIDENTE_VIAL']);
   expect(getTripsByCause(records)).toEqual([
-    { causa: 'NORMAL', etiqueta: 'Operación normal', viajes: 36 },
+    { causa: 'NORMAL', etiqueta: 'Finalizados normalmente', viajes: 36 },
     { causa: 'INCIDENTE_VIAL', etiqueta: 'Incidente vial', viajes: 12 },
   ]);
   expect(records).toEqual(original);
