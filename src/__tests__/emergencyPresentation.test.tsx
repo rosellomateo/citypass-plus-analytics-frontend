@@ -41,8 +41,11 @@ it('keeps useful totals and bicycle time while removing duplicate case cards, un
   }
   expect(screen.getByRole('article', { name: 'KPI: Tiempo promedio de resolución de emergencias durante viajes en bicicleta' })).toHaveTextContent('492,3');
   expect(screen.queryByText('Tiempo de resolución promedio por emergencia')).not.toBeInTheDocument();
-  expect(screen.getByRole('region', { name: 'Cambios de criticidad' })).toHaveTextContent('"etiqueta":"Evento público","valor":2');
-  expect(screen.getByRole('region', { name: 'Cambios de criticidad' })).toHaveTextContent('"etiqueta":"Sin causa informada","valor":1');
+  expect(screen.queryByText('Emergencias con criticidad afectada')).not.toBeInTheDocument();
+  expect(screen.queryByRole('table')).not.toBeInTheDocument();
+  for (const title of ['Emergencias por causa', 'Tiempo Promedio de Despacho por Prioridad', 'Distribución por Prioridad', 'Distribución por Categoría']) {
+    expect(screen.getByText(title)).toBeInTheDocument();
+  }
   expect(screen.queryByText('Emergencias con criticidad aumentada')).not.toBeInTheDocument();
 });
 
