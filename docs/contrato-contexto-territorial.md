@@ -1,7 +1,9 @@
 # Datos para el impacto de eventos públicos en un radio de 500 metros
 
 El cálculo ya está implementado en el frontend. No se modificó el backend.
-El mock incluye ejemplos en `testingDatos/contexto-territorial.mjs`, ignorado por Git.
+Los ejemplos de prueba permanecen en `testingDatos/contexto-territorial.mjs`, ignorado por Git; el mock de revisión usa las respuestas capturadas del backend sin agregar vínculos inexistentes.
+
+El sector de criticidad afectada de Emergencias fue retirado por indicación del usuario porque no habrá detalle individual. No se agrega una tabla ni se solicita ampliar el backend para ese sector. El contrato territorial siguiente queda como referencia opcional para los demás recursos.
 
 ## Qué se calcula en el navegador
 
@@ -104,7 +106,7 @@ Coordenadas WGS84 en orden GeoJSON **`[longitud, latitud]`**, fechas ISO 8601 co
 |---|---|---|
 | Evento público | `evento_id`, `coordenadas`, `inicio`, `fin`; radio 500 m por defecto | `nombre`, `zona`, `tipo`, `estado`, `radio_metros` |
 | `recorrido_residuos` | `recurso_id`, `trazado` de al menos dos coordenadas, `desde`, `hasta` | `nombre`, `zona`, `estado` |
-| `emergencia` | `recurso_id`, `coordenadas`, `creado_en` | Tipo en `nombre`, `zona`, `estado`, `criticidad`, `criticidad_original`, `criticidad_elevada`, `respondida` |
+| `emergencia` | No se solicita ampliar los datos | El sector de criticidad afectada fue retirado por falta de detalle individual |
 | `estacion` | `recurso_id`, `coordenadas` | `nombre`, `zona`, `desde`, `hasta`, `estado` |
 | `alerta_residuos` | `recurso_id`, `coordenadas`, `creado_en` | `nombre`, `zona` |
 | `intervencion_residuos` | `recurso_id`, `coordenadas`, `creado_en` | `nombre`, `zona`, `estado` |
@@ -136,7 +138,7 @@ Este endpoint separado es una propuesta y **no se invoca actualmente**. Si se im
 - Espacios Públicos: barras de cantidad de actividades/eventos por zona a partir de `zona` o `barrio` y `cantidadActividades`; al final, selector de evento y conteos por recurso dentro de su radio y horario.
 - Residuos: lista evento–recorrido, zona y distancia mínima al trazado. Dos eventos próximos al mismo recorrido generan dos relaciones y un único recorrido en el contador de IDs distintos.
 - Movilidad: lista de estaciones cercanas, evento asociado, zona y distancia. No modifica el bloqueo real de la estación.
-- Emergencias: lista de emergencias dentro del radio, ordenadas por criticidad informada. La vista de aumentos confirmados usa `criticidad_elevada = true` o una prioridad original y actual válidas que demuestren el aumento. La proximidad sin esos datos queda separada de la confirmación.
+- Emergencias: sector de criticidad afectada retirado. No se genera una lista individual desde los contadores agregados.
 - Reclamos, alertas e intervenciones: conteos espaciales en la ficha del evento cuando se entreguen sus coordenadas y tiempos.
 
 Los resultados publicados en `eventos_zona`, `emergencias_zona` y `afectaciones.recorridos_eventos` se conservan y tienen prioridad sobre las relaciones derivadas. El front no persiste alteraciones en servicios de otros grupos, no inventa cuánto debe subir una prioridad y no modifica los Parquet.

@@ -1,7 +1,5 @@
 import { DashboardImpactCharts } from '../components/common/DashboardImpactCharts';
 import { EmergencyCausesChart } from '../components/emergencies/EmergencyCausesChart';
-import { EmergencyCriticalityChart } from '../components/emergencies/EmergencyCriticalityChart';
-import { EmergencyZonePanel } from '../components/common/EmergencyZonePanel';
 import { useDashboardImpact } from '../hooks/useDashboardImpact';
 // src/pages/EmergenciesDashboard.tsx
 import { DashboardHeader } from '../components/common/DashboardHeader/DashboardHeader';
@@ -169,8 +167,6 @@ export function EmergenciesDashboard() {
         </>
       ) : null}
       <DashboardImpactCharts area="emergencies" {...impact} emergencyData={resolved.data} />
-      <EmergencyZonePanel data={impact.data} loading={impact.loading} filters={filters} />
-      {resolved.data && <EmergencyCriticalityChart data={resolved.data} />}
     </div>
   );
 }

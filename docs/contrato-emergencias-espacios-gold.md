@@ -2,6 +2,8 @@
 
 La presentación se simplificó el 19/11: [ajustes vigentes](ajustes-presentacion-2026-11-19.md). Los valores numéricos que siguen corresponden a la captura histórica del 18/11.
 
+El sector de criticidad afectada se retiró definitivamente por falta de detalle individual. No se agrega una tabla individual ni se solicitan nuevos datos al backend; los demás gráficos y métricas se conservan.
+
 Verificación del 18/11/2026: código remoto de `main` y `develop` del backend, OpenAPI desplegado, respuestas autenticadas y los cuatro Parquet descargados en `D:/Descargas`. Los Parquet se leyeron completos, sin modificarlos; sus hashes SHA-256 antes/después coinciden. Los datos completos y las herramientas de lectura quedan sólo en `testingDatos/`.
 
 ## Endpoints existentes y limitaciones verificadas
@@ -31,7 +33,7 @@ La copia local del backend estaba en otra rama; la verificación del contrato se
 | Activas | `estado_actual`, `cantidadEmergencias` | Estados no cerrados con estado informado. Las filas sin estado forman su propio grupo. |
 | Cerradas | Los anteriores | CANCELADA, CERRADA, CERRADO, RESUELTA, DESCARTADA y RECHAZADO, normalizados sin distinguir mayúsculas. |
 | Sin estado | Los anteriores | Suma de cantidades con estado ausente; se conserva dentro del total, sin tarjeta independiente. |
-| Criticidad afectada | `criticidadAfectada`, `causaTipo` | Gráfico al final del tablero con la suma por causa del contador ya agregado. No se multiplica por `cantidadEmergencias` ni se deduce un aumento de prioridad o un vínculo con un evento cercano. |
+| Criticidad afectada | `criticidadAfectada`, `causaTipo` | El campo puede llegar en el JSON, pero se retiró su sector de la pantalla. No se construye una tabla individual desde este contador. |
 | Circulación afectada | `afectaCirculacion`, `cantidadEmergencias` | Suma de cantidades donde el booleano es `true`. `false` y desconocido se distinguen; la tarjeta muestra cuántas quedan sin confirmación. |
 | Recuento por estado | `estado_actual`, `cantidadEmergencias` | Modelo utilizado para las tarjetas; conserva todos los estados, incluido el grupo sin estado. |
 | Distribución por prioridad | `prioridad`, `cantidadEmergencias` | CRITICA, ALTA, MEDIA y BAJA; MEDIO se interpreta como MEDIA. Ausentes se mantienen como sin prioridad. |

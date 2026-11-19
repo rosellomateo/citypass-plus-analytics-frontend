@@ -8,9 +8,9 @@ Se mantiene la fuente JSON del backend. No se modificaron el backend ni los Parq
 - Se retiran las tarjetas repetidas por causa, la tarjeta sin estado y la tarjeta general de criticidad. Los registros sin estado siguen incluidos en los totales y distribuciones.
 - Los recursos por incidente vial sólo se muestran si existe un `datos[id=c4b].valor` explícito en `/analytics/emergencies/parte2`. No se deduce un cero a partir de la ausencia de emergencias por esa causa.
 - Se elimina el gráfico vacío de resolución general. Sólo se muestra cuando el JSON principal contiene promedios válidos en `tiempoPromResolucion`. Mientras no exista ese campo, se conserva la tarjeta de resolución de bicicleta con el c5b recibido.
-- Al final se muestra «Emergencias con criticidad afectada», agrupando y sumando `criticidadAfectada` por `causaTipo`. No se multiplica ese contador por `cantidadEmergencias`.
+- Se retiró el sector «Emergencias con criticidad afectada» porque no habrá detalle individual. No se agrega una tabla de reemplazo; los demás gráficos permanecen.
 
-La API consultada el 19/11 a las 00:04 ART devuelve un cambio de criticidad con causa vacía y sin ID de evento, coordenadas ni criticidad anterior. Por eso el gráfico presenta «Sin causa informada» y no atribuye ese cambio a un aumento por un evento cercano. Con este contrato no se puede verificar la regla de 500 metros ni la dirección del cambio. El schema remoto sigue omitiendo `tiempoPromResolucion`; c5b sí está publicado en Parte 2.
+La API consultada el 19/11 devuelve un cambio de criticidad con causa vacía y sin ID de evento, coordenadas ni criticidad anterior. Ese agregado no permite identificar las emergencias afectadas por un evento; como no habrá detalle individual, se retiró el sector sin agregar un reemplazo. El schema remoto sigue omitiendo `tiempoPromResolucion`; c5b sí está publicado en Parte 2.
 
 ## Movilidad
 
