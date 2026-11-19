@@ -4,7 +4,7 @@ import styles from './ChartCard.module.css';
 import { CHART_HEIGHT } from '../../charts/chartTheme';
 
 interface ChartCardProps {
-  title: string;
+  title: ReactNode;
   subtitle?: string;
   children: ReactNode;
   actions?: ReactNode;
@@ -30,7 +30,7 @@ export function ChartCard({
     <div className={styles.card}>
       <div className={centerActions ? `${styles.header} ${styles.centeredHeader}` : styles.header}>
         <div className={styles.titleGroup}>
-          <span className={styles.title}>{title}</span>
+          <div className={styles.title}>{title}</div>
           {subtitle && <span className={styles.subtitle}>{subtitle}</span>}
         </div>
         {actions && <div className={styles.actions}>{actions}</div>}

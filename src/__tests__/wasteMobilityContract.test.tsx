@@ -1,5 +1,6 @@
 import { MantineProvider } from '@mantine/core';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import type { CrossModuleResponse, MobilityApiRecord, WasteApiRecord } from '../api/types';
@@ -120,7 +121,31 @@ it('uses the same primary mobility population for cards and the station pie, ign
   expect(screen.queryByRole('button', { name: 'Filtrar por estación' })).not.toBeInTheDocument();
   const pies = screen.getAllByTestId('pie');
   expect(pies.at(-1)).toHaveTextContent('"name":"Reclamo","value":35');
+  expect(screen.queryByText('Afectaciones de estaciones por causa')).not.toBeInTheDocument();
+  for (const name of ['Estaciones distintas', 'Estaciones distintas bloqueadas', 'Viajes']) {
+    expect(screen.queryByRole('columnheader', { name })).not.toBeInTheDocument();
+  }
+  expect(card('Viajes interrumpidos por emergencias').parentElement).toBe(card('Afectaciones de estaciones').parentElement);
   const bars = screen.getAllByTestId('bar');
   expect(bars.at(-1)).not.toHaveTextContent('"key":"preventivas"');
-  expect(bars.at(0)).toHaveTextContent('"key":"preventivas"');
+});
+
+it('orders waste states and counts interventions rather than aggregate rows when filtering the detail', async () => {
+  const user = userEvent.setup();
+  const data = mapWasteApiData(wasteRows().reverse(), filters);
+  if (data.mode !== 'interventions') throw new Error('Wrong contract');
+  render(wrap(<WasteInterventionsDashboard data={data} report={null} filters={filters} onFilterChange={vi.fn()} />));
+  expect(screen.queryByText(/detectadas/)).not.toBeInTheDocument();
+  const rows = screen.getAllByRole('row').slice(1);
+  expect(rows.map((row) => within(row).getAllByRole('cell')[1].textContent)).toEqual([
+    'Afectada', 'Afectada', 'Afectada', 'Programada', 'Cancelada', 'Completada',
+  ]);
+  expect(screen.queryByRole('columnheader', { name: 'Completadas' })).not.toBeInTheDocument();
+  await user.click(screen.getByRole('textbox', { name: 'Causa de afectación de intervenciones' }));
+  await user.click(screen.getByRole('option', { name: 'Incidente vial' }));
+  expect(screen.getByRole('status')).toHaveTextContent('6 detectadas');
+  await user.click(screen.getByRole('textbox', { name: 'Estado de intervenciones' }));
+  await user.click(screen.getByRole('option', { name: 'Afectada' }));
+  expect(screen.getByRole('status')).toHaveTextContent('2 detectadas');
+  expect(screen.getAllByRole('row')).toHaveLength(2);
 });

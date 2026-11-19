@@ -69,6 +69,10 @@ body {
   gap: var(--space-4, 16px);
 }
 
+.mobility-metrics {
+  grid-auto-rows: 1fr;
+}
+
 .section[id] {
   scroll-margin-top: 80px;
 }

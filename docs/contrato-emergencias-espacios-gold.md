@@ -1,5 +1,7 @@
 # Emergencias y Espacios: contrato Gold → API → frontend
 
+La presentación se simplificó el 19/11: [ajustes vigentes](ajustes-presentacion-2026-11-19.md). Los valores numéricos que siguen corresponden a la captura histórica del 18/11.
+
 Verificación del 18/11/2026: código remoto de `main` y `develop` del backend, OpenAPI desplegado, respuestas autenticadas y los cuatro Parquet descargados en `D:/Descargas`. Los Parquet se leyeron completos, sin modificarlos; sus hashes SHA-256 antes/después coinciden. Los datos completos y las herramientas de lectura quedan sólo en `testingDatos/`.
 
 ## Endpoints existentes y limitaciones verificadas
@@ -28,8 +30,8 @@ La copia local del backend estaba en otra rama; la verificación del contrato se
 | Total de emergencias | `cantidadEmergencias` | Suma del campo, no cantidad de filas. |
 | Activas | `estado_actual`, `cantidadEmergencias` | Estados no cerrados con estado informado. Las filas sin estado forman su propio grupo. |
 | Cerradas | Los anteriores | CANCELADA, CERRADA, CERRADO, RESUELTA, DESCARTADA y RECHAZADO, normalizados sin distinguir mayúsculas. |
-| Sin estado | Los anteriores | Suma de cantidades con estado ausente; se conserva dentro del total. |
-| Criticidad afectada | `criticidadAfectada` | Suma del contador ya agregado, como hace el backend. No se multiplica otra vez por `cantidadEmergencias` ni se deduce de prioridad ALTA/CRITICA. Se mantiene separado del caso 1, que exige vínculo climático. |
+| Sin estado | Los anteriores | Suma de cantidades con estado ausente; se conserva dentro del total, sin tarjeta independiente. |
+| Criticidad afectada | `criticidadAfectada`, `causaTipo` | Gráfico al final del tablero con la suma por causa del contador ya agregado. No se multiplica por `cantidadEmergencias` ni se deduce un aumento de prioridad o un vínculo con un evento cercano. |
 | Circulación afectada | `afectaCirculacion`, `cantidadEmergencias` | Suma de cantidades donde el booleano es `true`. `false` y desconocido se distinguen; la tarjeta muestra cuántas quedan sin confirmación. |
 | Recuento por estado | `estado_actual`, `cantidadEmergencias` | Modelo utilizado para las tarjetas; conserva todos los estados, incluido el grupo sin estado. |
 | Distribución por prioridad | `prioridad`, `cantidadEmergencias` | CRITICA, ALTA, MEDIA y BAJA; MEDIO se interpreta como MEDIA. Ausentes se mantienen como sin prioridad. |
@@ -42,8 +44,8 @@ La copia local del backend estaba en otra rama; la verificación del contrato se
 | Reclamos, caso 2 | c2 de Parte 2 | Se conserva el valor publicado. |
 | Preventivas, caso 3 | `categoria = PREVENTIVA`, `causaTipo = EVENTO_PUBLICO`, `cantidadEmergencias` | Respaldo cuando falta c3. Cuenta emergencias preventivas, no recursos distintos ni capacidad del evento. |
 | Incidentes, caso 4 | `causaTipo = INCIDENTE_VIAL`, `cantidadEmergencias` | Respaldo cuando falta c4; no afirma que el incidente esté programado, porque esa información no llega. |
-| Recursos por incidente | c4b de Parte 2 | Sólo se puede afirmar cero desde el resumen cuando no hay emergencias vinculadas a INCIDENTE_VIAL. Con incidentes presentes, se necesita el agregado y criterio de recursos del backend. |
-| Bicicleta, casos 5/5b | c5/c5b de Parte 2 | El tiempo de bicicleta permanece en su tarjeta propia. No llena el gráfico de todas las causas si falta el campo de resolución. |
+| Recursos por incidente | c4b de Parte 2 | Sólo se muestra un valor explícito publicado por el backend. No se infieren recursos desde los estados ni desde la ausencia de emergencias. |
+| Bicicleta, casos 5/5b | c5/c5b de Parte 2 | Se retira la tarjeta de cantidad, ya presente en el gráfico de causas. El tiempo de bicicleta permanece en su tarjeta propia sólo si no hay promedios generales disponibles. |
 | Evento ciudadano, caso 6 | c6 de Parte 2 | Se conserva el valor publicado; no se reparte EVENTO_PUBLICO entre los casos 3 y 6 sin un vínculo. |
 
 Comprobaciones del archivo y JSON inspeccionados: **186 emergencias = 174 cerradas + 11 activas + 1 sin estado**. El gráfico por categoría ahora incluye las 186. `SUM(criticidadAfectada) = 1`; circulación: **45 true, 51 false y 90 desconocidas**, ponderadas por `cantidadEmergencias`. Las 41 filas son agregados, no 41 emergencias.
@@ -66,8 +68,8 @@ El archivo completo sí contiene `tiempoPromResolucion`, aunque no se ve en toda
 | Ciudadanos frente al total, caso 6 | `organizadorTipo`, `cantidadActividades` | Incluye el denominador completo, ciudad y sin organizador en el detalle. |
 | Cantidad por zona | `barrio`, `cantidadActividades` | Agrupa por barrio; ausentes permanecen en «Sin zona informada». |
 | Cantidad por categoría | `categoria`, `cantidadActividades` | Normalización visual de variantes equivalentes y dañadas como Música/M�sica; se conserva el total. No se reescribe el Parquet. |
-| Causas de afecto | `culture-cause`, respaldo `causaTipo` + `cantidadActividades` | Distribución de actividades con causa informada. No equivale a sumar todos los cambios históricos. |
-| Afectaciones acumuladas por causa | `totalVecesEventoClimatico`, `totalVecesReclamo`, `totalVecesIncidenteVial`, `totalVecesAccidenteVial` | Nuevo gráfico de sumas de los contadores. Una misma actividad puede haber registrado varias afectaciones. No se presentan esas cantidades como actividades distintas. |
+| Actividades afectadas por causa | `causaTipo` + `cantidadActividades`, respaldo `culture-cause` | Barras horizontales de actividades con causa informada. No equivale a sumar todos los cambios históricos. |
+| Afectaciones acumuladas por causa | `totalVecesEventoClimatico`, `totalVecesReclamo`, `totalVecesIncidenteVial`, `totalVecesAccidenteVial` | El gráfico fue retirado de la pantalla el 19/11. Los contadores históricos no se usan para inflar la cantidad de actividades por causa. |
 
 Archivo inspeccionado: **162 actividades, 56 masivas, 37 afectadas por clima, 19 de ciudadanos, 77 de la ciudad y 66 sin organizador**. Casos 1–6: **30, 16, 56, 16, 12 y 19 de 162**. Historial: **154, 54, 54 y 45** para clima, reclamos, incidentes y accidentes, respectivamente. Son poblaciones distintas.
 

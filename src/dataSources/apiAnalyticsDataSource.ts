@@ -130,9 +130,6 @@ export function mapEmergencyApiData(
     const incidents = filtered.filter((row) => row.causaTipo?.trim().toUpperCase() === 'INCIDENTE_VIAL');
     const count = incidents.reduce((total, row) => total + numberOrZero(row.cantidadEmergencias), 0);
     caseMetrics.push({ id: 'c4', valor: count });
-    // No linked emergencies implies no incident-linked dispatches. With incidents present,
-    // current state alone cannot establish how many distinct resources were sent.
-    if (count === 0) caseMetrics.push({ id: 'c4b', valor: 0 });
     if (filtered.every((row) => row.categoria !== undefined)) caseMetrics.push({ id: 'c3', valor: filtered
       .filter((row) => row.categoria?.trim().toUpperCase() === 'PREVENTIVA' && row.causaTipo?.trim().toUpperCase() === 'EVENTO_PUBLICO')
       .reduce((total, row) => total + numberOrZero(row.cantidadEmergencias), 0) });
@@ -168,10 +165,14 @@ export function mapEmergencyApiData(
   );
 
   const causes = new Map<string, number>([[emergencyCause('INCIDENTE_VIAL'), 0]]);
+  const criticalityCauses = new Map<string, number>();
   const resolutions = new Map<string, Array<{ value: number; weight: number }>>();
   for (const row of filtered) {
     const label = emergencyCause(row.causaTipo);
     causes.set(label, (causes.get(label) ?? 0) + numberOrZero(row.cantidadEmergencias));
+    if (typeof row.criticidadAfectada === 'number' && Number.isFinite(row.criticidadAfectada) && row.criticidadAfectada >= 0) {
+      criticalityCauses.set(label, (criticalityCauses.get(label) ?? 0) + row.criticidadAfectada);
+    }
     if (row.tiempoPromResolucion != null && Number.isFinite(row.tiempoPromResolucion) &&
         row.tiempoPromResolucion >= 0 && (row.cantidadEmergencias ?? 0) > 0) {
       const values = resolutions.get(label) ?? [];
@@ -181,6 +182,7 @@ export function mapEmergencyApiData(
   }
 
   return {
+    affectedCriticalityByCause: criticalityCauses.size ? [...criticalityCauses].map(([etiqueta, valor]) => ({ etiqueta, valor })) : undefined,
     affectedCriticalityCount: filtered.every((row) => typeof row.criticidadAfectada === 'number' && Number.isFinite(row.criticidadAfectada) && row.criticidadAfectada >= 0)
       ? filtered.reduce((sum, row) => sum + row.criticidadAfectada!, 0) : undefined,
     circulationAffectedCount: filtered.some((row) => typeof row.afectaCirculacion === 'boolean') || filtered.length === 0

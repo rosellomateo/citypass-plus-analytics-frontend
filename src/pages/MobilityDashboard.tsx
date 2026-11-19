@@ -16,7 +16,7 @@ import { MetricsGridSkeleton, ChartSkeleton } from '../components/common/Loading
 import { useFilters } from '../hooks/useFilters';
 import { useMobilityData } from '../hooks/useMobilityData';
 import { useResolvedUiState } from '../hooks/useUiState';
-import { CAUSA_NORMAL, causeLabel } from '../services/mobilityService';
+import { causeLabel } from '../services/mobilityService';
 
 // Colores por causa (los mismos tonos que usa el resto de los tableros).
 const CAUSE_COLORS: Record<string, string> = {
@@ -40,7 +40,6 @@ export function MobilityDashboard() {
   const data = resolved.data;
   const records = useMemo(() => data?.records ?? [], [data]);
 
-  // Gráfico 1: afectaciones, bloqueos y restauraciones por causa.
   const affectationsByCause = data?.affectationsByCause ?? [];
 
   // Gráfico 2: viajes interrumpidos por causa vs. finalizados normalmente (caso 5).
@@ -77,7 +76,7 @@ export function MobilityDashboard() {
         <>
           {/* KPIs principales: totales del resumen por causa de gold */}
           <div className="section">
-            <div className="metrics-grid-6">
+            <div className="metrics-grid-4 mobility-metrics">
               <MetricCard
                 metric={{
                   label: 'Afectaciones de estaciones',
@@ -127,39 +126,18 @@ export function MobilityDashboard() {
                 }}
                 action={<Anchor href="#viajes-afectados" size="sm">Ver viajes afectados</Anchor>}
               />
-            </div>
-            <div className="metrics-grid-4">
               <DashboardImpactCards area="mobility" data={caseReport} showMissing />
             </div>
           </div>
 
           {/* Sección de Visualizaciones */}
           <div className="section">
-            <div className="charts-grid-2">
-              <ChartCard
-                title="Afectaciones de estaciones por causa"
-                subtitle="Afectaciones, bloqueos y restauraciones por causa"
-              >
-                <BarChart
-                  data={affectationsByCause}
-                  xKey="etiqueta"
-                  bars={[
-                    { key: 'afectaciones', label: 'Afectaciones', color: '#2563A6' },
-                    { key: 'bloqueadas', label: 'Bloqueos', color: '#EF4444' },
-                    { key: 'restauradas', label: 'Restauradas', color: '#10B981' },
-                    { key: 'preventivas', label: 'Preventivas', color: '#F59E0B' },
-                  ]}
-                  height={350} showLegend scrollable minWidth={Math.max(600, affectationsByCause.length * 130)}
-                />
-              </ChartCard>
-
               <ChartCard
                 title="Viajes interrumpidos y finalizados normalmente"
                 subtitle="Interrumpidos por causa frente a finalizados normalmente"
               >
-                <PieChart data={tripsByCauseData} height={280} />
+                <PieChart data={tripsByCauseData} height={320} />
               </ChartCard>
-            </div>
           </div>
 
           <div className="section">
@@ -205,13 +183,9 @@ export function MobilityDashboard() {
                 columns={[
                   { key: 'causa', label: 'Causa', render: (row: any) => row.causa },
                   { key: 'cantidadAfectaciones', label: 'Afectaciones', width: '120px' },
-                  { key: 'estacionesAfectadasDistintas', label: 'Estaciones distintas', width: '150px' },
                   { key: 'cantidadBloqueadas', label: 'Bloqueos', width: '100px' },
-                  { key: 'estacionesBloqueadasDistintas', label: 'Estaciones distintas bloqueadas', width: '150px' },
                   { key: 'cantidadPreventivas', label: 'Preventivas', width: '110px' },
                   { key: 'cantidadRestauradas', label: 'Restauradas', width: '110px' },
-                  { key: 'cantidadViajesInterrumpidos', label: 'Viajes', width: '90px',
-                    render: (row: any) => <span title={row.causaTipo === CAUSA_NORMAL ? 'Viajes finalizados normalmente' : 'Viajes interrumpidos por esta causa'}>{row.cantidadViajesInterrumpidos}</span> },
                 ]}
                 data={records.map((r) => ({ ...r, causa: causeLabel(r.causaTipo), _id: r.causaTipo || 'SIN_CAUSA' }))}
                 keyField="_id"

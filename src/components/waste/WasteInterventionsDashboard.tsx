@@ -14,6 +14,7 @@ import { MetricCard } from '../common/MetricCard/MetricCard';
 
 const STATE_COLORS: Record<string, string> = { AFECTADA: '#C83E4D', PROGRAMADA: '#2563A6', CANCELADA: '#D99838', COMPLETADA: '#4F8A72' };
 const stateLabel = (state: string) => state.charAt(0) + state.slice(1).toLowerCase();
+const STATE_ORDER = ['AFECTADA', 'PROGRAMADA', 'CANCELADA', 'COMPLETADA'];
 
 export function WasteInterventionsDashboard({ data, report, filters, onFilterChange }: {
   data: WasteInterventionMetrics;
@@ -23,7 +24,10 @@ export function WasteInterventionsDashboard({ data, report, filters, onFilterCha
 }) {
   const [state, setState] = useState<string | null>(null);
   const [affection, setAffection] = useState<string | null>(null);
-  const detail = data.details.filter((row) => (!state || row.state === state) && (!affection || row.affectionCause === affection));
+  const detail = data.details.filter((row) => (!state || row.state === state) && (!affection || row.affectionCause === affection))
+    .sort((a, b) => STATE_ORDER.indexOf(a.state) - STATE_ORDER.indexOf(b.state));
+  const hasDetailFilters = Boolean(state || affection || data.filtered);
+  const detected = detail.reduce((total, row) => total + row.interventions, 0);
   // c5 uses origenProgramacion, which the primary endpoint omits. Only use
   // the published Parte 2 metric for the same unfiltered snapshot.
   const sameCut = report?.fecha_snapshot?.slice(0, 10) === data.snapshotDate.slice(0, 10);
@@ -73,7 +77,9 @@ export function WasteInterventionsDashboard({ data, report, filters, onFilterCha
       </div>
     </section>
     <section className="section">
-      <ChartCard title="Detalle de intervenciones" actions={<Group gap="xs" justify="flex-end">
+      <ChartCard title={<Group gap="xs"><span>Detalle de intervenciones</span>
+        {hasDetailFilters && <Badge variant="light" color="blue" role="status">{detected.toLocaleString('es-AR')} detectadas</Badge>}
+      </Group>} actions={<Group gap="xs" justify="flex-end">
         <Select aria-label="Estado de intervenciones" placeholder="Todos los estados" size="xs" w={160} clearable value={state} onChange={setState}
           data={data.availableStates.map((value) => ({ value, label: stateLabel(value) }))} />
         <Select aria-label="Causa de afectación de intervenciones" placeholder="Todas las afectaciones" size="xs" w={200} clearable searchable
@@ -84,7 +90,7 @@ export function WasteInterventionsDashboard({ data, report, filters, onFilterCha
           { key: 'state', label: 'Estado', render: (row) => <Badge variant="light" color={STATE_COLORS[row.state]}>{stateLabel(row.state)}</Badge> },
           { key: 'schedulingCause', label: 'Causa de programación', render: (row) => wasteCauseLabel(row.schedulingCause) },
           { key: 'affectionCause', label: 'Causa de afectación', render: (row) => wasteCauseLabel(row.affectionCause) },
-          { key: 'interventions', label: 'Intervenciones' }, { key: 'completed', label: 'Completadas' },
+          { key: 'interventions', label: 'Intervenciones' },
         ]} />
       </ChartCard>
     </section>
